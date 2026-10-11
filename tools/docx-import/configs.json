@@ -1,0 +1,1065 @@
+{
+ "01_TypeScript_Penuh": {
+  "chapter": 1,
+  "lang": "ts"
+ },
+ "05_GraphQL": {
+  "chapter": 1,
+  "lang": "go"
+ },
+ "50_Soal_Advanced_React_SpringBoot": {
+  "chapter": 1,
+  "lang": "ts",
+  "qa_size": 24
+ },
+ "Algoritma_Java": {
+  "chapter": 2,
+  "lang": "java"
+ },
+ "Angular-Pemula-sampai-Mahir": {
+  "chapter": 1,
+  "lang": "ts"
+ },
+ "Backend_Go_PencatatKeuangan_API": {
+  "chapter": 1,
+  "lang": "go"
+ },
+ "Belajar-React-TypeScript-Lengkap": {
+  "chapter": 1,
+  "lang": "ts"
+ },
+ "Belajar_GoLang_Pemula_ke_Mahir": {
+  "chapter": 1,
+  "lang": "go"
+ },
+ "Design_Patterns_Java": {
+  "chapter": 1,
+  "lang": "java",
+  "size_levels": {
+   "36": 1,
+   "28": 2,
+   "24": 3
+  },
+  "part_min_size": 60
+ },
+ "Django_FinancialTracker_1_Fondasi": {
+  "chapter": 2,
+  "lang": "python"
+ },
+ "Django_FinancialTracker_2_Produksi": {
+  "chapter": 2,
+  "lang": "python"
+ },
+ "Docker-Kubernetes-Pemula-sampai-Mahir": {
+  "chapter": 1,
+  "lang": "bash"
+ },
+ "English_Vocabulary_and_Phrasal_Verbs_v3": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "Express_FinancialTracker_1_Fondasi": {
+  "chapter": 2,
+  "lang": "js"
+ },
+ "Express_FinancialTracker_2_Produksi": {
+  "chapter": 2,
+  "lang": "js"
+ },
+ "FastAPI_FinancialTracker_1_Fondasi": {
+  "chapter": 2,
+  "lang": "python"
+ },
+ "FastAPI_FinancialTracker_2_Produksi": {
+  "chapter": 2,
+  "lang": "python"
+ },
+ "Flutter-Panduan-Lengkap": {
+  "chapter": 1,
+  "lang": "dart"
+ },
+ "Golang_Masterclass_Lengkap": {
+  "chapter": 1,
+  "lang": "go"
+ },
+ "Materi-Java-SpringBoot-Pemula-sampai-Mahir": {
+  "chapter": 1,
+  "lang": "java"
+ },
+ "SpringBoot_Panduan_Lengkap": {
+  "chapter": 2,
+  "lang": "java"
+ },
+ "Panduan_Distributed_System_Spring_Boot": {
+  "chapter": 1,
+  "lang": "java"
+ },
+ "Struktur_Data_Java_Interview": {
+  "chapter": 1,
+  "lang": "java"
+ },
+ "Modul_Rust_Pemula_hingga_Mahir": {
+  "chapter": 1,
+  "lang": "rust"
+ },
+ "Nest_FinancialTracker_1_Fondasi": {
+  "chapter": 2,
+  "lang": "ts"
+ },
+ "Nest_FinancialTracker_2_Produksi": {
+  "chapter": 2,
+  "lang": "ts"
+ },
+ "Panduan-Arsitektur-dan-Performa-Sistem": {
+  "chapter": 1,
+  "lang": "java"
+ },
+ "Panduan_Backend_Platform_Engineering": {
+  "chapter": 1,
+  "lang": "yaml"
+ },
+ "Panduan_Belajar_Database_SQL_NoSQL": {
+  "chapter": 1,
+  "lang": "sql"
+ },
+ "SQL-Pemula-sampai-Mahir": {
+  "chapter": 1,
+  "lang": "sql"
+ },
+ "Proyek_React_PencatatKeuangan": {
+  "chapter": 1,
+  "lang": "js"
+ },
+ "Proyek_React_PencatatKeuangan_v2_SemuaHooks": {
+  "chapter": 1,
+  "lang": "js"
+ },
+ "React_Masterclass_Hooks_State_Performa": {
+  "chapter": 1,
+  "lang": "js"
+ },
+ "React_Panduan_Konsolidasi": {
+  "chapter": 2,
+  "lang": "js"
+ },
+ "ReactNative_PencatatKeuangan_Mobile": {
+  "chapter": 1,
+  "lang": "js"
+ },
+ "Software_Testing_Lengkap": {
+  "chapter": 1,
+  "lang": "js"
+ },
+ "03-DataAI-Roadmap-Komprehensif": {
+  "chapter": 2,
+  "lang": "python"
+ },
+ "03-DataAI-Fase1-LLM-Engineering": {
+  "chapter": 2,
+  "lang": "python"
+ },
+ "03-DataAI-Fase2-Fine-Tuning-Evaluasi": {
+  "chapter": 2,
+  "lang": "python"
+ },
+ "03-DataAI-Fase3-MLOps": {
+  "chapter": 2,
+  "lang": "python"
+ },
+ "03-DataAI-Fase4-Data-Engineering": {
+  "chapter": 2,
+  "lang": "python"
+ },
+ "01-Web-Fase1-Modern-Rendering-Edge": {
+  "chapter": 1,
+  "lang": "ts"
+ },
+ "01-Web-Fase2-API-Design-Type-Safety": {
+  "chapter": 1,
+  "lang": "ts"
+ },
+ "01-Web-Fase3-Performance-Engineering": {
+  "chapter": 1,
+  "lang": "ts"
+ },
+ "01-Web-Fase4-Web-Security": {
+  "chapter": 1,
+  "lang": "ts"
+ },
+ "02-Mobile-Fase1-Cross-Platform": {
+  "chapter": 1,
+  "lang": "dart"
+ },
+ "02-Mobile-Fase2-On-Device-AI": {
+  "chapter": 1,
+  "lang": "dart"
+ },
+ "02-Mobile-Fase3-Performance-Profiling": {
+  "chapter": 1,
+  "lang": "dart"
+ },
+ "02-Mobile-Fase4-Arsitektur-Delivery": {
+  "chapter": 1,
+  "lang": "dart"
+ },
+ "04-SysDesign-Fase1-Distributed-Systems": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "04-SysDesign-Fase2-Observability": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "04-SysDesign-Fase3-Platform-Engineering": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "04-SysDesign-Fase4-Skalabilitas-FinOps": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "05-LowLevel-Fase1-Fondasi-Bahasa-Sistem": {
+  "chapter": 1,
+  "lang": "rust"
+ },
+ "05-LowLevel-Fase2-Concurrency-Memory-Model": {
+  "chapter": 1,
+  "lang": "rust"
+ },
+ "05-LowLevel-Fase3-OS-Internals-Performance": {
+  "chapter": 1,
+  "lang": "rust"
+ },
+ "05-LowLevel-Fase4-Proyek-Sistem-Skala": {
+  "chapter": 1,
+  "lang": "rust"
+ },
+ "06-DBInternals-Fase1-Storage-Engine-Fundamentals": {
+  "chapter": 1,
+  "lang": "sql"
+ },
+ "06-DBInternals-Fase2-Transaksi-Concurrency-Control": {
+  "chapter": 1,
+  "lang": "sql"
+ },
+ "06-DBInternals-Fase3-Query-Processing-Optimizer": {
+  "chapter": 1,
+  "lang": "sql"
+ },
+ "06-DBInternals-Fase4-Search-Engineering-Relevance": {
+  "chapter": 1,
+  "lang": "sql"
+ },
+ "00-Roadmap-Teknis-Lanjutan-Overview": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "English_Komprehensif_Tenses_TOEFL_v2": {
+  "chapter": 2,
+  "lang": "text"
+ },
+ "English_Komprehensif_v2_Vocabulary_Baru": {
+  "chapter": 2,
+  "lang": "text"
+ },
+ "Greedy_Algo": {
+  "tool": "greedy",
+  "media": "greedy"
+ },
+ "Retrieval_Augmented_Generation": {
+  "tool": "canva",
+  "media": "rag",
+  "chapters": [
+   [
+    "Apa itu RAG & Manfaatnya",
+    3,
+    7
+   ],
+   [
+    "Arsitektur RAG & Data Loading",
+    8,
+    13
+   ],
+   [
+    "Document Splitting",
+    14,
+    22
+   ],
+   [
+    "Embeddings",
+    23,
+    28
+   ],
+   [
+    "Vector Stores",
+    29,
+    34
+   ],
+   [
+    "RAG Pipeline: Retrieval, Augmentation & Generation",
+    35,
+    45
+   ],
+   [
+    "Evaluasi RAG",
+    46,
+    55
+   ],
+   [
+    "RAG vs Fine-tuning & Evolving LLMOps Stack",
+    56,
+    62
+   ],
+   [
+    "Multimodal RAG & Progresi Sistem RAG",
+    63,
+    72
+   ],
+   [
+    "Acknowledgements & Resources",
+    73,
+    75
+   ]
+  ],
+  "skip_pages": [
+   1,
+   2
+  ],
+  "header_top": 30,
+  "footer_top": 805,
+  "dpi": 110,
+  "quality": 60
+ },
+ "Cheatsheet_ML_DL_AI_Stanford": {
+  "tool": "sheets",
+  "media": "stanford",
+  "skip_pages": [
+   1
+  ],
+  "dpi": 140,
+  "quality": 55,
+  "chapters": [
+   [
+    "Probabilitas: the Science of Uncertainty (MIT)",
+    2,
+    5,
+    "Ringkasan probabilitas MIT 6.041 (Fabián Kozynski): aksioma, Bayes, variabel acak diskrit & kontinu, kovarians, korelasi."
+   ],
+   [
+    "CS229 · Supervised Learning",
+    6,
+    10,
+    "Regresi linear & logistik, GLM, SVM, generative learning, tree & ensemble, k-NN, learning theory."
+   ],
+   [
+    "CS229 · Unsupervised & Deep Learning",
+    11,
+    14,
+    "Clustering (EM, k-means, hierarchical), PCA, ICA, neural network, CNN, RNN, reinforcement learning."
+   ],
+   [
+    "CS229 · Machine Learning Tips & Tricks",
+    15,
+    16,
+    "Metrik klasifikasi & regresi, pemilihan model, cross-validation, regularisasi, diagnosis bias/variance."
+   ],
+   [
+    "CS229 · Refresher Probabilitas, Statistik & Aljabar Linear",
+    17,
+    21,
+    "Probabilitas & kombinatorika, variabel acak, estimasi parameter, notasi & operasi matriks, kalkulus matriks."
+   ],
+   [
+    "CS230 · Convolutional Neural Networks",
+    22,
+    26,
+    "Lapisan CNN, hyperparameter filter, fungsi aktivasi, object detection, face recognition, neural style transfer."
+   ],
+   [
+    "CS230 · Recurrent Neural Networks",
+    27,
+    31,
+    "Arsitektur RNN, GRU/LSTM, word embedding, language model, machine translation, attention."
+   ],
+   [
+    "CS230 · Deep Learning Tips & Tricks",
+    32,
+    34,
+    "Data processing, training, inisialisasi bobot, optimizer, regularisasi, good practices."
+   ],
+   [
+    "CS221 · Reflex-based Models",
+    35,
+    38,
+    "Linear predictor, loss minimization, non-linear predictor, SGD, fine-tuning, unsupervised learning."
+   ],
+   [
+    "CS221 · States-based Models",
+    39,
+    46,
+    "Tree & graph search, A*, relaxation, Markov decision process, game playing, minimax."
+   ],
+   [
+    "CS221 · Variables-based Models",
+    46,
+    49,
+    "Constraint satisfaction problem, factor graph, Bayesian network, inference."
+   ],
+   [
+    "CS221 · Logic-based Models",
+    50,
+    52,
+    "Dasar logika, knowledge base, propositional logic, first-order logic."
+   ]
+  ]
+ },
+ "Lambda_Code_Snippets_Java_8": {
+  "tool": "manual"
+ },
+ "Java_Functional_Interfaces": {
+  "tool": "manual"
+ },
+ "Data_Structure": {
+  "tool": "manual"
+ },
+ "Spring_Dependency_Injection": {
+  "tool": "manual"
+ },
+ "Lazy_Loading_React": {
+  "tool": "manual"
+ },
+ "Apache_Kafka": {
+  "skip_pages": [
+   1,
+   2
+  ],
+  "lang": "java",
+  "para_gap": 1.12,
+  "rules": [
+   {
+    "font": "Bold",
+    "size": [
+     17,
+     19
+    ],
+    "role": "chapter"
+   },
+   {
+    "fill": [
+     1.0,
+     0.95,
+     0.8
+    ],
+    "role": "q"
+   },
+   {
+    "fill": [
+     0.74,
+     0.84,
+     0.93
+    ],
+    "role": "q"
+   },
+   {
+    "text": "^Answer:$",
+    "role": "skip"
+   },
+   {
+    "fill": [
+     0.18,
+     0.46,
+     0.71
+    ],
+    "font": "Bold",
+    "role": "h4"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     13.5,
+     14.5
+    ],
+    "nofill": true,
+    "role": "h3"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     11.5,
+     12.5
+    ],
+    "role": "h4"
+   }
+  ],
+  "q_new": "^(⭐|Q\\d+\\.)",
+  "star": "⭐\\s*FREQUENTLY ASKED\\s*",
+  "q_strip": "^Q\\d+\\.\\s*",
+  "callout_fill": [
+   [
+    0.89,
+    0.94,
+    0.85
+   ],
+   [
+    0.18,
+    0.46,
+    0.71
+   ],
+   [
+    0.12,
+    0.22,
+    0.39
+   ]
+  ],
+  "tool": "text"
+ },
+ "API_Testing": {
+  "skip_pages": [
+   1,
+   2
+  ],
+  "lang": "java",
+  "header": 45,
+  "footer": 730,
+  "code_need_fill": true,
+  "images": {
+   "min": 60,
+   "dpi": 110
+  },
+  "rules": [
+   {
+    "font": "Bold",
+    "size": [
+     19,
+     21
+    ],
+    "role": "skip"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     12.5,
+     13.5
+    ],
+    "role": "chapter"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     11.5,
+     12.5
+    ],
+    "pages": [
+     15,
+     16,
+     17
+    ],
+    "role": "q"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     11.5,
+     12.5
+    ],
+    "role": "h3"
+   },
+   {
+    "text": "^Answer:$",
+    "role": "skip"
+   },
+   {
+    "font": "RobotoMono",
+    "nofill": true,
+    "role": "body"
+   },
+   {
+    "text": "^\\d+\\.\\s",
+    "nofill": true,
+    "x0": [
+     55,
+     75
+    ],
+    "role": "num"
+   }
+  ],
+  "q_strip": "^\\d+\\.\\s*",
+  "tool": "text",
+  "media": "api-testing-ci"
+ },
+ "End_to_End_API_Testing": {
+  "skip_pages": [
+   1,
+   2
+  ],
+  "lang": "java",
+  "header": 45,
+  "footer": 730,
+  "code_need_fill": true,
+  "images": {
+   "min": 60,
+   "dpi": 110
+  },
+  "rules": [
+   {
+    "font": "Bold",
+    "size": [
+     19,
+     21
+    ],
+    "role": "skip"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     12.5,
+     13.5
+    ],
+    "role": "chapter"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     11.5,
+     12.5
+    ],
+    "role": "h3"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     10.5,
+     11.5
+    ],
+    "pages": [
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16
+    ],
+    "bold": true,
+    "role": "q"
+   },
+   {
+    "text": "^Answer:$",
+    "role": "skip"
+   },
+   {
+    "font": "RobotoMono",
+    "nofill": true,
+    "role": "body"
+   },
+   {
+    "text": "^\\d+\\.\\s",
+    "nofill": true,
+    "role": "num"
+   }
+  ],
+  "tool": "text",
+  "media": "api-testing-bdd",
+  "extra_skipped": [
+   "Lamhot Siagian — SDET Consultant | Author, Automation Test Enthusiast (teks di gambar sampul)"
+  ]
+ },
+ "Coding_Interview_in_Java": {
+  "skip_pages": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "lang": "java",
+  "header": 100,
+  "footer": 770,
+  "dehyphen": true,
+  "space": 0.15,
+  "images": {
+   "min": 40,
+   "dpi": 120
+  },
+  "rules": [
+   {
+    "font": "BeraSans-Bold",
+    "size": [
+     17,
+     19
+    ],
+    "role": "chapter"
+   },
+   {
+    "font": "BeraSans-Bold",
+    "size": [
+     11.5,
+     13
+    ],
+    "role": "h3"
+   }
+  ],
+  "tool": "text",
+  "media": "coding-interview",
+  "page_margin_shift": true
+ },
+ "React_JS": {
+  "skip_pages": [
+   1,
+   2,
+   3,
+   4,
+   110
+  ],
+  "lang": "js",
+  "footer": 800,
+  "code_need_fill": true,
+  "code_fill_min_w": 300,
+  "images": {
+   "min": 60,
+   "dpi": 110
+  },
+  "rules": [
+   {
+    "font": "Bold",
+    "size": [
+     25,
+     27
+    ],
+    "role": "chapter"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     17,
+     19
+    ],
+    "role": "h3"
+   },
+   {
+    "text": "^\\(continued from above\\)$",
+    "role": "skip"
+   }
+  ],
+  "tool": "text",
+  "media": "reactjs",
+  "tables": false
+ },
+ "SQL_Notes": {
+  "lang": "sql",
+  "mono": "Courier",
+  "header": 50,
+  "code_strip_num": "^\\s*(\\d+\\.\\s|•\\s?)",
+  "images": {
+   "min": 60,
+   "dpi": 110,
+   "skip": [
+    [
+     900,
+     300
+    ],
+    [
+     3000,
+     3000
+    ]
+   ]
+  },
+  "rules": [
+   {
+    "text": "^Powered by|^PPPooo",
+    "role": "skip"
+   },
+   {
+    "font": "DejaVu",
+    "role": "skip"
+   },
+   {
+    "text": "^SQL Commands$",
+    "pages": [
+     1
+    ],
+    "role": "chapter"
+   },
+   {
+    "text": "^•\\s*(CREATE TABLE|UPDATE Query|TOP, LIMIT or ROWNUM Clause|UNIONS CLAUSE|Constraints|Using VIEWS)$",
+    "role": "chapter"
+   },
+   {
+    "text": "^Queries Using aggregate functions",
+    "role": "chapter"
+   },
+   {
+    "text": "^•\\s*(NULL Values|ALTER TABLE Command|TRUNCATE TABLE|GROUP BY clause|Using Joins)$",
+    "role": "h3"
+   },
+   {
+    "color": [
+     0.38,
+     0.04,
+     0.29
+    ],
+    "role": "h3"
+   },
+   {
+    "color": [
+     0.38,
+     0.04,
+     0.22
+    ],
+    "role": "h3"
+   },
+   {
+    "x0": [
+     55,
+     80
+    ],
+    "role": "h3",
+    "first_font": "Symbol",
+    "first_size": [
+     8.5,
+     9.5
+    ]
+   },
+   {
+    "font": "Wingdings",
+    "role": "h4"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     10.5,
+     11.5
+    ],
+    "role": "h3"
+   },
+   {
+    "text": "^Inserting Rows into a View$|^Updating a View$|^Dropping Views$|^Creating Views$",
+    "role": "h4"
+   },
+   {
+    "text": "^(Syntax|Examples?|EXAMPLE|For example|Or)\\s*[:\\-–]*\\s*$",
+    "role": "body"
+   },
+   {
+    "color": [
+     0.4,
+     0.4,
+     0.0
+    ],
+    "role": "code"
+   },
+   {
+    "color": [
+     0.0,
+     0.0,
+     0.8
+    ],
+    "role": "code"
+   },
+   {
+    "x0": [
+     18,
+     32
+    ],
+    "role": "code"
+   },
+   {
+    "text": "^•\\s*(\\+-|\\||SQL>|SELECT |FROM |INNER JOIN|ON |WHERE )",
+    "role": "code"
+   },
+   {
+    "text": "^(SQL\\s?>|\\+-+|\\|.*\\|$)",
+    "role": "code"
+   },
+   {
+    "x0": [
+     42,
+     44.5
+    ],
+    "nofill": true,
+    "bold": false,
+    "role": "code"
+   },
+   {
+    "x0": [
+     47,
+     52
+    ],
+    "nofill": true,
+    "bold": false,
+    "role": "code"
+   },
+   {
+    "pages": [
+     50,
+     51,
+     52,
+     53,
+     54,
+     55,
+     56
+    ],
+    "x0": [
+     90,
+     130
+    ],
+    "text": "^(SELECT|FROM|WHERE|ORDER|GROUP|HAVING|UNION|AND|OR|INNER|LEFT|RIGHT|ON|INSERT|UPDATE|DELETE|CREATE|SET|VALUES|DROP|ALTER)\\b",
+    "role": "code"
+   },
+   {
+    "text": "^o\\s",
+    "role": "bullet",
+    "first_font": "Courier"
+   }
+  ],
+  "list_gap": 2.6,
+  "tool": "text",
+  "media": "sql-notes",
+  "extra_skipped": [
+   "Powered by TCPDF (www.tcpdf.org)"
+  ]
+ },
+ "E-Book_Arsitektur_Performa_Sistem_Enterprise": {
+  "lang": "text",
+  "code_fill": "dark",
+  "rules": [
+   {
+    "font": "Bold",
+    "size": [
+     23,
+     25
+    ],
+    "role": "skip"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     17,
+     19
+    ],
+    "page_min": 1,
+    "role": "chapter"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     13.5,
+     14.5
+    ],
+    "role": "h3"
+   }
+  ],
+  "tool": "text"
+ },
+ "Modul_DevOps_Production-Ready_Docker_Kubernetes_V2": {
+  "lang": "bash",
+  "code_fill": "dark",
+  "callout_fill": [
+   [
+    0.99,
+    0.6,
+    0.4
+   ]
+  ],
+  "rules": [
+   {
+    "font": "Bold",
+    "size": [
+     23,
+     25
+    ],
+    "role": "skip"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     17,
+     19
+    ],
+    "role": "chapter"
+   },
+   {
+    "font": "Bold",
+    "size": [
+     13.5,
+     14.5
+    ],
+    "role": "h3"
+   }
+  ],
+  "tool": "text"
+ },
+ "TDD": {
+  "tool": "manual"
+ },
+ "FSD_dan_TSD": {
+  "tool": "manual"
+ },
+ "60_days_Java": {
+  "tool": "manual"
+ },
+ "Exploring_the_Java_Ecosystem": {
+  "tool": "manual"
+ },
+ "Microservices_Design_Pattern": {
+  "tool": "manual",
+  "media": "microservices-patterns",
+  "render_pages": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15
+  ],
+  "dpi": 110,
+  "width": 900
+ },
+ "00-Roadmap-ConcDist-Green-Overview": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "07-ConcDist-Fase1-GPU-Parallel-Computing": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "07-ConcDist-Fase2-Formal-Methods-TLA": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "07-ConcDist-Fase3-Algoritma-Terdistribusi-Lanjutan": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "07-ConcDist-Fase4-Capstone-Terverifikasi-Terakselerasi": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "08-GreenComputing-Fase1-Fundamental-Energy-Aware": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "08-GreenComputing-Fase2-Efisiensi-Software-Hardware": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "08-GreenComputing-Fase3-Carbon-Aware-Infrastructure": {
+  "chapter": 1,
+  "lang": "text"
+ },
+ "08-GreenComputing-Fase4-Capstone-Audit-Karbon": {
+  "chapter": 1,
+  "lang": "text"
+ }
+}
