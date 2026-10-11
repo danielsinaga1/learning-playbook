@@ -7,7 +7,7 @@ dan tiap dokumen sumber menjadi **track** (submodul) di dalam kurikulumnya.
 |---|---|---|
 | **Java & Spring Boot** | Java Fundamentals · Java Functional & Lambda · Struktur Data · Strategi Algoritma · Soal Struktur Data · Soal Algoritma · Coding Interview (Program Creek, 120 soal) · Greedy (6 track: Konsep & Graf, Penjadwalan, Koin/Knapsack/Huffman, Array & Angka, String, Sistem Operasi) · Design Patterns · Spring Boot: Inti · Data & Persistence · Lanjutan & Produksi · Proyek & Studi Kasus · Karier & Sertifikasi | Java Algorithm Mastery (HTML), Materi-Java-SpringBoot, SpringBoot_Panduan_Lengkap, Struktur_Data_Java_Interview, Algoritma_Java, Design_Patterns_Java, Greedy_Algo.pdf (145 artikel), 100 Lambda Code Snippets.pdf, Java Functional Interfaces.pdf, Data Structure.pdf (tulisan tangan), Spring Dependency Injection.pdf, Coding Interview in Java.pdf, 60 days Java.pdf, Exploring the Java Ecosystem.pdf |
 | **Go** | Dasar · Concurrency · Idiom & Arsitektur · Web API & DB · Testing & Produksi · gRPC & GraphQL · Message Queue · Proyek Pencatat Keuangan · Proyek E-Commerce · Karier | Belajar_GoLang_Pemula_ke_Mahir, Golang_Masterclass_Lengkap, 05_GraphQL, Backend_Go_PencatatKeuangan_API |
-| **JavaScript & TypeScript** | React: Fondasi · Hooks, State & Performa · Ekosistem & Produksi · Proyek React · React: Notes for Professionals · React Native · TypeScript Lanjutan · Angular · Node.js: Express · Node.js: NestJS · Roadmap Senior Web (12 Bulan) | Belajar-React-TypeScript-Lengkap, React_Panduan_Konsolidasi, React_Masterclass, Proyek_React v1 & v2, ReactNative_PencatatKeuangan_Mobile, 01_TypeScript_Penuh, Angular, Express 1 & 2, Nest 1 & 2, 01-Web-Fase1…4, Lazy Loading React.pdf, React JS.pdf (GoalKicker) |
+| **JavaScript & TypeScript** | React: Fondasi · Hooks, State & Performa · Ekosistem & Produksi · Proyek React · React: Notes for Professionals · React Native · TypeScript Lanjutan · Next.js: Fondasi · Next.js: Data & Full Stack · Next.js: Produksi & Proyek · Angular · Node.js: Express · Node.js: NestJS · Roadmap Senior Web (12 Bulan) | Belajar-React-TypeScript-Lengkap, React_Panduan_Konsolidasi, React_Masterclass, Proyek_React v1 & v2, ReactNative_PencatatKeuangan_Mobile, 01_TypeScript_Penuh, dokumentasi resmi Next.js App Router, Angular, Express 1 & 2, Nest 1 & 2, 01-Web-Fase1…4, Lazy Loading React.pdf, React JS.pdf (GoalKicker) |
 | **Python** | Kontrak API · FastAPI · Django | FastAPI 1 & 2, Django 1 & 2 |
 | **Rust** | Rust Dasar | Modul_Rust_Pemula_hingga_Mahir |
 | **Mobile: Flutter & Cross-Platform** | Fondasi · Membangun Aplikasi · Menuju Produksi · Roadmap Senior Mobile (12 Bulan) | Flutter-Panduan-Lengkap, 02-Mobile-Fase1…4 |
@@ -21,6 +21,21 @@ dan tiap dokumen sumber menjadi **track** (submodul) di dalam kurikulumnya.
 | **English Learning** | Vocabulary (4 track) · Vocabulary Lanjutan · 16 Tenses · Grammar & Strategi TOEFL · IELTS (5 track) · IELTS Vocabulary Booster | English_Vocabulary_and_Phrasal_Verbs_v3, English_Komprehensif v2 (dua file identik), Panduan_Master_IELTS.pdf, Ringkasan_IELTS_Vocabulary_Booster.pdf |
 
 Setiap kurikulum juga punya track **Arsip Sumber** (lihat di bawah).
+
+## Jalur belajar Next.js
+
+Di kurikulum **JavaScript & TypeScript**, setelah TypeScript Lanjutan, tersedia **12 modul** dalam tiga track:
+
+- **Next.js: Fondasi** — setup, App Router/layout/dynamic route, Server & Client Components, navigasi/streaming/error.
+- **Next.js: Data & Full Stack** — fetching & Cache Components, Server Actions/form/validasi, Route Handlers/BFF, database/autentikasi/otorisasi.
+- **Next.js: Produksi & Proyek** — metadata/SEO/performa, testing Playwright, deployment, proyek akhir Learning Tracker.
+
+Materi berbahasa Indonesia dilengkapi contoh kode, estimasi durasi, checklist latihan yang tersimpan, dan empat soal evaluasi.
+Acuan: **Next.js 16.4 App Router**, dokumentasi resmi diperiksa pada **11 Oktober 2026**.
+Setiap modul menautkan referensi resmi; contoh integrasi database/auth menjelaskan adapter yang harus disiapkan.
+Buat aplikasi latihan di folder terpisah. Materi baru disimpan di [`src/data/nextjs.ts`](src/data/nextjs.ts),
+digabung melalui `src/data/index.ts`, sehingga konversi ulang `gen/*.json` tidak menghapusnya.
+Bab pengantar Next.js dari dokumen React tetap tersedia dengan tautan ke jalur praktik ini.
 
 ## Aturan anti-duplikasi
 
@@ -115,6 +130,7 @@ src/
     index.ts              Menggabungkan semua kurikulum (urutan tampil, track, arsip, alias ID lama)
     gen/*.json            Kurikulum hasil konversi dokumen (jangan diedit manual; generate ulang)
     aws.ts, interview.ts, algorithms.ts, ai.ts   Kurikulum yang ditulis tangan (dari HTML & slide Hacktiv8)
+    nextjs.ts             12 modul praktik Next.js App Router + track + referensi resmi
   assets/                 Dua slide asli Belajar_Hacktiv8 (WebP)
 public/media/             Gambar halaman & ilustrasi (greedy/, rag/, stanford/, coding-interview/, reactjs/, sql-notes/,
                           api-testing-ci/, api-testing-bdd/, microservices-patterns/), dirujuk sebagai media/...

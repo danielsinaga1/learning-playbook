@@ -3,6 +3,7 @@ import { aws } from './aws';
 import { interview } from './interview';
 import { algorithms } from './algorithms';
 import { ai } from './ai';
+import { nextjsModules, nextjsSource, nextjsTracks } from './nextjs';
 import javaGen from './gen/java.json';
 import goGen from './gen/go.json';
 import jsGen from './gen/js.json';
@@ -20,7 +21,7 @@ import interviewExtra from './gen/interview-extra.json';
 
 /*
  * Kurikulum hasil konversi .docx ada di ./gen/*.json (dibuat oleh skrip konversi).
- * Kurikulum yang ditulis tangan (aws, interview, algorithms, ai) digabung di sini
+ * Kurikulum yang ditulis tangan (aws, interview, algorithms, ai, nextjs) digabung di sini
  * supaya satu bahasa/ekosistem = satu kurikulum, dengan track sebagai submodul.
  */
 
@@ -65,6 +66,28 @@ const devops = numbered({
   ...gen(devopsGen),
   modules: [...withTrack(aws.modules, 'AWS untuk Java Developer'), ...gen(devopsGen).modules],
   intro: aws.intro,
+});
+
+/** Next.js ditambahkan setelah TypeScript, sebelum Angular; ID materi lama tetap stabil. */
+const javascriptGen = gen(jsGen);
+const javascriptTracks = javascriptGen.tracks ?? [];
+const angularIndex = javascriptTracks.findIndex((track) => track.title === 'Angular');
+const nextjsIndex = angularIndex < 0 ? javascriptTracks.length : angularIndex;
+const javascript = numbered({
+  ...javascriptGen,
+  description: 'React dari fondasi sampai performa dan proyek nyata, React Native, TypeScript lanjutan, Next.js App Router sampai full stack dan produksi, Angular modern, serta backend Node.js dengan Express dan NestJS.',
+  tracks: [...javascriptTracks.slice(0, nextjsIndex), ...nextjsTracks, ...javascriptTracks.slice(nextjsIndex)],
+  sources: [...(javascriptGen.sources ?? []), nextjsSource],
+  modules: [
+    ...javascriptGen.modules.map((module) => module.id === 'next-js-app-router' ? {
+      ...module,
+      blocks: [
+        { type: 'callout' as const, tone: 'info' as const, title: 'Jalur praktik Next.js terbaru', text: 'Bab ini merupakan pengantar dari dokumen React. Lanjutkan ke [Next.js: Fondasi & Setup](#js.nextjs-fondasi-setup) untuk 12 modul praktik App Router dengan acuan Next.js 16.4, Cache Components, autentikasi, testing, dan proyek akhir.' },
+        ...module.blocks,
+      ],
+    } : module),
+    ...nextjsModules,
+  ],
 });
 
 /** LLM: outline program Applied AI Engineer (Hacktiv8) masuk ke track Peta Belajar. */
@@ -133,7 +156,7 @@ function mergeInterview(): Curriculum {
 export const curricula: Curriculum[] = [
   java,
   numbered(gen(goGen)),
-  numbered(gen(jsGen)),
+  javascript,
   numbered(gen(pythonGen)),
   numbered(gen(rustGen)),
   numbered(gen(flutterGen)),
