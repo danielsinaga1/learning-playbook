@@ -4,6 +4,7 @@ import { interview } from './interview';
 import { algorithms } from './algorithms';
 import { ai } from './ai';
 import { nextjsModules, nextjsSource, nextjsTracks } from './nextjs';
+import { englishFoundationArchives, englishFoundationModules, englishFoundationSources, englishFoundationTracks } from './english-foundations';
 import javaGen from './gen/java.json';
 import goGen from './gen/go.json';
 import jsGen from './gen/js.json';
@@ -90,6 +91,23 @@ const javascript = numbered({
   ],
 });
 
+/** Fondasi grammar mendahului tenses/ujian; Materi 2 dan 3 berbagi satu modul. */
+const englishBase = gen(englishGen);
+const englishTracks = englishBase.tracks ?? [];
+const tensesIndex = englishTracks.findIndex((track) => track.title === '16 Tenses');
+const foundationIndex = tensesIndex < 0 ? 0 : tensesIndex;
+const english = numbered({
+  ...englishBase,
+  description: 'Kosakata & phrasal verbs untuk kerja dan developer, grammar dasar, struktur kalimat, superlative & ordinal numbers, 16 tenses, TOEFL, dan IELTS.',
+  tracks: [...englishTracks.slice(0, foundationIndex), ...englishFoundationTracks, ...englishTracks.slice(foundationIndex)],
+  sources: [...(englishBase.sources ?? []), ...englishFoundationSources],
+  intro: [
+    { type: 'callout', tone: 'tip', title: 'Mulai dari fondasi grammar', text: 'Untuk pemula: [Parts of Speech](#english.english-parts-noun-pronoun-verb) → [Adjectives & Adverbs](#english.english-adjectives-adverbs) → [Prepositions & Determiners](#english.english-function-words) → [Struktur Kalimat](#english.english-sentence-structure) → [Superlative & Ordinal](#english.english-superlative-ordinal), lalu 16 Tenses dan Grammar TOEFL. Materi 2 dan 3 digabung agar tidak berulang; semua halaman asli tersedia di Arsip Sumber.' },
+    ...(englishBase.intro ?? []),
+  ],
+  modules: [...englishBase.modules, ...englishFoundationModules, ...englishFoundationArchives],
+});
+
 /** LLM: outline program Applied AI Engineer (Hacktiv8) masuk ke track Peta Belajar. */
 const llm = numbered({
   ...gen(llmGen),
@@ -167,7 +185,7 @@ export const curricula: Curriculum[] = [
   numbered(gen(testingGen)),
   llm,
   mergeInterview(),
-  numbered(gen(englishGen)),
+  english,
 ];
 
 /** ID lama (sebelum penggabungan) tetap bisa dibuka. */

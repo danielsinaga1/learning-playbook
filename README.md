@@ -18,9 +18,25 @@ dan tiap dokumen sumber menjadi **track** (submodul) di dalam kurikulumnya.
 | **Software Testing & QA** | Fondasi (+ FSD vs TSD) · Praktik · Automation · API Testing & TDD · Lanjutan & Snippet | Software_Testing_Lengkap, API Testing.pdf, End to End API Testing.pdf, TDD.pdf, FSD dan TSD.pdf |
 | **LLM** | Peta Belajar (termasuk program Hacktiv8) · Fase 0 · Fase 1 · RAG: Panduan Lengkap · Fase 2–4 · Proyek Akhir Terpadu · Referensi: Cheatsheet ML, DL & AI | 03-DataAI-Roadmap-Komprehensif, 03-DataAI-Fase1…4, Belajar_Hacktiv8, Retrieval Augmented Generation.pdf, All Cheatsheet ML DL AI (Stanford & MIT).pdf |
 | **Interview Prep** | Java, Spring Boot & AWS · React & Spring Boot Advanced · Apache Kafka (Java) | Interview Prep (HTML), 50_Soal_Advanced_React_SpringBoot, Apache Kafka.pdf |
-| **English Learning** | Vocabulary (4 track) · Vocabulary Lanjutan · 16 Tenses · Grammar & Strategi TOEFL · IELTS (5 track) · IELTS Vocabulary Booster | English_Vocabulary_and_Phrasal_Verbs_v3, English_Komprehensif v2 (dua file identik), Panduan_Master_IELTS.pdf, Ringkasan_IELTS_Vocabulary_Booster.pdf |
+| **English Learning** | Vocabulary (4 track) · Vocabulary Lanjutan · Grammar Dasar · Struktur Kalimat · Adjectives & Numbers · 16 Tenses · Grammar & Strategi TOEFL · IELTS (5 track) · IELTS Vocabulary Booster | English_Vocabulary_and_Phrasal_Verbs_v3, English_Komprehensif v2 (dua file identik), Panduan_Master_IELTS.pdf, Ringkasan_IELTS_Vocabulary_Booster.pdf, Materi 1-4 (Parts of Speech, Phrase/Clause/Sentence, Sentence Structure, Superlative & Ordinal) |
 
 Setiap kurikulum juga punya track **Arsip Sumber** (lihat di bawah).
+
+## Fondasi English Learning
+
+Empat handout grammar ditambahkan sebelum **16 Tenses** dan **Grammar TOEFL**:
+
+| Submodul | Pelajaran | Sumber |
+|---|---|---|
+| Grammar Dasar | Noun, Pronoun & Verb; Adjectives & Adverbs; Prepositions, Conjunctions & Determiners | Materi 1: Parts of Speech |
+| Struktur Kalimat | Phrase, Clause & Sentence Structure | Materi 2 dan 3, digabung agar tidak berulang |
+| Adjectives & Numbers | Superlative Adjectives & Ordinal Numbers | Materi 4 |
+
+Lima pelajaran memiliki checklist dan soal pemahaman. Koreksi contoh/istilah sumber diberi catatan;
+14 halaman asli beserta teks lengkap tetap tersedia pada empat entri **Arsip Sumber** dan tidak dihitung dalam progres.
+ID materi lama tetap sama. Materi tambahan disimpan dalam `src/data/english-foundations.ts`, terpisah dari `gen/`.
+Untuk memperbarui gambar halaman dan teks sumber, jalankan
+`python tools/import-english-foundations.py C:/Users/nama/Downloads` (memerlukan pdfplumber, pypdfium2, dan Pillow).
 
 ## Jalur belajar Next.js
 

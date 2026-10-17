@@ -1,5 +1,20 @@
 import { expect, test } from '@playwright/test';
 
+test('fondasi English: struktur gabungan, latihan, dan arsip halaman sumber', async ({ page }) => {
+  await page.goto('/#english.english-sentence-structure');
+  await expect(page.locator('.reader-sheet h1')).toHaveText('Phrase, Clause & Sentence Structure');
+  await expect(page.getByRole('heading', { name: 'Empat jenis sentence structure', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: /Lihat halaman asli & teks lengkap Materi 3/ }).click();
+  await expect(page).toHaveURL(/#english\.arsip-english-sentence-structure$/);
+  await page.getByText('Lihat halaman asli 1', { exact: true }).click();
+  const image = page.locator('.reading-content img').first();
+  await expect(image).toBeVisible();
+  await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
+  await page.getByRole('link', { name: 'Phrase, Clause & Sentence Structure', exact: true }).last().click();
+  await expect(page.locator('.reader-sheet h1')).toHaveText('Phrase, Clause & Sentence Structure');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
 test('beranda, filter kurikulum, navigasi, dan progres tersimpan', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.c-card')).toHaveCount(14);
