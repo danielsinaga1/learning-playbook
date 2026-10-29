@@ -5,18 +5,18 @@ dan tiap dokumen sumber menjadi **track** (submodul) di dalam kurikulumnya.
 
 | Kurikulum | Track | Sumber |
 |---|---|---|
-| **Java & Spring Boot** | Java Fundamentals · Java Functional & Lambda · Struktur Data · Strategi Algoritma · Soal Struktur Data · Soal Algoritma · Coding Interview (Program Creek, 120 soal) · Greedy (6 track: Konsep & Graf, Penjadwalan, Koin/Knapsack/Huffman, Array & Angka, String, Sistem Operasi) · Design Patterns · Spring Boot: Inti · Data & Persistence · Lanjutan & Produksi · Proyek & Studi Kasus · Karier & Sertifikasi | Java Algorithm Mastery (HTML), Materi-Java-SpringBoot, SpringBoot_Panduan_Lengkap, Struktur_Data_Java_Interview, Algoritma_Java, Design_Patterns_Java, Greedy_Algo.pdf (145 artikel), 100 Lambda Code Snippets.pdf, Java Functional Interfaces.pdf, Data Structure.pdf (tulisan tangan), Spring Dependency Injection.pdf, Coding Interview in Java.pdf, 60 days Java.pdf, Exploring the Java Ecosystem.pdf |
-| **Go** | Dasar · Concurrency · Idiom & Arsitektur · Web API & DB · Testing & Produksi · gRPC & GraphQL · Message Queue · Proyek Pencatat Keuangan · Proyek E-Commerce · Karier | Belajar_GoLang_Pemula_ke_Mahir, Golang_Masterclass_Lengkap, 05_GraphQL, Backend_Go_PencatatKeuangan_API |
-| **JavaScript & TypeScript** | React: Fondasi · Hooks, State & Performa · Ekosistem & Produksi · Proyek React · React: Notes for Professionals · React Native · TypeScript Lanjutan · Next.js: Fondasi · Next.js: Data & Full Stack · Next.js: Produksi & Proyek · Angular · Node.js: Express · Node.js: NestJS · Roadmap Senior Web (12 Bulan) | Belajar-React-TypeScript-Lengkap, React_Panduan_Konsolidasi, React_Masterclass, Proyek_React v1 & v2, ReactNative_PencatatKeuangan_Mobile, 01_TypeScript_Penuh, dokumentasi resmi Next.js App Router, Angular, Express 1 & 2, Nest 1 & 2, 01-Web-Fase1…4, Lazy Loading React.pdf, React JS.pdf (GoalKicker) |
-| **Python** | Kontrak API · FastAPI · Django | FastAPI 1 & 2, Django 1 & 2 |
-| **Rust** | Rust Dasar | Modul_Rust_Pemula_hingga_Mahir |
-| **Mobile: Flutter & Cross-Platform** | Fondasi · Membangun Aplikasi · Menuju Produksi · Roadmap Senior Mobile (12 Bulan) | Flutter-Panduan-Lengkap, 02-Mobile-Fase1…4 |
+| **Java & Spring Boot** | Java Fundamentals · Java Functional & Lambda · Java Modern (17–25) · Struktur Data · Strategi Algoritma · Soal Struktur Data · Soal Algoritma · Coding Interview (Program Creek, 120 soal) · Greedy (6 track: Konsep & Graf, Penjadwalan, Koin/Knapsack/Huffman, Array & Angka, String, Sistem Operasi) · Design Patterns · Spring Boot: Inti · Data & Persistence · Lanjutan & Produksi (+ Testcontainers & Resilience4j) · Proyek & Studi Kasus · Karier & Sertifikasi | Java Algorithm Mastery (HTML), Materi-Java-SpringBoot, SpringBoot_Panduan_Lengkap, Struktur_Data_Java_Interview, Algoritma_Java, Design_Patterns_Java, Greedy_Algo.pdf (145 artikel), 100 Lambda Code Snippets.pdf, Java Functional Interfaces.pdf, Data Structure.pdf (tulisan tangan), Spring Dependency Injection.pdf, Coding Interview in Java.pdf, 60 days Java.pdf, Exploring the Java Ecosystem.pdf |
+| **Go** | Dasar · Concurrency · Idiom & Arsitektur · Web API & DB (+ pgx, sqlc & goose) · Testing & Produksi (+ fuzzing, benchmark & govulncheck) · gRPC & GraphQL · Message Queue · Proyek Pencatat Keuangan · Proyek E-Commerce · Karier | Belajar_GoLang_Pemula_ke_Mahir, Golang_Masterclass_Lengkap, 05_GraphQL, Backend_Go_PencatatKeuangan_API |
+| **JavaScript & TypeScript** | React: Fondasi · Hooks, State & Performa · Ekosistem & Produksi · Proyek React · React: Notes for Professionals · React Native · TypeScript Lanjutan · Next.js: Fondasi · Next.js: Data & Full Stack · Next.js: Produksi & Proyek · Angular · Node.js: Inti Runtime · Node.js: Express · Node.js: NestJS · Roadmap Senior Web (12 Bulan) | Belajar-React-TypeScript-Lengkap, React_Panduan_Konsolidasi, React_Masterclass, Proyek_React v1 & v2, ReactNative_PencatatKeuangan_Mobile, 01_TypeScript_Penuh, dokumentasi resmi Next.js App Router, Angular, Express 1 & 2, Nest 1 & 2, 01-Web-Fase1…4, Lazy Loading React.pdf, React JS.pdf (GoalKicker) |
+| **Python** | Python Inti · Kontrak API · FastAPI · Django | FastAPI 1 & 2, Django 1 & 2, dokumentasi resmi Python |
+| **Rust** | Rust Dasar · Rust Inti · Rust untuk Backend | Modul_Rust_Pemula_hingga_Mahir, The Rust Programming Language, dokumentasi Tokio/Axum/SQLx |
+| **Mobile: Flutter & Cross-Platform** | Fondasi (+ Dart 3) · Membangun Aplikasi (+ Pigeon) · Menuju Produksi (+ aksesibilitas) · Roadmap Senior Mobile (12 Bulan) | Flutter-Panduan-Lengkap, 02-Mobile-Fase1…4 |
 | **Database & SQL** | Konsep Database · SQL: Pemula sampai Mahir · SQL Notes (Referensi Cepat) · NoSQL & Database Modern | SQL-Pemula-sampai-Mahir, Panduan_Belajar_Database_SQL_NoSQL, SQL Notes.pdf |
 | **Distributed System** | Roadmap 12 Bulan · Arsitektur & Performa Sistem (+ 14 Microservices Design Patterns) · Distributed System dengan Spring Boot | 04-SysDesign-Fase1…4, Panduan-Arsitektur-dan-Performa-Sistem, E-Book Arsitektur & Performa Sistem Enterprise.pdf (bagian baru), Microservices Design Pattern.pdf, Panduan_Distributed_System_Spring_Boot |
 | **Low Level Design** | Peta Roadmap · Low-Level & Systems Programming · Database Internals & Search · Concurrency & Distributed Lanjutan · Green & Sustainable Computing | 00-Roadmap-Teknis-Lanjutan-Overview, 05-LowLevel-Fase1…4, 06-DBInternals-Fase1…4, 00-Roadmap-ConcDist-Green-Overview, 07-ConcDist-Fase1…4, 08-GreenComputing-Fase1…4 |
 | **Cloud & DevOps** | AWS untuk Java Developer · Docker · Kubernetes · Platform Engineering & SRE | AWS Roadmap (HTML), Docker-Kubernetes + Modul DevOps V2.pdf (bagian baru), Panduan_Backend_Platform_Engineering |
 | **Software Testing & QA** | Fondasi (+ FSD vs TSD) · Praktik · Automation · API Testing & TDD · Lanjutan & Snippet | Software_Testing_Lengkap, API Testing.pdf, End to End API Testing.pdf, TDD.pdf, FSD dan TSD.pdf |
-| **LLM** | Peta Belajar (termasuk program Hacktiv8) · Fase 0 · Fase 1 · RAG: Panduan Lengkap · Fase 2–4 · Proyek Akhir Terpadu · Referensi: Cheatsheet ML, DL & AI | 03-DataAI-Roadmap-Komprehensif, 03-DataAI-Fase1…4, Belajar_Hacktiv8, Retrieval Augmented Generation.pdf, All Cheatsheet ML DL AI (Stanford & MIT).pdf |
+| **LLM** | Peta Belajar (termasuk program Hacktiv8) · Fase 0 · Fase 1 · RAG: Panduan Lengkap · AI Engineer: Fondasi · LangChain & LangGraph · Observability & Produksi · Fase 2–4 · Proyek Akhir Terpadu · Referensi: Cheatsheet ML, DL & AI | 03-DataAI-Roadmap-Komprehensif, 03-DataAI-Fase1…4, Belajar_Hacktiv8, Retrieval Augmented Generation.pdf, All Cheatsheet ML DL AI (Stanford & MIT).pdf |
 | **Interview Prep** | Java, Spring Boot & AWS · React & Spring Boot Advanced · Apache Kafka (Java) | Interview Prep (HTML), 50_Soal_Advanced_React_SpringBoot, Apache Kafka.pdf |
 | **English Learning** | Vocabulary (4 track) · Vocabulary Lanjutan · Grammar Dasar · Struktur Kalimat · Adjectives & Numbers · 16 Tenses · Grammar & Strategi TOEFL · IELTS (5 track) · IELTS Vocabulary Booster | English_Vocabulary_and_Phrasal_Verbs_v3, English_Komprehensif v2 (dua file identik), Panduan_Master_IELTS.pdf, Ringkasan_IELTS_Vocabulary_Booster.pdf, Materi 1-4 (Parts of Speech, Phrase/Clause/Sentence, Sentence Structure, Superlative & Ordinal) |
 
@@ -52,6 +52,33 @@ Setiap modul menautkan referensi resmi; contoh integrasi database/auth menjelask
 Buat aplikasi latihan di folder terpisah. Materi baru disimpan di [`src/data/nextjs.ts`](src/data/nextjs.ts),
 digabung melalui `src/data/index.ts`, sehingga konversi ulang `gen/*.json` tidak menghapusnya.
 Bab pengantar Next.js dari dokumen React tetap tersedia dengan tautan ke jalur praktik ini.
+
+## Jalur AI Engineer
+
+Di kurikulum **LLM**, setelah *RAG: Panduan Lengkap*, tersedia **11 modul** praktik dalam tiga track:
+
+- **AI Engineer: Fondasi**: peta stack, Python modern (uv, Pydantic, async), Claude API (streaming, structured output, tool calling manual).
+- **AI Engineer: LangChain & LangGraph**: `create_agent` LangChain v1, StateGraph, memory/checkpointer + `interrupt()`, supervisor multi-agent dan streaming.
+- **AI Engineer: Observability & Produksi**: Langfuse (tracing, prompt management), dataset + experiment, full stack FastAPI SSE + Next.js, proyek akhir Support Agent.
+
+Acuan: LangChain/LangGraph v1, Langfuse Python SDK v3, Anthropic Python SDK; dokumentasi diperiksa pada **29 Oktober 2026**.
+Materi ada di [`src/data/ai-engineer.ts`](src/data/ai-engineer.ts).
+
+## Pelajaran tambahan per bahasa
+
+Topik yang belum tercakup dokumen sumber ditulis tangan dan digabung lewat `src/data/index.ts` (helper `insertTracks`):
+
+| Kurikulum | Pelajaran baru | File |
+|---|---|---|
+| Java & Spring Boot | Records, Sealed & Pattern Matching · Virtual Threads & Structured Concurrency · Spring Boot: Testcontainers & Resilience4j | `java-modern.ts` |
+| Go | Database Type-Safe: pgx, sqlc & goose · Fuzzing, Benchmark & govulncheck | `go-modern.ts` |
+| JavaScript & TypeScript | Event Loop & Async · Streams, Worker Threads & fitur bawaan Node · Drizzle ORM | `node-core.ts` |
+| Python | Fondasi & Koleksi · OOP, dataclass & Protocol · Generator, Decorator & Context Manager · Typing & Tooling (uv, Ruff, mypy, pytest) · asyncio | `python-core.ts` |
+| Rust | Ownership & Borrowing · Struct, Enum & Pattern Matching · Option/Result & Error Handling · Trait & Generic · REST API Tokio + Axum + SQLx | `rust-core.ts` |
+| Flutter | Dart 3: Records, Patterns & Sealed · Integrasi Native dengan Pigeon · Aksesibilitas | `dart-modern.ts` |
+
+Setiap pelajaran berisi contoh kode, checklist latihan, dan tautan referensi resmi; sebagian dilengkapi soal pemahaman.
+Blok dibuat dengan helper bersama di `src/data/lesson-kit.ts`.
 
 ## Aturan anti-duplikasi
 
@@ -147,6 +174,9 @@ src/
     gen/*.json            Kurikulum hasil konversi dokumen (jangan diedit manual; generate ulang)
     aws.ts, interview.ts, algorithms.ts, ai.ts   Kurikulum yang ditulis tangan (dari HTML & slide Hacktiv8)
     nextjs.ts             12 modul praktik Next.js App Router + track + referensi resmi
+    ai-engineer.ts        11 modul jalur AI Engineer (LangChain, LangGraph, Langfuse)
+    lesson-kit.ts         Helper blok untuk materi tulisan tangan
+    java-modern.ts, go-modern.ts, node-core.ts, python-core.ts, rust-core.ts, dart-modern.ts   Pelajaran tambahan per bahasa
   assets/                 Dua slide asli Belajar_Hacktiv8 (WebP)
 public/media/             Gambar halaman & ilustrasi (greedy/, rag/, stanford/, coding-interview/, reactjs/, sql-notes/,
                           api-testing-ci/, api-testing-bdd/, microservices-patterns/), dirujuk sebagai media/...

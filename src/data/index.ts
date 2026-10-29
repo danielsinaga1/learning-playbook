@@ -1,9 +1,16 @@
-import type { Block, Curriculum, Module } from '../types';
+import type { Block, Curriculum, Module, Track } from '../types';
 import { aws } from './aws';
 import { interview } from './interview';
 import { algorithms } from './algorithms';
 import { ai } from './ai';
 import { nextjsModules, nextjsSource, nextjsTracks } from './nextjs';
+import { aiEngineerModules, aiEngineerSource, aiEngineerTracks } from './ai-engineer';
+import { javaModernModules, javaModernSource, javaModernTracks } from './java-modern';
+import { goModernModules, goModernSource } from './go-modern';
+import { nodeCoreModules, nodeCoreSource, nodeCoreTracks } from './node-core';
+import { pythonCoreModules, pythonCoreSource, pythonCoreTracks } from './python-core';
+import { rustCoreModules, rustCoreSource, rustCoreTracks } from './rust-core';
+import { dartModernModules, dartModernSource } from './dart-modern';
 import { englishFoundationArchives, englishFoundationModules, englishFoundationSources, englishFoundationTracks } from './english-foundations';
 import javaGen from './gen/java.json';
 import goGen from './gen/go.json';
@@ -57,9 +64,24 @@ function numbered(c: GenCurriculum): Curriculum {
 export const ARCHIVE_TRACK = { title: 'Arsip Sumber', summary: 'Peta bab dokumen asli dan bagian yang tidak masuk jalur utama, supaya tidak ada isi yang hilang.' };
 export const learning = (c: Curriculum) => c.modules.filter((m) => !m.archive);
 
+/**
+ * Sisipkan track tulisan tangan sebelum/sesudah track acuan (atau sebelum Arsip Sumber bila acuan tidak ada),
+ * sehingga konversi ulang gen/*.json tidak menghapus pelajaran tambahan.
+ */
+function insertTracks(tracks: Track[] | undefined, add: Track[], anchor: string, position: 'before' | 'after'): Track[] {
+  const list = tracks ?? [];
+  const found = list.findIndex((track) => track.title === anchor);
+  const archive = list.findIndex((track) => track.title === ARCHIVE_TRACK.title);
+  const at = found < 0 ? (archive < 0 ? list.length : archive) : position === 'after' ? found + 1 : found;
+  return [...list.slice(0, at), ...add, ...list.slice(at)];
+}
+
+/** Java Modern disisipkan setelah Functional & Lambda; modul Testcontainers masuk track Spring Boot lanjutan. */
 const java = numbered({
   ...gen(javaGen),
-  modules: [...withTrack(algorithms.modules, 'Strategi Algoritma'), ...gen(javaGen).modules],
+  tracks: insertTracks(gen(javaGen).tracks, javaModernTracks, 'Java Functional & Lambda', 'after'),
+  sources: [...(gen(javaGen).sources ?? []), javaModernSource],
+  modules: [...withTrack(algorithms.modules, 'Strategi Algoritma'), ...gen(javaGen).modules, ...javaModernModules],
   intro: [...(algorithms.intro ?? []), ...(gen(javaGen).intro ?? [])],
 });
 
@@ -76,9 +98,12 @@ const angularIndex = javascriptTracks.findIndex((track) => track.title === 'Angu
 const nextjsIndex = angularIndex < 0 ? javascriptTracks.length : angularIndex;
 const javascript = numbered({
   ...javascriptGen,
-  description: 'React dari fondasi sampai performa dan proyek nyata, React Native, TypeScript lanjutan, Next.js App Router sampai full stack dan produksi, Angular modern, serta backend Node.js dengan Express dan NestJS.',
-  tracks: [...javascriptTracks.slice(0, nextjsIndex), ...nextjsTracks, ...javascriptTracks.slice(nextjsIndex)],
-  sources: [...(javascriptGen.sources ?? []), nextjsSource],
+  description: 'React dari fondasi sampai performa dan proyek nyata, React Native, TypeScript lanjutan, Next.js App Router sampai full stack dan produksi, Angular modern, serta backend Node.js: inti runtime (event loop, streams, Drizzle), Express, dan NestJS.',
+  tracks: insertTracks(
+    [...javascriptTracks.slice(0, nextjsIndex), ...nextjsTracks, ...javascriptTracks.slice(nextjsIndex)],
+    nodeCoreTracks, 'Node.js: Express', 'before',
+  ),
+  sources: [...(javascriptGen.sources ?? []), nextjsSource, nodeCoreSource],
   modules: [
     ...javascriptGen.modules.map((module) => module.id === 'next-js-app-router' ? {
       ...module,
@@ -88,6 +113,7 @@ const javascript = numbered({
       ],
     } : module),
     ...nextjsModules,
+    ...nodeCoreModules,
   ],
 });
 
@@ -108,10 +134,25 @@ const english = numbered({
   modules: [...englishBase.modules, ...englishFoundationModules, ...englishFoundationArchives],
 });
 
-/** LLM: outline program Applied AI Engineer (Hacktiv8) masuk ke track Peta Belajar. */
+/**
+ * LLM: outline program Applied AI Engineer (Hacktiv8) masuk ke track Peta Belajar.
+ * Jalur praktik AI Engineer (LangChain v1, LangGraph, Langfuse) disisipkan setelah RAG, sebelum Fase 2.
+ */
+const llmBase = gen(llmGen);
+const llmTracks = llmBase.tracks ?? [];
+const ragIndex = llmTracks.findIndex((track) => track.title === 'RAG: Panduan Lengkap');
+const aiEngineerIndex = ragIndex < 0 ? llmTracks.length : ragIndex + 1;
 const llm = numbered({
-  ...gen(llmGen),
+  ...llmBase,
+  description: `${llmBase.description} Plus jalur praktik AI Engineer: Claude API, LangChain v1, LangGraph, Langfuse, eval, dan full stack.`,
+  tracks: [...llmTracks.slice(0, aiEngineerIndex), ...aiEngineerTracks, ...llmTracks.slice(aiEngineerIndex)],
+  sources: [...(llmBase.sources ?? []), aiEngineerSource],
+  intro: [
+    { type: 'callout', tone: 'tip', title: 'Jalur praktik AI Engineer', text: 'Ingin langsung membangun agent? Ikuti 11 modul mulai dari [Peta Stack & Jalur Belajar](#llm.aie-roadmap-stack): Python modern, Claude API & tool calling, LangChain v1, LangGraph (memory, human-in-the-loop, multi-agent), Langfuse (tracing, prompt, eval), lalu full stack FastAPI + Next.js dan proyek akhir.' },
+    ...(llmBase.intro ?? []),
+  ],
   modules: [
+    ...aiEngineerModules,
     ...withTrack(ai.modules, 'Peta Belajar').map((m) => ({
       ...m,
       id: m.id === 'program' ? m.id : `hacktiv8-${m.id}`,
@@ -170,14 +211,51 @@ function mergeInterview(): Curriculum {
   };
 }
 
+/** Go: pelajaran tambahan masuk ke track yang sudah ada. */
+const goBase = gen(goGen);
+const go = numbered({
+  ...goBase,
+  sources: [...(goBase.sources ?? []), goModernSource],
+  modules: [...goBase.modules, ...goModernModules],
+});
+
+/** Python Inti mendahului FastAPI/Django: bahasa dulu, framework kemudian. */
+const pythonBase = gen(pythonGen);
+const python = numbered({
+  ...pythonBase,
+  title: 'Python: Inti, FastAPI & Django',
+  description: `Bahasa Python dari fondasi sampai asyncio dan tooling modern, lalu ${pythonBase.description.charAt(0).toLowerCase()}${pythonBase.description.slice(1)}`,
+  tracks: insertTracks(pythonBase.tracks, pythonCoreTracks, 'Kontrak API', 'before'),
+  sources: [...(pythonBase.sources ?? []), pythonCoreSource],
+  modules: [...pythonBase.modules, ...pythonCoreModules],
+});
+
+/** Rust: inti bahasa (ownership sampai trait) dan backend Axum setelah Rust Dasar. */
+const rustBase = gen(rustGen);
+const rust = numbered({
+  ...rustBase,
+  description: `${rustBase.description} Dilanjutkan ownership, borrowing, enum & pattern matching, error handling, trait & generic, serta REST API dengan Tokio, Axum, dan SQLx.`,
+  tracks: insertTracks(rustBase.tracks, rustCoreTracks, 'Rust Dasar', 'after'),
+  sources: [...(rustBase.sources ?? []), rustCoreSource],
+  modules: [...rustBase.modules, ...rustCoreModules],
+});
+
+/** Flutter: Dart 3, Pigeon, dan aksesibilitas masuk ke track yang sudah ada. */
+const flutterBase = gen(flutterGen);
+const flutter = numbered({
+  ...flutterBase,
+  sources: [...(flutterBase.sources ?? []), dartModernSource],
+  modules: [...flutterBase.modules, ...dartModernModules],
+});
+
 /** Daftar kurikulum sesuai urutan tampil. */
 export const curricula: Curriculum[] = [
   java,
-  numbered(gen(goGen)),
+  go,
   javascript,
-  numbered(gen(pythonGen)),
-  numbered(gen(rustGen)),
-  numbered(gen(flutterGen)),
+  python,
+  rust,
+  flutter,
   numbered(gen(sqlGen)),
   numbered(gen(distributedGen)),
   numbered(gen(lldGen)),

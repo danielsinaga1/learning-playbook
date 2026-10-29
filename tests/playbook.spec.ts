@@ -15,6 +15,28 @@ test('fondasi English: struktur gabungan, latihan, dan arsip halaman sumber', as
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
+test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const lessons: [string, string][] = [
+    ['#llm.aie-langgraph-memory-hitl', 'AI Engineer: LangGraph — Memory & Human-in-the-Loop'],
+    ['#java.java-records-sealed-pattern', 'Java Modern: Records, Sealed Class & Pattern Matching'],
+    ['#go.go-pgx-sqlc', 'Database Type-Safe: pgx, sqlc & Migrasi goose'],
+    ['#js.node-event-loop', 'Node.js: Event Loop, Promise & Async Mendalam'],
+    ['#python.py-fondasi-bahasa', 'Python: Fondasi Bahasa & Koleksi'],
+    ['#rust.rust-ownership-borrowing', 'Rust: Ownership, Borrowing & Lifetime'],
+    ['#flutter.dart3-records-patterns-sealed', 'Dart 3 Mendalam: Records, Patterns & Sealed Class'],
+  ];
+  for (const [hash, title] of lessons) {
+    await page.goto('/' + hash);
+    await expect(page.locator('.reader-sheet h1')).toHaveText(title);
+    await expect(page.locator('.reading-content pre').first()).toBeVisible();
+  }
+  await page.goto('/#python');
+  await expect(page.getByText('Python Inti', { exact: true }).first()).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test('beranda, filter kurikulum, navigasi, dan progres tersimpan', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.c-card')).toHaveCount(14);
