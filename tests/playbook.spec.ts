@@ -26,6 +26,13 @@ test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', a
     ['#python.py-fondasi-bahasa', 'Python: Fondasi Bahasa & Koleksi'],
     ['#rust.rust-ownership-borrowing', 'Rust: Ownership, Borrowing & Lifetime'],
     ['#flutter.dart3-records-patterns-sealed', 'Dart 3 Mendalam: Records, Patterns & Sealed Class'],
+    ['#js.js-fungsi-closure', 'JavaScript: Fungsi, Scope & Closure'],
+    ['#js.ts-setup-tipe-dasar', 'TypeScript: Setup, tsc & Tipe Dasar'],
+    ['#rust.rust-closure-iterator', 'Rust: Closure & Iterator Mendalam'],
+    ['#python.py-pytest-mendalam', 'Python: pytest Mendalam'],
+    ['#kotlin.kt-setup-dasar', 'Kotlin: Setup & Sintaks Dasar'],
+    ['#csharp.cs-setup-dasar', 'C#: Setup .NET & Dasar Bahasa'],
+    ['#tools.git-konsep-dasar', 'Git: Konsep Dasar & Commit yang Baik'],
   ];
   for (const [hash, title] of lessons) {
     await page.goto('/' + hash);
@@ -37,9 +44,21 @@ test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', a
   expect(errors).toEqual([]);
 });
 
+test('jalur belajar: rute per tujuan menautkan ke modul bahasa', async ({ page }) => {
+  await page.goto('/#jalur.jalur-per-tujuan');
+  await expect(page.locator('.reader-sheet h1')).toHaveText('Jalur per Tujuan Karier');
+  await page.getByRole('tab', { name: 'Enterprise (.NET)' }).click();
+  await page.getByRole('link', { name: 'Minimal API', exact: true }).click();
+  await expect(page).toHaveURL(/#csharp\.cs-aspnet-minimal-api$/);
+  await expect(page.locator('.reading-content pre').first()).toBeVisible();
+  await page.goto('/#jalur.jalur-fase-1-java-backend');
+  await page.getByRole('link', { name: 'Git: Konsep Dasar', exact: true }).click();
+  await expect(page).toHaveURL(/#tools\.git-konsep-dasar$/);
+});
+
 test('beranda, filter kurikulum, navigasi, dan progres tersimpan', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.c-card')).toHaveCount(14);
+  await expect(page.locator('.c-card')).toHaveCount(18);
   await page.getByRole('searchbox', { name: 'Cari kurikulum', exact: true }).fill('Rust');
   const rust = page.locator('.c-card').filter({ has: page.getByRole('heading', { name: 'Rust', exact: true }) });
   await expect(rust).toBeVisible();

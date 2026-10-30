@@ -36,6 +36,9 @@
   --c-slate: #475569;
   --c-fuchsia: #a21caf;
   --c-cyan: #0e7490;
+  --c-purple: #7e22ce;
+  --c-pink: #c2185b;
+  --c-stone: #78614a;
 
   /* Kode (selalu gelap, di kedua tema) */
   --code-bg: #121923;
@@ -98,6 +101,9 @@
     --c-slate: #aab6c8;
     --c-fuchsia: #f0abfc;
     --c-cyan: #67e8f9;
+    --c-purple: #d8b4fe;
+    --c-pink: #f9a8d4;
+    --c-stone: #d6c3a8;
     --code-bg: #0a0e14;
     --code-head: #111720;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.25);
@@ -136,6 +142,9 @@
   --c-slate: #aab6c8;
   --c-fuchsia: #f0abfc;
   --c-cyan: #67e8f9;
+  --c-purple: #d8b4fe;
+  --c-pink: #f9a8d4;
+  --c-stone: #d6c3a8;
   --code-bg: #0a0e14;
   --code-head: #111720;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.25);
@@ -156,6 +165,9 @@
 .hue-slate { --hue: var(--c-slate); }
 .hue-fuchsia { --hue: var(--c-fuchsia); }
 .hue-cyan { --hue: var(--c-cyan); }
+.hue-purple { --hue: var(--c-purple); }
+.hue-pink { --hue: var(--c-pink); }
+.hue-stone { --hue: var(--c-stone); }
 
 /* ───────────── Dasar ───────────── */
 *,

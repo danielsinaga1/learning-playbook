@@ -31,6 +31,7 @@ export type CodeLang =
   | 'c'
   | 'csharp'
   | 'php'
+  | 'kotlin'
   | 'text';
 
 export type Hue =
@@ -47,7 +48,10 @@ export type Hue =
   | 'indigo'
   | 'slate'
   | 'fuchsia'
-  | 'cyan';
+  | 'cyan'
+  | 'purple'
+  | 'pink'
+  | 'stone';
 
 export type Cell = string | { badge: BadgeTone; text: string };
 
