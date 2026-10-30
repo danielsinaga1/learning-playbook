@@ -32,6 +32,8 @@
   --c-purple: #8a5fb3;
   --c-pink: #b5617f;
   --c-stone: #85715c;
+  --c-gold: #9a7a2c;
+  --c-maroon: #a1505f;
   color-scheme: light;
 }
 
@@ -93,6 +95,7 @@ input, select { font: inherit; color: inherit; }
 .rail-foot-note { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; margin-bottom: 8px; }
 .rail-foot-note > span { width: 5px; height: 5px; background: var(--good); border-radius: 50%; }
 .rail-foot .btn-link { font-size: 10px; text-decoration: none; }
+.rail-foot-notice { font-size: 10px; }
 .rail-close { display: none; }
 .eyebrow { font-family: var(--f-body); font-size: 10px; font-weight: 600; letter-spacing: 1.3px; }
 .page-home { max-width: 1160px; gap: 26px; }

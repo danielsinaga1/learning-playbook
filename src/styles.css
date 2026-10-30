@@ -39,6 +39,8 @@
   --c-purple: #7e22ce;
   --c-pink: #c2185b;
   --c-stone: #78614a;
+  --c-gold: #a16207;
+  --c-maroon: #9f1239;
 
   /* Kode (selalu gelap, di kedua tema) */
   --code-bg: #121923;
@@ -104,6 +106,8 @@
     --c-purple: #d8b4fe;
     --c-pink: #f9a8d4;
     --c-stone: #d6c3a8;
+    --c-gold: #facc15;
+    --c-maroon: #fda4af;
     --code-bg: #0a0e14;
     --code-head: #111720;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.25);
@@ -145,6 +149,8 @@
   --c-purple: #d8b4fe;
   --c-pink: #f9a8d4;
   --c-stone: #d6c3a8;
+  --c-gold: #facc15;
+  --c-maroon: #fda4af;
   --code-bg: #0a0e14;
   --code-head: #111720;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.25);
@@ -168,6 +174,8 @@
 .hue-purple { --hue: var(--c-purple); }
 .hue-pink { --hue: var(--c-pink); }
 .hue-stone { --hue: var(--c-stone); }
+.hue-gold { --hue: var(--c-gold); }
+.hue-maroon { --hue: var(--c-maroon); }
 
 /* ───────────── Dasar ───────────── */
 *,
@@ -460,6 +468,9 @@ kbd {
   border-top: 1px solid var(--rule-soft);
   font-size: 13px;
 }
+.rail-foot-actions { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.rail-foot-notice { margin: 6px 0 0; color: var(--ink-2); font-size: 12px; }
+.rail-foot-notice:empty { display: none; }
 .confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--ink-2); }
 .confirm span { flex-basis: 100%; }
 

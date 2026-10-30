@@ -129,3 +129,45 @@ export function toggleFocusMode() {
 export function resetProgress() {
   setState((s) => ({ ...initial, theme: s.theme, readingSize: s.readingSize, focusMode: s.focusMode }));
 }
+
+const EXPORT_FORMAT = 'backend-playbook-progress';
+
+/** Cadangan progres (modul selesai, status latihan, checklist) sebagai JSON; preferensi tampilan tidak ikut. */
+export function exportProgress(): string {
+  const { done, qa, checks, last } = state;
+  return JSON.stringify({ format: EXPORT_FORMAT, version: 1, exportedAt: new Date().toISOString(), done, qa, checks, last }, null, 2);
+}
+
+const isRecord = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+const onlyTrue = (v: unknown) => Object.fromEntries(Object.entries(isRecord(v) ? v : {}).filter(([, x]) => x === true)) as Record<string, true>;
+
+/**
+ * Gabungkan cadangan ke progres saat ini: yang sudah ada tidak dihapus, status latihan dari cadangan menang.
+ * Mengembalikan jumlah entri yang dibaca, atau melempar Error bila file bukan cadangan playbook.
+ */
+export function importProgress(text: string): { done: number; qa: number; checks: number } {
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error('File bukan JSON yang valid.');
+  }
+  if (!isRecord(data) || data.format !== EXPORT_FORMAT) throw new Error('File ini bukan cadangan progres Backend Playbook.');
+  const done = onlyTrue(data.done);
+  const checks = onlyTrue(data.checks);
+  const qa = Object.fromEntries(
+    Object.entries(isRecord(data.qa) ? data.qa : {}).filter(([, x]) => x === 'known' || x === 'review'),
+  ) as Record<string, QAStatus>;
+  const last = isRecord(data.last) && typeof data.last.cid === 'string' && typeof data.last.mid === 'string'
+    ? { cid: data.last.cid, mid: data.last.mid }
+    : undefined;
+  const incoming = migrate({ ...initial, done, qa, checks, last });
+  setState((s) => ({
+    ...s,
+    done: { ...s.done, ...incoming.done },
+    qa: { ...s.qa, ...incoming.qa },
+    checks: { ...s.checks, ...incoming.checks },
+    last: s.last ?? incoming.last,
+  }));
+  return { done: Object.keys(done).length, qa: Object.keys(qa).length, checks: Object.keys(checks).length };
+}

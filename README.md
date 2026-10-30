@@ -7,9 +7,10 @@ dan tiap dokumen sumber menjadi **track** (submodul) di dalam kurikulumnya.
 |---|---|---|
 | **Jalur Belajar** | Mulai di Sini · Jalur Utama 12 Bulan · Jalur per Tujuan | Rekomendasi tulisan tangan yang menautkan modul di semua kurikulum |
 | **Git & Shell** | Git · Shell & Terminal | Pro Git, dokumentasi git-scm.com, GNU Bash Manual, GitHub Docs |
+| **Web & Keamanan** | Internet & HTTP · Keamanan Aplikasi | MDN, OWASP Top 10:2025 & Cheat Sheet Series, RFC HTTP, web.dev |
 | **Java & Spring Boot** | Java Fundamentals · Java Functional & Lambda · Java Modern (17–25) · Struktur Data · Strategi Algoritma · Soal Struktur Data · Soal Algoritma · Coding Interview (Program Creek, 120 soal) · Greedy (6 track: Konsep & Graf, Penjadwalan, Koin/Knapsack/Huffman, Array & Angka, String, Sistem Operasi) · Design Patterns · Spring Boot: Inti · Data & Persistence · Lanjutan & Produksi (+ Testcontainers & Resilience4j) · Proyek & Studi Kasus · Karier & Sertifikasi | Java Algorithm Mastery (HTML), Materi-Java-SpringBoot, SpringBoot_Panduan_Lengkap, Struktur_Data_Java_Interview, Algoritma_Java, Design_Patterns_Java, Greedy_Algo.pdf (145 artikel), 100 Lambda Code Snippets.pdf, Java Functional Interfaces.pdf, Data Structure.pdf (tulisan tangan), Spring Dependency Injection.pdf, Coding Interview in Java.pdf, 60 days Java.pdf, Exploring the Java Ecosystem.pdf |
 | **Go** | Dasar · Concurrency · Idiom & Arsitektur · Web API & DB (+ pgx, sqlc & goose) · Testing & Produksi (+ fuzzing, benchmark & govulncheck) · gRPC & GraphQL · Message Queue · Proyek Pencatat Keuangan · Proyek E-Commerce · Karier | Belajar_GoLang_Pemula_ke_Mahir, Golang_Masterclass_Lengkap, 05_GraphQL, Backend_Go_PencatatKeuangan_API |
-| **JavaScript & TypeScript** | JavaScript Dasar · TypeScript Dasar · React: Fondasi · Hooks, State & Performa · Ekosistem & Produksi · Proyek React · React: Notes for Professionals · React Native · TypeScript Lanjutan · Next.js: Fondasi · Next.js: Data & Full Stack · Next.js: Produksi & Proyek · Angular · Node.js: Inti Runtime · Node.js: Express · Node.js: NestJS · Roadmap Senior Web (12 Bulan) | Belajar-React-TypeScript-Lengkap, React_Panduan_Konsolidasi, React_Masterclass, Proyek_React v1 & v2, ReactNative_PencatatKeuangan_Mobile, 01_TypeScript_Penuh, dokumentasi resmi Next.js App Router, Angular, Express 1 & 2, Nest 1 & 2, 01-Web-Fase1…4, Lazy Loading React.pdf, React JS.pdf (GoalKicker), MDN, TypeScript Handbook |
+| **JavaScript & TypeScript** | HTML & CSS Dasar · JavaScript Dasar · TypeScript Dasar · React: Fondasi · Hooks, State & Performa · Ekosistem & Produksi · Proyek React · React: Notes for Professionals · React Native · TypeScript Lanjutan · Next.js: Fondasi · Next.js: Data & Full Stack · Next.js: Produksi & Proyek · Angular · Node.js: Inti Runtime · Node.js: Express · Node.js: NestJS · Roadmap Senior Web (12 Bulan) | Belajar-React-TypeScript-Lengkap, React_Panduan_Konsolidasi, React_Masterclass, Proyek_React v1 & v2, ReactNative_PencatatKeuangan_Mobile, 01_TypeScript_Penuh, dokumentasi resmi Next.js App Router, Angular, Express 1 & 2, Nest 1 & 2, 01-Web-Fase1…4, Lazy Loading React.pdf, React JS.pdf (GoalKicker), MDN, web.dev, TypeScript Handbook |
 | **Python** | Python Inti · Python Praktik · Kontrak API · FastAPI · Django | FastAPI 1 & 2, Django 1 & 2, dokumentasi resmi Python, pytest, Python Packaging User Guide, uv |
 | **Rust** | Rust Dasar · Rust Inti · Rust Lanjutan · Rust untuk Backend | Modul_Rust_Pemula_hingga_Mahir, The Rust Programming Language, Rust by Example, dokumentasi std/Tokio/Axum/SQLx |
 | **Kotlin** | Kotlin Dasar · Kotlin Lanjutan · Kotlin untuk Backend · Android: Jetpack Compose | Dokumentasi resmi Kotlin, kotlinx.coroutines, Spring, Android Developers |
@@ -21,7 +22,7 @@ dan tiap dokumen sumber menjadi **track** (submodul) di dalam kurikulumnya.
 | **Cloud & DevOps** | AWS untuk Java Developer · Docker · Kubernetes · Platform Engineering & SRE | AWS Roadmap (HTML), Docker-Kubernetes + Modul DevOps V2.pdf (bagian baru), Panduan_Backend_Platform_Engineering |
 | **Software Testing & QA** | Fondasi (+ FSD vs TSD) · Praktik · Automation · API Testing & TDD · Lanjutan & Snippet | Software_Testing_Lengkap, API Testing.pdf, End to End API Testing.pdf, TDD.pdf, FSD dan TSD.pdf |
 | **LLM** | Peta Belajar (termasuk program Hacktiv8) · Fase 0 · Fase 1 · RAG: Panduan Lengkap · AI Engineer: Fondasi · LangChain & LangGraph · Observability & Produksi · Fase 2–4 · Proyek Akhir Terpadu · Referensi: Cheatsheet ML, DL & AI | 03-DataAI-Roadmap-Komprehensif, 03-DataAI-Fase1…4, Belajar_Hacktiv8, Retrieval Augmented Generation.pdf, All Cheatsheet ML DL AI (Stanford & MIT).pdf |
-| **Interview Prep** | Java, Spring Boot & AWS · React & Spring Boot Advanced · Apache Kafka (Java) | Interview Prep (HTML), 50_Soal_Advanced_React_SpringBoot, Apache Kafka.pdf |
+| **Interview Prep** | Cara Menjawab · Java, Spring Boot & AWS · Go · Python & AI Engineer · TypeScript & Node.js · Kotlin & C#/.NET · React & Spring Boot Advanced · Apache Kafka (Java) · System Design Interview | Interview Prep (HTML), 50_Soal_Advanced_React_SpringBoot, Apache Kafka.pdf, dokumentasi resmi tiap bahasa |
 | **English Learning** | Vocabulary (4 track) · Vocabulary Lanjutan · Grammar Dasar · Struktur Kalimat · Adjectives & Numbers · 16 Tenses · Grammar & Strategi TOEFL · IELTS (5 track) · IELTS Vocabulary Booster | English_Vocabulary_and_Phrasal_Verbs_v3, English_Komprehensif v2 (dua file identik), Panduan_Master_IELTS.pdf, Ringkasan_IELTS_Vocabulary_Booster.pdf, Materi 1-4 (Parts of Speech, Phrase/Clause/Sentence, Sentence Structure, Superlative & Ordinal) |
 
 Kurikulum hasil konversi dokumen juga punya track **Arsip Sumber** (lihat di bawah).
@@ -43,8 +44,12 @@ Python & AI → produksi & interview) dengan checklist kriteria lulus tiap fase,
 | Python Praktik | pytest mendalam, packaging dengan pyproject & uv, proyek CLI otomasi | `python-practice.ts` |
 | Kotlin | 11 modul: dasar, null safety, lambda, sealed, koleksi, coroutines, Flow, DSL & interop Java, Spring Boot, testing, Jetpack Compose | `kotlin.ts` |
 | C# & .NET | 11 modul: dasar, OOP & record, LINQ, fitur modern, async, generic & DI, Minimal API, EF Core, auth & middleware, xUnit, Docker | `csharp.ts` |
+| HTML & CSS Dasar | Struktur & semantik, form & aksesibilitas, cascade & box model, Flexbox & Grid, responsif modern, proyek halaman profil | `html-css.ts` |
+| Web & Keamanan | Internet & HTTP: cara kerja internet, HTTP, desain REST API, CORS · Keamanan: OWASP Top 10:2025, injection, XSS & CSRF, autentikasi, otorisasi, secret & supply chain, checklist produksi | `web-security.ts` |
+| Interview Prep | Strategi & behavioral (STAR); 61 soal Go, Python & AI Engineer, TypeScript & Node.js, Kotlin & C#/.NET | `interview-languages.ts` |
+| Interview Prep | System design: kerangka 45 menit & estimasi, URL shortener, rate limiter, chat, news feed, sistem pembayaran, 15 soal trade-off | `system-design-interview.ts` |
 
-Highlighter mendukung Kotlin. Versi yang disebut di materi diperiksa pada **30 Oktober 2026**.
+Highlighter mendukung Kotlin. Jalur Belajar menautkan materi-materi ini ke fase dan rute yang sesuai. Versi yang disebut di materi diperiksa pada **30 Oktober 2026**.
 
 ## Fondasi English Learning
 
@@ -142,7 +147,8 @@ Navigasi per kurikulum → track → modul, tandai modul selesai, progres per ku
 (Paham / Ulangi + filter, soal coding dengan tombol "Lihat jawaban"), checklist yang bisa dicentang, mode hafalan
 kosakata, pencarian global (`Ctrl+K` / `/`, termasuk isi arsip), salin kode, highlight sintaks (Java, Go, TS/JS, Python,
 Dart, Rust, SQL, YAML, Docker, Terraform, GraphQL, dll.), tema terang/gelap, tampilan mobile. Progres disimpan di
-`localStorage` browser.
+`localStorage` browser; tombol **Ekspor** / **Impor** di sidebar mengunduh dan memulihkan cadangan progres (modul selesai,
+status latihan, checklist) sebagai file JSON. Impor menggabungkan cadangan dengan progres yang ada, tanpa menghapus apa pun.
 
 Tampilan ruang belajar menggunakan warna hijau tenang, kartu kurikulum, filter status belajar, dan pencarian kurikulum.
 Halaman materi memiliki daftar isi, penanda posisi membaca, ukuran teks Ringkas/Nyaman/Besar, mode fokus, serta pembesaran
@@ -202,7 +208,8 @@ src/
     lesson-kit.ts         Helper blok untuk materi tulisan tangan
     java-modern.ts, go-modern.ts, node-core.ts, python-core.ts, rust-core.ts, dart-modern.ts   Pelajaran tambahan per bahasa
     js-core.ts, rust-advanced.ts, python-practice.ts   JS/TS Dasar, Rust Lanjutan, Python Praktik
-    roadmap.ts, dev-tools.ts, kotlin.ts, csharp.ts   Kurikulum tulisan tangan: Jalur Belajar, Git & Shell, Kotlin, C# & .NET
+    roadmap.ts, dev-tools.ts, web-security.ts, kotlin.ts, csharp.ts   Kurikulum tulisan tangan: Jalur Belajar, Git & Shell, Web & Keamanan, Kotlin, C# & .NET
+    html-css.ts, interview-languages.ts, system-design-interview.ts   HTML & CSS Dasar, interview per bahasa, system design interview
   assets/                 Dua slide asli Belajar_Hacktiv8 (WebP)
 public/media/             Gambar halaman & ilustrasi (greedy/, rag/, stanford/, coding-interview/, reactjs/, sql-notes/,
                           api-testing-ci/, api-testing-bdd/, microservices-patterns/), dirujuk sebagai media/...

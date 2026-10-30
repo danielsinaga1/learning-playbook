@@ -33,6 +33,9 @@ test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', a
     ['#kotlin.kt-setup-dasar', 'Kotlin: Setup & Sintaks Dasar'],
     ['#csharp.cs-setup-dasar', 'C#: Setup .NET & Dasar Bahasa'],
     ['#tools.git-konsep-dasar', 'Git: Konsep Dasar & Commit yang Baik'],
+    ['#js.css-flexbox-grid', 'CSS: Layout dengan Flexbox & Grid'],
+    ['#web.sec-injection', 'Injection: SQL, Command & Path Traversal'],
+    ['#interview.sd-rate-limiter', 'Studi Kasus: Design Rate Limiter'],
   ];
   for (const [hash, title] of lessons) {
     await page.goto('/' + hash);
@@ -41,6 +44,9 @@ test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', a
   }
   await page.goto('/#python');
   await expect(page.getByText('Python Inti', { exact: true }).first()).toBeVisible();
+  await page.goto('/#interview.iv-go');
+  await expect(page.locator('.reader-sheet h1')).toHaveText('Interview Go');
+  await expect(page.locator('section.qa').first()).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -56,9 +62,31 @@ test('jalur belajar: rute per tujuan menautkan ke modul bahasa', async ({ page }
   await expect(page).toHaveURL(/#tools\.git-konsep-dasar$/);
 });
 
+test('progres dapat diekspor, direset, lalu diimpor kembali', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Di ponsel sidebar berupa laci tertutup; alur yang sama diuji di desktop.');
+  await page.goto('/#tools.git-konsep-dasar');
+  await page.getByRole('button', { name: 'Tandai modul ini selesai' }).click();
+  const rail = page.locator('.rail');
+  const [download] = await Promise.all([page.waitForEvent('download'), rail.getByRole('button', { name: 'Ekspor', exact: true }).click()]);
+  expect(download.suggestedFilename()).toMatch(/^playbook-progres-\d{4}-\d{2}-\d{2}\.json$/);
+  const backup = testInfo.outputPath('progres.json');
+  await download.saveAs(backup);
+
+  await rail.getByRole('button', { name: 'Reset progres' }).click();
+  await rail.getByRole('button', { name: 'Ya, reset' }).click();
+  await expect(page.locator('.done-btn')).toHaveAttribute('aria-pressed', 'false');
+
+  await rail.getByLabel('Pilih file cadangan progres').setInputFiles(backup);
+  await expect(rail.getByRole('status')).toHaveText(/Dipulihkan: 1 modul/);
+  await expect(page.locator('.done-btn')).toHaveAttribute('aria-pressed', 'true');
+
+  await rail.getByLabel('Pilih file cadangan progres').setInputFiles({ name: 'salah.json', mimeType: 'application/json', buffer: Buffer.from('{"done":{}}') });
+  await expect(rail.getByRole('status')).toHaveText('File ini bukan cadangan progres Backend Playbook.');
+});
+
 test('beranda, filter kurikulum, navigasi, dan progres tersimpan', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.c-card')).toHaveCount(18);
+  await expect(page.locator('.c-card')).toHaveCount(19);
   await page.getByRole('searchbox', { name: 'Cari kurikulum', exact: true }).fill('Rust');
   const rust = page.locator('.c-card').filter({ has: page.getByRole('heading', { name: 'Rust', exact: true }) });
   await expect(rust).toBeVisible();

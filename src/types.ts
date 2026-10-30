@@ -51,7 +51,9 @@ export type Hue =
   | 'cyan'
   | 'purple'
   | 'pink'
-  | 'stone';
+  | 'stone'
+  | 'gold'
+  | 'maroon';
 
 export type Cell = string | { badge: BadgeTone; text: string };
 
