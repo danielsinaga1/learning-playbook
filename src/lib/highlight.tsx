@@ -37,6 +37,8 @@ const CPP_KW =
   '|class|public|private|protected|virtual|override|template|typename|namespace|using|new|delete|this|nullptr|try|catch|throw|operator|friend|const_cast|static_cast|dynamic_cast|reinterpret_cast|auto|constexpr|noexcept|explicit|mutable|std|vector|string|pair|map|set|queue|stack|priority_queue|cout|cin|endl';
 const CS_KW =
   'abstract|as|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|do|double|else|enum|event|explicit|extern|false|finally|fixed|float|for|foreach|goto|if|implicit|in|int|interface|internal|is|lock|long|namespace|new|null|object|operator|out|override|params|private|protected|public|readonly|ref|return|sbyte|sealed|short|sizeof|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|var|virtual|void|volatile|while';
+const KT_KW =
+  'abstract|actual|annotation|as|break|by|catch|class|companion|const|constructor|continue|crossinline|data|do|else|enum|expect|external|false|final|finally|for|fun|get|if|import|in|infix|init|inline|inner|interface|internal|is|lateinit|noinline|null|object|open|operator|out|override|package|private|protected|public|reified|return|sealed|set|super|suspend|tailrec|this|throw|true|try|typealias|val|value|var|vararg|when|where|while';
 const PHP_KW =
   'abstract|and|array|as|break|case|catch|class|clone|const|continue|declare|default|do|echo|else|elseif|empty|endfor|endforeach|endif|endwhile|extends|final|for|foreach|function|global|if|implements|include|instanceof|interface|isset|list|new|or|print|private|protected|public|require|return|static|switch|throw|try|unset|use|var|while|true|false|null';
 const PREPROC: Rule = ['ann', /#\s*(?:include|define|ifndef|ifdef|endif|pragma|undef|if|else)\b[^\n]*/y];
@@ -46,6 +48,7 @@ const RULES: Record<CodeLang, Rule[]> = {
   c: [SLASH_CMT, PREPROC, DQ_STR, SQ_STR, ['kw', kw(C_KW)], NUM, TYPE, FN],
   csharp: [SLASH_CMT, DQ_STR, SQ_STR, ['kw', kw(CS_KW)], NUM, TYPE, FN],
   php: [SLASH_CMT, HASH_CMT, DQ_STR, SQ_STR, ['ann', /<\?php|\?>/y], ['num', /\$[A-Za-z_]\w*/y], ['kw', kw(PHP_KW)], NUM, FN],
+  kotlin: [SLASH_CMT, ['str', /"""[\s\S]*?"""/y], DQ_STR, SQ_STR, ANN, ['kw', kw(KT_KW)], NUM, TYPE, FN],
   java: [SLASH_CMT, DQ_STR, SQ_STR, ANN, ['kw', kw(JAVA_KW)], NUM, TYPE, FN],
   go: [SLASH_CMT, DQ_STR, BT_STR, SQ_STR, ['kw', kw(GO_KW)], NUM, TYPE, FN],
   ts: [SLASH_CMT, BT_STR, DQ_STR, SQ_STR, ANN, ['kw', kw(TS_KW)], NUM, TYPE, FN],
@@ -65,7 +68,7 @@ const RULES: Record<CodeLang, Rule[]> = {
     HASH_CMT,
     DQ_STR,
     ['str', /'[^']*'/y],
-    ['kw', /(?<=^|\n|&&\s|\|\s|;\s|\$\(|sudo\s)\s*(?:aws|mvn|\.\/mvnw|\.\/gradlew|gradle|docker|docker-compose|kubectl|minikube|helm|git|go|java|npm|npx|pnpm|yarn|node|pip3?|python3?|uvicorn|gunicorn|celery|alembic|django-admin|curl|cd|mkdir|cp|mv|rm|ls|cat|echo|export|flutter|dart|ng|protoc|brew|apt|apt-get|sudo|chmod|wget|grpcurl|golangci-lint)\b/y],
+    ['kw', /(?<=^|\n|&&\s|\|\s|;\s|\$\(|sudo\s)\s*(?:aws|mvn|\.\/mvnw|\.\/gradlew|gradle|docker|docker-compose|kubectl|minikube|helm|git|go|java|npm|npx|pnpm|yarn|node|pip3?|python3?|uvicorn|gunicorn|celery|alembic|django-admin|curl|cd|mkdir|cp|mv|rm|ls|cat|echo|export|flutter|dart|ng|protoc|brew|apt|apt-get|sudo|chmod|wget|grpcurl|golangci-lint|cargo|rustup|dotnet|kotlinc?|uv|pytest|ruff|tsc|grep|sed|awk|find|xargs|sort|uniq|wc|head|tail|cut|tr|tee|ssh|scp|chown|ps|kill|source|trap|jq|touch|diff)\b/y],
     ['flag', /(?<=\s)-{1,2}[A-Za-z][\w-]*/y],
     ['num', /\$\{?[A-Za-z_]\w*\}?/y],
   ],

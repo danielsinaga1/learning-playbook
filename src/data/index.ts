@@ -11,6 +11,13 @@ import { nodeCoreModules, nodeCoreSource, nodeCoreTracks } from './node-core';
 import { pythonCoreModules, pythonCoreSource, pythonCoreTracks } from './python-core';
 import { rustCoreModules, rustCoreSource, rustCoreTracks } from './rust-core';
 import { dartModernModules, dartModernSource } from './dart-modern';
+import { jsCoreModules, jsCoreSource, jsCoreTracks } from './js-core';
+import { rustAdvancedModules, rustAdvancedSource, rustAdvancedTracks } from './rust-advanced';
+import { pythonPracticeModules, pythonPracticeSource, pythonPracticeTracks } from './python-practice';
+import { kotlinCurriculum } from './kotlin';
+import { csharpCurriculum } from './csharp';
+import { devToolsCurriculum } from './dev-tools';
+import { roadmapCurriculum } from './roadmap';
 import { englishFoundationArchives, englishFoundationModules, englishFoundationSources, englishFoundationTracks } from './english-foundations';
 import javaGen from './gen/java.json';
 import goGen from './gen/go.json';
@@ -29,7 +36,8 @@ import interviewExtra from './gen/interview-extra.json';
 
 /*
  * Kurikulum hasil konversi .docx ada di ./gen/*.json (dibuat oleh skrip konversi).
- * Kurikulum yang ditulis tangan (aws, interview, algorithms, ai, nextjs) digabung di sini
+ * Kurikulum yang ditulis tangan (aws, interview, algorithms, ai, nextjs) digabung di sini;
+ * jalur belajar, Git & Shell, Kotlin, dan C# adalah kurikulum tulisan tangan yang berdiri sendiri,
  * supaya satu bahasa/ekosistem = satu kurikulum, dengan track sebagai submodul.
  */
 
@@ -91,19 +99,22 @@ const devops = numbered({
   intro: aws.intro,
 });
 
-/** Next.js ditambahkan setelah TypeScript, sebelum Angular; ID materi lama tetap stabil. */
+/**
+ * JavaScript & TypeScript Dasar membuka kurikulum (sebelum React).
+ * Next.js ditambahkan setelah TypeScript, sebelum Angular; ID materi lama tetap stabil.
+ */
 const javascriptGen = gen(jsGen);
-const javascriptTracks = javascriptGen.tracks ?? [];
+const javascriptTracks = insertTracks(javascriptGen.tracks, jsCoreTracks, 'React: Fondasi', 'before');
 const angularIndex = javascriptTracks.findIndex((track) => track.title === 'Angular');
 const nextjsIndex = angularIndex < 0 ? javascriptTracks.length : angularIndex;
 const javascript = numbered({
   ...javascriptGen,
-  description: 'React dari fondasi sampai performa dan proyek nyata, React Native, TypeScript lanjutan, Next.js App Router sampai full stack dan produksi, Angular modern, serta backend Node.js: inti runtime (event loop, streams, Drizzle), Express, dan NestJS.',
+  description: 'JavaScript dan TypeScript dasar, lalu React dari fondasi sampai performa dan proyek nyata, React Native, TypeScript lanjutan, Next.js App Router sampai full stack dan produksi, Angular modern, serta backend Node.js: inti runtime (event loop, streams, Drizzle), Express, dan NestJS.',
   tracks: insertTracks(
     [...javascriptTracks.slice(0, nextjsIndex), ...nextjsTracks, ...javascriptTracks.slice(nextjsIndex)],
     nodeCoreTracks, 'Node.js: Express', 'before',
   ),
-  sources: [...(javascriptGen.sources ?? []), nextjsSource, nodeCoreSource],
+  sources: [...(javascriptGen.sources ?? []), jsCoreSource, nextjsSource, nodeCoreSource],
   modules: [
     ...javascriptGen.modules.map((module) => module.id === 'next-js-app-router' ? {
       ...module,
@@ -112,6 +123,7 @@ const javascript = numbered({
         ...module.blocks,
       ],
     } : module),
+    ...jsCoreModules,
     ...nextjsModules,
     ...nodeCoreModules,
   ],
@@ -219,25 +231,25 @@ const go = numbered({
   modules: [...goBase.modules, ...goModernModules],
 });
 
-/** Python Inti mendahului FastAPI/Django: bahasa dulu, framework kemudian. */
+/** Python Inti lalu Python Praktik mendahului FastAPI/Django: bahasa dulu, framework kemudian. */
 const pythonBase = gen(pythonGen);
 const python = numbered({
   ...pythonBase,
   title: 'Python: Inti, FastAPI & Django',
-  description: `Bahasa Python dari fondasi sampai asyncio dan tooling modern, lalu ${pythonBase.description.charAt(0).toLowerCase()}${pythonBase.description.slice(1)}`,
-  tracks: insertTracks(pythonBase.tracks, pythonCoreTracks, 'Kontrak API', 'before'),
-  sources: [...(pythonBase.sources ?? []), pythonCoreSource],
-  modules: [...pythonBase.modules, ...pythonCoreModules],
+  description: `Bahasa Python dari fondasi sampai asyncio dan tooling modern, praktik pytest, packaging, dan proyek CLI, lalu ${pythonBase.description.charAt(0).toLowerCase()}${pythonBase.description.slice(1)}`,
+  tracks: insertTracks(insertTracks(pythonBase.tracks, pythonCoreTracks, 'Kontrak API', 'before'), pythonPracticeTracks, 'Kontrak API', 'before'),
+  sources: [...(pythonBase.sources ?? []), pythonCoreSource, pythonPracticeSource],
+  modules: [...pythonBase.modules, ...pythonCoreModules, ...pythonPracticeModules],
 });
 
-/** Rust: inti bahasa (ownership sampai trait) dan backend Axum setelah Rust Dasar. */
+/** Rust: inti bahasa (ownership sampai trait), lanjutan (iterator sampai macro), lalu backend Axum. */
 const rustBase = gen(rustGen);
 const rust = numbered({
   ...rustBase,
-  description: `${rustBase.description} Dilanjutkan ownership, borrowing, enum & pattern matching, error handling, trait & generic, serta REST API dengan Tokio, Axum, dan SQLx.`,
-  tracks: insertTracks(rustBase.tracks, rustCoreTracks, 'Rust Dasar', 'after'),
-  sources: [...(rustBase.sources ?? []), rustCoreSource],
-  modules: [...rustBase.modules, ...rustCoreModules],
+  description: `${rustBase.description} Dilanjutkan ownership, borrowing, enum & pattern matching, error handling, trait & generic, closure & iterator, smart pointer, concurrency, testing, macro, serta REST API dengan Tokio, Axum, dan SQLx.`,
+  tracks: insertTracks(insertTracks(rustBase.tracks, rustCoreTracks, 'Rust Dasar', 'after'), rustAdvancedTracks, 'Rust Inti', 'after'),
+  sources: [...(rustBase.sources ?? []), rustCoreSource, rustAdvancedSource],
+  modules: [...rustBase.modules, ...rustCoreModules, ...rustAdvancedModules],
 });
 
 /** Flutter: Dart 3, Pigeon, dan aksesibilitas masuk ke track yang sudah ada. */
@@ -250,11 +262,15 @@ const flutter = numbered({
 
 /** Daftar kurikulum sesuai urutan tampil. */
 export const curricula: Curriculum[] = [
+  numbered(roadmapCurriculum),
+  numbered(devToolsCurriculum),
   java,
   go,
   javascript,
   python,
   rust,
+  numbered(kotlinCurriculum),
+  numbered(csharpCurriculum),
   flutter,
   numbered(gen(sqlGen)),
   numbered(gen(distributedGen)),
