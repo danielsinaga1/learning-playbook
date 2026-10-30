@@ -18,6 +18,10 @@ import { kotlinCurriculum } from './kotlin';
 import { csharpCurriculum } from './csharp';
 import { devToolsCurriculum } from './dev-tools';
 import { roadmapCurriculum } from './roadmap';
+import { htmlCssModules, htmlCssSource, htmlCssTracks } from './html-css';
+import { webSecurityCurriculum } from './web-security';
+import { interviewLanguageModules, interviewLanguageSource, interviewLanguageTracks } from './interview-languages';
+import { systemDesignModules, systemDesignSource, systemDesignTracks } from './system-design-interview';
 import { englishFoundationArchives, englishFoundationModules, englishFoundationSources, englishFoundationTracks } from './english-foundations';
 import javaGen from './gen/java.json';
 import goGen from './gen/go.json';
@@ -37,7 +41,7 @@ import interviewExtra from './gen/interview-extra.json';
 /*
  * Kurikulum hasil konversi .docx ada di ./gen/*.json (dibuat oleh skrip konversi).
  * Kurikulum yang ditulis tangan (aws, interview, algorithms, ai, nextjs) digabung di sini;
- * jalur belajar, Git & Shell, Kotlin, dan C# adalah kurikulum tulisan tangan yang berdiri sendiri,
+ * jalur belajar, Git & Shell, Web & Keamanan, Kotlin, dan C# adalah kurikulum tulisan tangan yang berdiri sendiri,
  * supaya satu bahasa/ekosistem = satu kurikulum, dengan track sebagai submodul.
  */
 
@@ -100,21 +104,21 @@ const devops = numbered({
 });
 
 /**
- * JavaScript & TypeScript Dasar membuka kurikulum (sebelum React).
+ * HTML & CSS, lalu JavaScript & TypeScript Dasar membuka kurikulum (sebelum React).
  * Next.js ditambahkan setelah TypeScript, sebelum Angular; ID materi lama tetap stabil.
  */
 const javascriptGen = gen(jsGen);
-const javascriptTracks = insertTracks(javascriptGen.tracks, jsCoreTracks, 'React: Fondasi', 'before');
+const javascriptTracks = insertTracks(insertTracks(javascriptGen.tracks, jsCoreTracks, 'React: Fondasi', 'before'), htmlCssTracks, 'JavaScript Dasar', 'before');
 const angularIndex = javascriptTracks.findIndex((track) => track.title === 'Angular');
 const nextjsIndex = angularIndex < 0 ? javascriptTracks.length : angularIndex;
 const javascript = numbered({
   ...javascriptGen,
-  description: 'JavaScript dan TypeScript dasar, lalu React dari fondasi sampai performa dan proyek nyata, React Native, TypeScript lanjutan, Next.js App Router sampai full stack dan produksi, Angular modern, serta backend Node.js: inti runtime (event loop, streams, Drizzle), Express, dan NestJS.',
+  description: 'HTML & CSS, JavaScript dan TypeScript dasar, lalu React dari fondasi sampai performa dan proyek nyata, React Native, TypeScript lanjutan, Next.js App Router sampai full stack dan produksi, Angular modern, serta backend Node.js: inti runtime (event loop, streams, Drizzle), Express, dan NestJS.',
   tracks: insertTracks(
     [...javascriptTracks.slice(0, nextjsIndex), ...nextjsTracks, ...javascriptTracks.slice(nextjsIndex)],
     nodeCoreTracks, 'Node.js: Express', 'before',
   ),
-  sources: [...(javascriptGen.sources ?? []), jsCoreSource, nextjsSource, nodeCoreSource],
+  sources: [...(javascriptGen.sources ?? []), htmlCssSource, jsCoreSource, nextjsSource, nodeCoreSource],
   modules: [
     ...javascriptGen.modules.map((module) => module.id === 'next-js-app-router' ? {
       ...module,
@@ -123,6 +127,7 @@ const javascript = numbered({
         ...module.blocks,
       ],
     } : module),
+    ...htmlCssModules,
     ...jsCoreModules,
     ...nextjsModules,
     ...nodeCoreModules,
@@ -208,18 +213,29 @@ function mergeInterview(): Curriculum {
       .filter((m) => m.track === track)
       .reduce((n, m) => n + m.blocks.reduce((k, b) => k + (b.type === 'qa' ? b.items.length : 0), 0), 0);
   const archive = (extra.archive ?? []).map((m, i) => ({ ...m, code: `A${i + 1}` }));
+  /** Interview per bahasa & system design (tulisan tangan): kode modul pendek dan tetap. */
+  const LANG_CODE: Record<string, string> = { 'iv-go': 'GO', 'iv-python-ai': 'PY', 'iv-typescript-node': 'TS', 'iv-kotlin-dotnet': 'KC', 'iv-strategi-behavioral': 'ST' };
+  const languages = interviewLanguageModules.map((m) => ({ ...m, code: LANG_CODE[m.id] ?? m.id }));
+  const strategy = languages.filter((m) => m.id === 'iv-strategi-behavioral');
+  const perLanguage = languages.filter((m) => m.id !== 'iv-strategi-behavioral');
+  const systemDesign = systemDesignModules.map((m, i) => ({ ...m, code: `SD${i + 1}` }));
+  const track = (title: string) => interviewLanguageTracks.find((t) => t.title === title)!;
+  const qaIn = (mods: Omit<Module, 'code'>[]) => mods.reduce((n, m) => n + m.blocks.reduce((k, b) => k + (b.type === 'qa' ? b.items.length : 0), 0), 0);
   return {
     ...interview,
-    title: 'Interview Prep: Java, Spring, React & Kafka',
-    description: `Pertanyaan interview: 30 konsep Java, Spring Boot & AWS untuk Senior Java Backend, ${qaCount('React & Spring Boot Advanced')} soal advanced React & Spring Boot, dan ${qaCount('Apache Kafka (Java)')} soal Apache Kafka plus cheat sheet. Jawab dulu di kepala, lalu nilai dirimu.`,
+    title: 'Interview Prep: Bahasa, System Design & Kafka',
+    description: `Pertanyaan interview: strategi & behavioral, 30 konsep Java, Spring Boot & AWS untuk Senior Java Backend, ${qaIn(perLanguage)} soal Go, Python & AI Engineer, TypeScript & Node.js, Kotlin & C#/.NET, ${qaCount('React & Spring Boot Advanced')} soal advanced React & Spring Boot, ${qaCount('Apache Kafka (Java)')} soal Apache Kafka plus cheat sheet, dan ${systemDesign.length} modul system design interview. Jawab dulu di kepala, lalu nilai dirimu.`,
     tracks: [
+      track('Cara Menjawab'),
       { title: 'Java, Spring Boot & AWS', summary: '30 pertanyaan konsep dasar level senior.' },
+      ...interviewLanguageTracks.filter((t) => t.title !== 'Cara Menjawab'),
       { title: 'React & Spring Boot Advanced', summary: 'Soal technical & coding test level advanced.' },
       { title: 'Apache Kafka (Java)', summary: 'Arsitektur, producer/consumer, replikasi, Streams, Connect, security, skenario, cheat sheet.' },
+      ...systemDesignTracks,
       ARCHIVE_TRACK,
     ],
-    sources: ['Interview Prep Java, Spring & AWS (HTML)', ...((interviewExtra as unknown as { sources: string[] }).sources ?? [])],
-    modules: [...modules, ...advanced, ...archive],
+    sources: ['Interview Prep Java, Spring & AWS (HTML)', ...((interviewExtra as unknown as { sources: string[] }).sources ?? []), interviewLanguageSource, systemDesignSource],
+    modules: [...strategy, ...modules, ...perLanguage, ...advanced, ...systemDesign, ...archive],
   };
 }
 
@@ -264,6 +280,7 @@ const flutter = numbered({
 export const curricula: Curriculum[] = [
   numbered(roadmapCurriculum),
   numbered(devToolsCurriculum),
+  numbered(webSecurityCurriculum),
   java,
   go,
   javascript,

@@ -39,6 +39,7 @@ const modules: Omit<Module, 'code'>[] = [
         ['**Pendamping 1**', '[JavaScript & TypeScript](#js)', 'Wajib untuk full stack (React, Next.js) dan backend Node.js.'],
         ['**Pendamping 2**', '[Python](#python)', 'Jalan masuk ke AI Engineer (LangChain, LangGraph, FastAPI) dan otomasi.'],
         ['**Fondasi harian**', '[Git & Shell](#tools)', 'Dipakai setiap hari di bahasa apa pun; pelajari sejak minggu pertama.'],
+        ['**Fondasi lintas bahasa**', '[Web & Keamanan](#web)', 'HTTP, desain REST API, dan OWASP berlaku sama di semua bahasa backend.'],
         ['**Opsional, nanti**', '[Go](#go), [Rust](#rust), [Kotlin](#kotlin), [C# & .NET](#csharp)', 'Sesuai tujuan karier; lihat [Jalur per Tujuan](#jalur.jalur-per-tujuan).'],
       ]),
       callout('info', 'Lebih suka startup atau infrastruktur cloud?', 'Tukar posisi Java dengan **Go**. Go lebih cepat dikuasai, binarinya kecil, dan materinya di playbook juga dalam (dua proyek lengkap). Rute lengkapnya ada di [Jalur per Tujuan](#jalur.jalur-per-tujuan).'),
@@ -117,12 +118,13 @@ const modules: Omit<Module, 'code'>[] = [
         ['Bulan 1–2: Functional & Java Modern', '[Functional Interfaces](#java.functional-interfaces-konsep-use-case) → [Stream API](#java.stream-api-dengan-lambda-19-35) → [Records, Sealed & Pattern Matching](#java.java-records-sealed-pattern) → [Virtual Threads](#java.java-virtual-threads).'],
         ['Paralel: Struktur Data & Algoritma', '[Catatan Ringkas Struktur Data](#java.catatan-ringkas-struktur-data) → [Rekursi](#java.rekursi) → [Soal Array](#java.soal-array); target 3–5 soal per minggu.'],
         ['Bulan 2: SQL', '[Pengenalan Database](#sql.pengenalan-database) → [Peta Belajar SQL](#sql.peta-belajar-sql).'],
+        ['Bulan 2: Fondasi web', '[Cara Kerja Internet](#web.web-cara-kerja-internet) → [HTTP Mendalam](#web.web-http-mendalam) → [Desain REST API](#web.web-desain-rest-api).'],
         ['Bulan 3: Spring Boot', '[Spring Dasar](#java.spring-dasar) → [Spring Web MVC](#java.spring-web-mvc) → [Spring Data JPA](#java.spring-data-jpa) → [Testcontainers & Resilience4j](#java.spring-testcontainers-resilience).'],
         ['Bulan 4: Proyek & testing', '[Proyek Spring RESTful API](#java.proyek-spring-restful-api-contact-management) + [Fondasi Testing](#testing.pendahuluan) → [TDD](#testing.tdd-untuk-vibe-coding-red-green-refactor).'],
       ]),
       ...checklist('jalur-fase-1', [
         'Bisa membuat branch, commit rapi, dan menyelesaikan konflik merge sendiri.',
-        'REST API Spring Boot dengan PostgreSQL, validasi, dan global exception handler berjalan.',
+        'REST API Spring Boot dengan PostgreSQL, validasi, dan global exception handler berjalan, mengikuti konvensi status code dan format error yang konsisten.',
         'Ada unit test dan minimal satu integration test dengan Testcontainers.',
         'Sudah menyelesaikan ≥ 40 soal struktur data/algoritma dan bisa menjelaskan kompleksitasnya.',
         'Proyek di-push ke GitHub dengan README cara menjalankan.',
@@ -132,11 +134,12 @@ const modules: Omit<Module, 'code'>[] = [
   {
     id: 'jalur-fase-2-typescript-frontend',
     title: 'Fase 2 · Bulan 5–7: TypeScript & Frontend',
-    summary: 'JavaScript dasar, TypeScript, React, lalu Next.js full stack yang memanggil API dari fase 1.',
+    summary: 'HTML & CSS, JavaScript dasar, TypeScript, React, lalu Next.js full stack yang memanggil API dari fase 1.',
     track: MAIN, source: roadmapSource, duration: '3 bulan', level: 'Med',
     blocks: [
       paragraph('Tujuan fase ini: menjadi full stack. Jangan langsung lompat ke React. Closure, `this`, dan Promise yang dipahami setengah-setengah adalah sumber bug React yang paling sering.'),
       route([
+        ['Bulan 5: HTML & CSS', '[Struktur & Semantik](#js.html-struktur-semantik) → [Form & Aksesibilitas](#js.html-form-aksesibilitas) → [Selector, Cascade & Box Model](#js.css-selector-cascade-box) → [Flexbox & Grid](#js.css-flexbox-grid) → [Responsif Modern](#js.css-responsif-modern) → [Proyek Halaman Profil](#js.css-proyek-landing).'],
         ['Bulan 5: JavaScript Dasar', '[Variabel & Tipe](#js.js-variabel-tipe) → [Fungsi & Closure](#js.js-fungsi-closure) → [Objek, Prototype & Class](#js.js-objek-prototype-class) → [Array & Iterasi](#js.js-array-iterasi) → [Async & Promise](#js.js-async-promise) → [Modul & Runtime](#js.js-modul-runtime).'],
         ['Bulan 5–6: TypeScript', '[TS: Setup & Tipe Dasar](#js.ts-setup-tipe-dasar) → [Union & Narrowing](#js.ts-object-union-narrowing) → [Fungsi & Generic](#js.ts-fungsi-generic-dasar) → [Utility Types & Proyek](#js.ts-utility-proyek) → [TypeScript Lanjutan](#js.kenapa-typescript-dan-kenapa-sekarang).'],
         ['Bulan 6: React', '[Peta Jalan React + TypeScript](#js.peta-jalan-react-typescript) → [Hooks Lengkap](#js.hooks-lengkap) → [Proyek Praktik](#js.proyek-praktik-mudah-kompleks).'],
@@ -144,6 +147,7 @@ const modules: Omit<Module, 'code'>[] = [
       ]),
       callout('tip', 'Proyek fase ini', 'Buat frontend Next.js untuk API Spring Boot dari fase 1: login, daftar data dengan pagination, form dengan validasi, dan halaman error. Deploy keduanya.'),
       ...checklist('jalur-fase-2', [
+        'Halaman profil responsif buatan sendiri (tanpa framework CSS) lolos audit aksesibilitas Lighthouse.',
         'Bisa menjelaskan closure, `this`, dan event loop dengan contoh kode sendiri.',
         'Proyek JavaScript kecil sudah dimigrasikan ke TypeScript strict tanpa `any`.',
         'Aplikasi Next.js memanggil API Spring Boot, lengkap dengan loading & error state.',
@@ -174,7 +178,7 @@ const modules: Omit<Module, 'code'>[] = [
   {
     id: 'jalur-fase-4-produksi-interview',
     title: 'Fase 4 · Bulan 11–12: Produksi & Interview',
-    summary: 'Docker, Kubernetes, AWS, sistem terdistribusi, otomasi shell, lalu persiapan interview dan coding test.',
+    summary: 'Docker, Kubernetes, AWS, keamanan aplikasi, sistem terdistribusi, otomasi shell, lalu persiapan interview, system design, dan coding test.',
     track: MAIN, source: roadmapSource, duration: '2 bulan', level: 'Hard',
     blocks: [
       paragraph('Tujuan fase ini: proyek dari fase sebelumnya berjalan di cloud dengan pipeline otomatis, dan kamu siap menghadapi interview teknis.'),
@@ -182,12 +186,16 @@ const modules: Omit<Module, 'code'>[] = [
         ['Kontainer & cloud', '[Pendahuluan Docker & Kubernetes](#devops.pendahuluan-docker-kubernetes) → [Mengenal Kubernetes](#devops.mengenal-kubernetes) → [Fondasi AWS](#devops.fondasi) → [Deploy](#devops.deploy).'],
         ['Otomasi', '[Shell Scripting](#tools.sh-scripting) → [Otomasi Proyek](#tools.sh-otomasi-proyek) → [Git Lanjutan](#tools.git-lanjutan).'],
         ['Sistem terdistribusi', '[Memahami Distributed System](#distributed.pengantar-memahami-distributed-system) → [Arsitektur & Performa](#distributed.pengantar-arsitektur-performa).'],
-        ['Interview', '[Interview Java](#interview.java) → [Interview Spring](#interview.spring) → [Coding Interview](#java.coding-interview-array-string-interval-1-11) → [Greedy](#java.correctness-of-greedy-algorithms).'],
+        ['Keamanan aplikasi', '[OWASP Top 10](#web.sec-owasp-top-10) → [Injection](#web.sec-injection) → [Autentikasi](#web.sec-autentikasi) → [Otorisasi](#web.sec-otorisasi) → [Checklist Produksi](#web.sec-checklist-produksi).'],
+        ['Interview', '[Strategi & Behavioral](#interview.iv-strategi-behavioral) → [Interview Java](#interview.java) → [Interview Spring](#interview.spring) → [Coding Interview](#java.coding-interview-array-string-interval-1-11) → [Greedy](#java.correctness-of-greedy-algorithms).'],
+        ['System design interview', '[Kerangka & Estimasi](#interview.sd-kerangka-estimasi) → [URL Shortener](#interview.sd-url-shortener) → [Rate Limiter](#interview.sd-rate-limiter) → [Sistem Pembayaran](#interview.sd-sistem-pembayaran) → [Soal Cepat](#interview.sd-soal-cepat).'],
       ]),
       ...checklist('jalur-fase-4', [
         'Proyek berjalan di container dan ter-deploy ke cloud lewat CI/CD.',
         'Bisa menggambar dan menjelaskan arsitektur proyek: cache, queue, database, dan titik gagalnya.',
+        'Proyek lolos checklist keamanan produksi: password di-hash, query terparameter, otorisasi per resource, tanpa secret di repo.',
         'Menjawab 30 pertanyaan Interview Prep tanpa melihat jawaban.',
+        'Bisa mendesain dua studi kasus system design dalam 45 menit sambil menjelaskan trade-off-nya.',
         'Mock interview coding 45 menit selesai minimal tiga kali.',
       ]),
     ],
@@ -206,14 +214,16 @@ const modules: Omit<Module, 'code'>[] = [
             ['Bahasa', '[Pengenalan Go](#go.pengenalan-go-golang) → [Goroutine & Channel](#go.goroutine-channel-concurrency-di-go) → [Error Handling Idiomatik](#go.error-handling-idiomatik).'],
             ['Web & database', '[net/http](#go.http-client-server-net-http) → [pgx, sqlc & goose](#go.go-pgx-sqlc) → [Testing di Go](#go.testing-di-go).'],
             ['Proyek & sistem', '[API Pencatat Keuangan](#go.apa-yang-akan-kita-bangun) → [Microservices](#go.pengenalan-microservices-dengan-go) → [Message Queue](#go.kenapa-message-queue-dari-sinkron-ke-asinkron) → [Kubernetes](#devops.mengenal-kubernetes).'],
+            ['Interview', '[Interview Go](#interview.iv-go) → [System Design: Kerangka & Estimasi](#interview.sd-kerangka-estimasi).'],
           ]),
         ] },
         { label: 'Full stack (TypeScript)', blocks: [
           paragraph('Satu bahasa untuk frontend dan backend.'),
           route([
-            ['Fondasi', '[JavaScript Dasar](#js.js-variabel-tipe) → [TypeScript Dasar](#js.ts-setup-tipe-dasar) → [TypeScript Lanjutan](#js.kenapa-typescript-dan-kenapa-sekarang).'],
+            ['Fondasi', '[HTML & CSS Dasar](#js.html-struktur-semantik) → [JavaScript Dasar](#js.js-variabel-tipe) → [TypeScript Dasar](#js.ts-setup-tipe-dasar) → [TypeScript Lanjutan](#js.kenapa-typescript-dan-kenapa-sekarang).'],
             ['Frontend', '[React](#js.peta-jalan-react-typescript) → [Next.js](#js.nextjs-fondasi-setup).'],
             ['Backend', '[Event Loop](#js.node-event-loop) → [Express](#js.kontrak-api-yang-akan-dibangun) → [NestJS](#js.mengenal-nest-js) → [Drizzle ORM](#js.node-drizzle-orm).'],
+            ['Interview', '[Interview TypeScript & Node.js](#interview.iv-typescript-node) → [React Advanced](#interview.react-advanced).'],
           ]),
         ] },
         { label: 'Mobile', blocks: [
@@ -229,6 +239,7 @@ const modules: Omit<Module, 'code'>[] = [
             ['Python', '[Fondasi Bahasa](#python.py-fondasi-bahasa) → [asyncio](#python.py-asyncio) → [pytest Mendalam](#python.py-pytest-mendalam).'],
             ['LLM', '[Prompt Engineering](#llm.prompt-engineering-sistematis) → [RAG](#llm.apa-itu-rag-manfaatnya) → [AI Engineer: Peta Stack](#llm.aie-roadmap-stack).'],
             ['Produksi', '[Evaluasi dengan Langfuse](#llm.aie-evaluasi-langfuse) → [Full Stack & Deploy](#llm.aie-fullstack-deploy) → [Proyek Akhir](#llm.aie-proyek-akhir).'],
+            ['Interview', '[Interview Python & AI Engineer](#interview.iv-python-ai).'],
           ]),
         ] },
         { label: 'Systems (Rust)', blocks: [
@@ -244,6 +255,7 @@ const modules: Omit<Module, 'code'>[] = [
           route([
             ['Bahasa', '[Setup & Dasar](#kotlin.kt-setup-dasar) → [Fungsi & Lambda](#kotlin.kt-fungsi-lambda) → [Class, Data & Sealed](#kotlin.kt-class-data-sealed) → [Koleksi & Scope Function](#kotlin.kt-koleksi-scope).'],
             ['Backend', '[Coroutines](#kotlin.kt-coroutines) → [Spring Boot dengan Kotlin](#kotlin.kt-spring-boot-api) → [Testing](#kotlin.kt-testing).'],
+            ['Interview', '[Interview Kotlin & C#/.NET](#interview.iv-kotlin-dotnet) → [Interview Spring](#interview.spring).'],
           ]),
         ] },
         { label: 'Enterprise (.NET)', blocks: [
@@ -252,6 +264,7 @@ const modules: Omit<Module, 'code'>[] = [
             ['Bahasa', '[Setup & Dasar](#csharp.cs-setup-dasar) → [Class & Record](#csharp.cs-oop-class-record) → [Koleksi & LINQ](#csharp.cs-koleksi-linq) → [async/await](#csharp.cs-async-await).'],
             ['Web API', '[Minimal API](#csharp.cs-aspnet-minimal-api) → [EF Core](#csharp.cs-ef-core) → [Auth & Middleware](#csharp.cs-auth-middleware).'],
             ['Produksi', '[Testing dengan xUnit](#csharp.cs-testing-xunit) → [Deploy dengan Docker](#csharp.cs-deploy-docker).'],
+            ['Interview', '[Interview Kotlin & C#/.NET](#interview.iv-kotlin-dotnet).'],
           ]),
         ] },
       ] },
@@ -265,7 +278,7 @@ export const roadmapCurriculum: Omit<Curriculum, 'modules'> & { modules: Omit<Mo
   title: 'Jalur Belajar Bahasa Pemrograman',
   short: 'Jalur Belajar',
   monogram: 'Rute',
-  hue: 'green',
+  hue: 'gold',
   description: 'Rekomendasi urutan belajar: satu bahasa utama sampai produksi, lalu pendamping. Jalur 12 bulan (Java → TypeScript → Python & AI → produksi) dan tujuh rute per tujuan karier, dengan tautan langsung ke modul.',
   tracks,
   sources: [roadmapSource],

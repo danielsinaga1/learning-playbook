@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { curricula, findModule, groupByTrack, learning, resolveCid } from '../data';
 import { href, type Route } from '../lib/router';
-import { resetProgress, usePlaybook } from '../lib/store';
+import { exportProgress, importProgress, resetProgress, usePlaybook } from '../lib/store';
 import { curriculumDone } from '../lib/stats';
 
 const TOTAL = curricula.reduce((n, c) => n + learning(c).length, 0);
@@ -11,6 +11,8 @@ const GROUPS = Object.fromEntries(curricula.map((c) => [c.id, groupByTrack(c)]))
 export function Rail({ route, onNavigate, inactive }: { route: Route; onNavigate: () => void; inactive?: boolean }) {
   const done = usePlaybook((s) => s.done);
   const [confirming, setConfirming] = useState(false);
+  const [notice, setNotice] = useState('');
+  const fileInput = useRef<HTMLInputElement>(null);
   const [openC, setOpenC] = useState<Record<string, boolean>>({});
   const [openT, setOpenT] = useState<Record<string, boolean>>({});
   const scroller = useRef<HTMLDivElement>(null);
@@ -34,6 +36,26 @@ export function Rail({ route, onNavigate, inactive }: { route: Route; onNavigate
     }, 60);
     return () => window.clearTimeout(t);
   }, [activeC, activeM, activeTrack]);
+
+  const download = () => {
+    const url = URL.createObjectURL(new Blob([exportProgress()], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `playbook-progres-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setNotice('Cadangan progres diunduh.');
+  };
+
+  const restore = async (file: File | undefined) => {
+    if (!file) return;
+    try {
+      const n = importProgress(await file.text());
+      setNotice(`Dipulihkan: ${n.done} modul, ${n.qa} soal, ${n.checks} checklist.`);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Gagal membaca file.');
+    }
+  };
 
   return (
     <nav className="rail" id="playbook-navigation" aria-label="Navigasi playbook" inert={inactive}>
@@ -174,10 +196,30 @@ export function Rail({ route, onNavigate, inactive }: { route: Route; onNavigate
             </button>
           </div>
         ) : (
-          <button type="button" className="btn-link" onClick={() => setConfirming(true)} disabled={!doneTotal}>
-            Reset progres
-          </button>
+          <div className="rail-foot-actions">
+            <button type="button" className="btn-link" onClick={download}>
+              Ekspor
+            </button>
+            <button type="button" className="btn-link" onClick={() => fileInput.current?.click()}>
+              Impor
+            </button>
+            <button type="button" className="btn-link" onClick={() => setConfirming(true)} disabled={!doneTotal}>
+              Reset progres
+            </button>
+          </div>
         )}
+        <input
+          ref={fileInput}
+          type="file"
+          accept="application/json,.json"
+          hidden
+          aria-label="Pilih file cadangan progres"
+          onChange={(e) => {
+            void restore(e.target.files?.[0]);
+            e.target.value = '';
+          }}
+        />
+        <p className="rail-foot-notice" role="status">{notice}</p>
       </div>
     </nav>
   );
