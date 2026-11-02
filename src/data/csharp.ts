@@ -36,7 +36,7 @@ export const csharpCurriculum: Omit<Curriculum, 'modules'> & { modules: Omit<Mod
       summary: 'Instal .NET SDK, dotnet new console, struktur proyek, top-level statements, tipe, var, interpolasi string, dan switch expression.',
       track: DASAR, source: csharpSource, duration: '1,5 jam', level: 'Easy',
       blocks: [
-        paragraph('.NET adalah runtime dan pustaka standar; C# adalah bahasa utamanya. Satu perintah `dotnet` (CLI) dipakai untuk membuat proyek, restore paket NuGet, build, test, dan publish, mirip gabungan `mvn`/`gradle` dan `java`. Rilis genap (8, 10, ...) adalah **LTS** dengan dukungan tiga tahun; .NET 10 dirilis November 2025 dan .NET 8/9 berakhir dukungannya 10 November 2026.'),
+        paragraph('.NET adalah runtime dan pustaka standar; C# adalah bahasa utamanya. Satu perintah `dotnet` (CLI) dipakai untuk membuat proyek, restore paket NuGet, build, test, dan publish, mirip gabungan `mvn`/`gradle` dan `java`. Rilis genap (8, 10, ...) adalah **LTS** dengan dukungan tiga tahun; .NET 10 dirilis November 2025 dan .NET 8/9 berakhir dukungannya 10 November 2026. .NET 11 (STS, dukungan dua tahun) dijadwalkan rilis November 2026; untuk produksi jangka panjang tetap pilih .NET 10 LTS.'),
         code('Membuat dan menjalankan proyek', `dotnet --list-sdks                 # pastikan SDK 10.0.x terpasang
 dotnet new console -n HaloKasir     # proyek konsol baru
 cd HaloKasir
@@ -872,7 +872,9 @@ public class KatalogDb(DbContextOptions<KatalogDb> options) : DbContext(options)
 // Program.cs: DbContext otomatis scoped (satu per request)
 // builder.Services.AddDbContext<KatalogDb>(o =>
 //     o.UseNpgsql(builder.Configuration.GetConnectionString("Katalog")));`, 'csharp'),
-        code('Query: proyeksi, AsNoTracking, Include, N+1, update massal', `public sealed class ProdukService(KatalogDb db)
+        code('Query: proyeksi, AsNoTracking, Include, N+1, update massal', `using Microsoft.EntityFrameworkCore;   // wajib di tiap file: tanpa ini FirstOrDefaultAsync/CountAsync jatuh ke System.Linq.AsyncEnumerable (.NET 10)
+
+public sealed class ProdukService(KatalogDb db)
 {
     // Baca saja: AsNoTracking + proyeksi ke DTO = SELECT kolom yang perlu saja
     public Task<List<ProdukDto>> DaftarAsync(string? cari, CancellationToken ct) =>
@@ -1147,7 +1149,7 @@ public sealed class PengirimEmailWorker(
     }
 }`, 'csharp'),
         code('Program.cs: registrasi dan endpoint 202 Accepted', `builder.Services.AddSingleton<AntreanEmail>();
-builder.Services.AddScoped<IPengirimEmail, PengirimEmailSmtp>();
+builder.Services.AddScoped<IPengirimEmail, PengirimEmailSmtp>();   // PengirimEmailSmtp: implementasi Anda (mis. MailKit)
 builder.Services.AddHostedService<PengirimEmailWorker>();
 builder.Services.AddHostedService<SinkronKursJob>();
 
@@ -1611,7 +1613,9 @@ public sealed partial class LaporanRepository(NpgsqlDataSource dataSource)
             new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct))).AsList();
     }
 }`, 'csharp'),
-        code('Multi-mapping dan transaksi', `public sealed class Kategori
+        code('Multi-mapping dan transaksi', `using Dapper;                               // using berlaku per file, termasuk file partial lain
+
+public sealed class Kategori
 {
     public long Id { get; set; }
     public string Nama { get; set; } = "";
@@ -2706,7 +2710,7 @@ using Xunit;
 
 public sealed class KeuanganApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _pg = new PostgreSqlBuilder().WithImage("postgres:17-alpine").Build();
+    private readonly PostgreSqlContainer _pg = new PostgreSqlBuilder("postgres:17-alpine").Build();   // Testcontainers 4.x: image lewat konstruktor
 
     protected override void ConfigureWebHost(IWebHostBuilder builder) =>
         builder.UseSetting("ConnectionStrings:Keuangan", _pg.GetConnectionString());

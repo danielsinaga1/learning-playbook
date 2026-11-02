@@ -936,7 +936,7 @@ $stmt->execute(['%' . ($_GET['q'] ?? '') . '%']);   // wildcard ditempel di nila
     track: LV_DASAR, source: phpSource, duration: '2,5 jam', level: 'Easy',
     blocks: [
       paragraph('Laravel adalah framework PHP paling populer: routing, ORM (Eloquent), validasi, queue, autentikasi, dan testing tersedia dalam satu paket dengan dokumentasi yang sangat rapi. Filosofinya *convention over configuration*: bila Anda mengikuti penamaan standar (model `Transaksi`, controller `TransaksiController`, policy `TransaksiPolicy`), framework menyambungkan bagian-bagiannya sendiri. Perintah **Artisan** (`php artisan ...`) membuat file, menjalankan migrasi, dan banyak lagi.'),
-      paragraph('Materi ini ditulis untuk **Laravel 12** (rilis 24 Februari 2025, butuh PHP 8.2+). Laravel merilis versi mayor setiap tahun dan menjadwalkan Laravel 13 pada kuartal pertama 2026; konsep di modul ini tetap sama, tetapi cek [Release Notes](https://laravel.com/docs/releases) dan panduan upgrade untuk versi terbaru sebelum memulai proyek baru.'),
+      paragraph('Materi ini ditulis untuk **Laravel 12** (rilis 24 Februari 2025, butuh PHP 8.2+). Laravel merilis versi mayor setiap tahun: **Laravel 13** sudah rilis 17 Maret 2026 (butuh PHP 8.3+), dan Laravel 12 kini hanya menerima perbaikan keamanan. Konsep dan kode di modul ini tetap berlaku di Laravel 13; untuk proyek baru pakai versi terbaru dan cek [Release Notes](https://laravel.com/docs/releases) serta panduan upgrade.'),
       code('Membuat dan menjalankan proyek', `composer global require laravel/installer    # sekali saja (Herd dan php.new sudah menyertakannya)
 laravel new dompet                           # pilih starter kit (None/React/Vue/Livewire), Pest/PHPUnit, database
 # alternatif tanpa installer:
@@ -2472,7 +2472,7 @@ export const phpCurriculum: Omit<Curriculum, 'modules'> & { modules: Omit<Module
   sources: [phpSource],
   intro: [
     callout('tip', 'Jalur belajar', 'Mulai dari **PHP Dasar** bila belum pernah menulis PHP modern; developer yang sudah familiar bisa langsung ke [PHP Modern 8.x](#php.php-modern) lalu [Laravel: Instalasi & Routing](#php.lv-dasar-routing). Urutan yang disarankan: PHP Dasar → Laravel Dasar (Eloquent, validasi, Sanctum) → Laravel Lanjutan (queue, testing, deployment) → proyek. Proyek akhir [Financial Tracker REST API](#php.lv-proyek-financial-tracker) mengikuti **kontrak API yang sama** dengan versi Python ([Kontrak API Financial Tracker](#python.kontrak-api-financial-tracker)) dan Node.js ([Kontrak API yang Akan Dibangun](#js.kontrak-api-yang-akan-dibangun)), jadi Anda bisa membandingkan solusi tiap ekosistem dan memakai frontend yang sama.'),
-    callout('info', 'Versi yang dipakai', 'Contoh kode memakai **PHP 8.4** dan **Laravel 12**; fitur PHP 8.5 diberi tanda. Laravel merilis versi mayor setiap tahun, jadi periksa [Release Notes Laravel](https://laravel.com/docs/releases) sebelum memulai proyek baru. Konsep inti (routing, Eloquent, validasi, queue, testing) stabil antarversi.'),
+    callout('info', 'Versi yang dipakai', 'Contoh kode memakai **PHP 8.4** dan **Laravel 12**; fitur PHP 8.5 diberi tanda. Laravel 13 (Maret 2026) sudah rilis dan kode di sini tetap berlaku; Laravel merilis versi mayor setiap tahun, jadi periksa [Release Notes Laravel](https://laravel.com/docs/releases) sebelum memulai proyek baru. Konsep inti (routing, Eloquent, validasi, queue, testing) stabil antarversi.'),
   ],
   modules: phpModules,
 };
