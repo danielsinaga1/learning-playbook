@@ -36,6 +36,20 @@ test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', a
     ['#js.css-flexbox-grid', 'CSS: Layout dengan Flexbox & Grid'],
     ['#web.sec-injection', 'Injection: SQL, Command & Path Traversal'],
     ['#interview.sd-rate-limiter', 'Studi Kasus: Design Rate Limiter'],
+    ['#jalur.cs-clean-code-refactoring', 'Clean Code & Refactoring'],
+    ['#java.jc-concurrency-klasik', 'Java Inti: Concurrency Klasik & Java Memory Model'],
+    ['#java.dsa-heap-priority-queue', 'Heap & Priority Queue'],
+    ['#python.pyf-setup-variabel-string', 'Python Dasar: Setup, REPL, Variabel, Angka & String'],
+    ['#js.jsa-ts-conditional-infer', 'TypeScript: Conditional Types, infer & Utility Type Sendiri'],
+    ['#js.jse-vue-dasar', 'Vue 3 Dasar: SFC, Composition API & Template'],
+    ['#rust.rsp-async-mendalam', 'Rust: Async Mendalam — Future, Pin, Runtime Tokio & Cancellation'],
+    ['#go.gox-pola-concurrency', 'Pola Concurrency: Pipeline, Fan-out/Fan-in, Worker Pool Berbatas & Rate Limiting'],
+    ['#cpp.cpp-smart-pointer-move', 'C++: Smart Pointer & Move Semantics'],
+    ['#php.lv-eloquent', 'Laravel: Eloquent, Migration, Relasi & Factory'],
+    ['#swift.sw-swiftui-state', 'SwiftUI: State, Data Flow & Navigasi'],
+    ['#kotlin.kt-ktor-server', 'Kotlin: Ktor Server — Routing, Plugin & JWT'],
+    ['#csharp.cs-signalr-realtime', 'ASP.NET Core: Realtime dengan SignalR'],
+    ['#flutter.dart-async-stream-isolate', 'Async Dart Mendalam: Future, Stream & Isolate'],
   ];
   for (const [hash, title] of lessons) {
     await page.goto('/' + hash);
@@ -44,6 +58,7 @@ test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', a
   }
   await page.goto('/#python');
   await expect(page.getByText('Python Inti', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Python Dasar', { exact: true }).first()).toBeVisible();
   await page.goto('/#interview.iv-go');
   await expect(page.locator('.reader-sheet h1')).toHaveText('Interview Go');
   await expect(page.locator('section.qa').first()).toBeVisible();
@@ -86,7 +101,7 @@ test('progres dapat diekspor, direset, lalu diimpor kembali', async ({ page }, t
 
 test('beranda, filter kurikulum, navigasi, dan progres tersimpan', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.c-card')).toHaveCount(19);
+  await expect(page.locator('.c-card')).toHaveCount(22);
   await page.getByRole('searchbox', { name: 'Cari kurikulum', exact: true }).fill('Rust');
   const rust = page.locator('.c-card').filter({ has: page.getByRole('heading', { name: 'Rust', exact: true }) });
   await expect(rust).toBeVisible();

@@ -6,18 +6,29 @@ import { ai } from './ai';
 import { nextjsModules, nextjsSource, nextjsTracks } from './nextjs';
 import { aiEngineerModules, aiEngineerSource, aiEngineerTracks } from './ai-engineer';
 import { javaModernModules, javaModernSource, javaModernTracks } from './java-modern';
+import { dsaExtraModules, dsaExtraSource } from './dsa-extra';
+import { javaCoreModules, javaCoreSource, javaCoreTracks } from './java-core';
 import { goModernModules, goModernSource } from './go-modern';
+import { goExtraModules, goExtraSource } from './go-extra';
 import { nodeCoreModules, nodeCoreSource, nodeCoreTracks } from './node-core';
 import { pythonCoreModules, pythonCoreSource, pythonCoreTracks } from './python-core';
 import { rustCoreModules, rustCoreSource, rustCoreTracks } from './rust-core';
 import { dartModernModules, dartModernSource } from './dart-modern';
 import { jsCoreModules, jsCoreSource, jsCoreTracks } from './js-core';
+import { jsEcosystemModules, jsEcosystemSource, jsEcosystemTracks } from './js-ecosystem';
+import { jsAdvancedModules, jsAdvancedSource, jsAdvancedTracks } from './js-advanced';
 import { rustAdvancedModules, rustAdvancedSource, rustAdvancedTracks } from './rust-advanced';
+import { rustProjectsModules, rustProjectsSource, rustProjectsTracks } from './rust-projects';
 import { pythonPracticeModules, pythonPracticeSource, pythonPracticeTracks } from './python-practice';
+import { pythonFoundationModules, pythonFoundationSource, pythonFoundationTracks } from './python-foundations';
 import { kotlinCurriculum } from './kotlin';
 import { csharpCurriculum } from './csharp';
+import { swiftCurriculum } from './swift';
+import { cppCurriculum } from './cpp';
+import { phpCurriculum } from './php';
 import { devToolsCurriculum } from './dev-tools';
 import { roadmapCurriculum } from './roadmap';
+import { csFoundationModules, csFoundationSource, csFoundationTracks } from './cs-foundations';
 import { htmlCssModules, htmlCssSource, htmlCssTracks } from './html-css';
 import { webSecurityCurriculum } from './web-security';
 import { interviewLanguageModules, interviewLanguageSource, interviewLanguageTracks } from './interview-languages';
@@ -88,12 +99,28 @@ function insertTracks(tracks: Track[] | undefined, add: Track[], anchor: string,
   return [...list.slice(0, at), ...add, ...list.slice(at)];
 }
 
-/** Java Modern disisipkan setelah Functional & Lambda; modul Testcontainers masuk track Spring Boot lanjutan. */
+/** Big-O membuka track Struktur Data; modul DSA lain (Heap, Trie, Union-Find, graf, binary search, bit) menyusul di track masing-masing. */
+const BIG_O = 'dsa-big-o-kompleksitas';
+
+/**
+ * Java Inti (OOP sampai JVM & GC) menyusul Java Fundamentals; Java Modern disisipkan setelah Functional & Lambda.
+ * Modul Spring tambahan (JPA mendalam, cache, messaging, native image, Testcontainers) masuk track Spring yang sudah ada.
+ */
 const java = numbered({
   ...gen(javaGen),
-  tracks: insertTracks(gen(javaGen).tracks, javaModernTracks, 'Java Functional & Lambda', 'after'),
-  sources: [...(gen(javaGen).sources ?? []), javaModernSource],
-  modules: [...withTrack(algorithms.modules, 'Strategi Algoritma'), ...gen(javaGen).modules, ...javaModernModules],
+  tracks: insertTracks(
+    insertTracks(gen(javaGen).tracks, javaModernTracks, 'Java Functional & Lambda', 'after'),
+    javaCoreTracks, 'Java Fundamentals', 'after',
+  ),
+  sources: [...(gen(javaGen).sources ?? []), javaCoreSource, javaModernSource, dsaExtraSource],
+  modules: [
+    ...withTrack(algorithms.modules, 'Strategi Algoritma'),
+    ...dsaExtraModules.filter((m) => m.id === BIG_O),
+    ...gen(javaGen).modules,
+    ...javaModernModules,
+    ...javaCoreModules,
+    ...dsaExtraModules.filter((m) => m.id !== BIG_O),
+  ],
   intro: [...(algorithms.intro ?? []), ...(gen(javaGen).intro ?? [])],
 });
 
@@ -104,21 +131,30 @@ const devops = numbered({
 });
 
 /**
- * HTML & CSS, lalu JavaScript & TypeScript Dasar membuka kurikulum (sebelum React).
+ * HTML & CSS, lalu JavaScript Dasar → Lanjutan dan TypeScript Dasar membuka kurikulum (sebelum React);
+ * TypeScript Tingkat Mahir menyusul TypeScript Lanjutan, Vue & Nuxt sebelum Angular.
  * Next.js ditambahkan setelah TypeScript, sebelum Angular; ID materi lama tetap stabil.
  */
 const javascriptGen = gen(jsGen);
-const javascriptTracks = insertTracks(insertTracks(javascriptGen.tracks, jsCoreTracks, 'React: Fondasi', 'before'), htmlCssTracks, 'JavaScript Dasar', 'before');
+const javascriptBaseTracks = insertTracks(insertTracks(javascriptGen.tracks, jsCoreTracks, 'React: Fondasi', 'before'), htmlCssTracks, 'JavaScript Dasar', 'before');
+const [jsLanjutanTrack, tsMahirTrack] = jsAdvancedTracks;
+const javascriptTracks = insertTracks(
+  insertTracks(javascriptBaseTracks, [jsLanjutanTrack], 'JavaScript Dasar', 'after'),
+  [tsMahirTrack], 'TypeScript Lanjutan', 'after',
+);
 const angularIndex = javascriptTracks.findIndex((track) => track.title === 'Angular');
 const nextjsIndex = angularIndex < 0 ? javascriptTracks.length : angularIndex;
 const javascript = numbered({
   ...javascriptGen,
   description: 'HTML & CSS, JavaScript dan TypeScript dasar, lalu React dari fondasi sampai performa dan proyek nyata, React Native, TypeScript lanjutan, Next.js App Router sampai full stack dan produksi, Angular modern, serta backend Node.js: inti runtime (event loop, streams, Drizzle), Express, dan NestJS.',
   tracks: insertTracks(
-    [...javascriptTracks.slice(0, nextjsIndex), ...nextjsTracks, ...javascriptTracks.slice(nextjsIndex)],
-    nodeCoreTracks, 'Node.js: Express', 'before',
+    insertTracks(
+      [...javascriptTracks.slice(0, nextjsIndex), ...nextjsTracks, ...javascriptTracks.slice(nextjsIndex)],
+      nodeCoreTracks, 'Node.js: Express', 'before',
+    ),
+    jsEcosystemTracks, 'Angular', 'before',
   ),
-  sources: [...(javascriptGen.sources ?? []), htmlCssSource, jsCoreSource, nextjsSource, nodeCoreSource],
+  sources: [...(javascriptGen.sources ?? []), htmlCssSource, jsCoreSource, nextjsSource, nodeCoreSource, jsEcosystemSource, jsAdvancedSource],
   modules: [
     ...javascriptGen.modules.map((module) => module.id === 'next-js-app-router' ? {
       ...module,
@@ -129,8 +165,10 @@ const javascript = numbered({
     } : module),
     ...htmlCssModules,
     ...jsCoreModules,
+    ...jsAdvancedModules,
     ...nextjsModules,
     ...nodeCoreModules,
+    ...jsEcosystemModules,
   ],
 });
 
@@ -243,29 +281,38 @@ function mergeInterview(): Curriculum {
 const goBase = gen(goGen);
 const go = numbered({
   ...goBase,
-  sources: [...(goBase.sources ?? []), goModernSource],
-  modules: [...goBase.modules, ...goModernModules],
+  sources: [...(goBase.sources ?? []), goModernSource, goExtraSource],
+  modules: [...goBase.modules, ...goModernModules, ...goExtraModules],
 });
 
-/** Python Inti lalu Python Praktik mendahului FastAPI/Django: bahasa dulu, framework kemudian. */
+/** Python Dasar → Inti → Praktik → Mahir → Data mendahului FastAPI/Django: bahasa dulu, framework kemudian. */
 const pythonBase = gen(pythonGen);
 const python = numbered({
   ...pythonBase,
   title: 'Python: Inti, FastAPI & Django',
-  description: `Bahasa Python dari fondasi sampai asyncio dan tooling modern, praktik pytest, packaging, dan proyek CLI, lalu ${pythonBase.description.charAt(0).toLowerCase()}${pythonBase.description.slice(1)}`,
-  tracks: insertTracks(insertTracks(pythonBase.tracks, pythonCoreTracks, 'Kontrak API', 'before'), pythonPracticeTracks, 'Kontrak API', 'before'),
-  sources: [...(pythonBase.sources ?? []), pythonCoreSource, pythonPracticeSource],
-  modules: [...pythonBase.modules, ...pythonCoreModules, ...pythonPracticeModules],
+  description: `Bahasa Python dari dasar untuk pemula sampai asyncio dan tooling modern, praktik pytest, packaging, dan proyek CLI, topik mahir (data model, metaprogramming, performa & paralelisme, soal algoritma), ekosistem data (NumPy, pandas, SQLAlchemy), lalu ${pythonBase.description.charAt(0).toLowerCase()}${pythonBase.description.slice(1)}`,
+  tracks: insertTracks(
+    insertTracks(
+      insertTracks(insertTracks(pythonBase.tracks, pythonCoreTracks, 'Kontrak API', 'before'), pythonPracticeTracks, 'Kontrak API', 'before'),
+      pythonFoundationTracks.filter((t) => t.title === 'Python Dasar'), 'Python Inti', 'before',
+    ),
+    pythonFoundationTracks.filter((t) => t.title !== 'Python Dasar'), 'Python Praktik', 'after',
+  ),
+  sources: [...(pythonBase.sources ?? []), pythonCoreSource, pythonPracticeSource, pythonFoundationSource],
+  modules: [...pythonBase.modules, ...pythonCoreModules, ...pythonPracticeModules, ...pythonFoundationModules],
 });
 
 /** Rust: inti bahasa (ownership sampai trait), lanjutan (iterator sampai macro), lalu backend Axum. */
 const rustBase = gen(rustGen);
 const rust = numbered({
   ...rustBase,
-  description: `${rustBase.description} Dilanjutkan ownership, borrowing, enum & pattern matching, error handling, trait & generic, closure & iterator, smart pointer, concurrency, testing, macro, serta REST API dengan Tokio, Axum, dan SQLx.`,
-  tracks: insertTracks(insertTracks(rustBase.tracks, rustCoreTracks, 'Rust Dasar', 'after'), rustAdvancedTracks, 'Rust Inti', 'after'),
-  sources: [...(rustBase.sources ?? []), rustCoreSource, rustAdvancedSource],
-  modules: [...rustBase.modules, ...rustCoreModules, ...rustAdvancedModules],
+  description: `${rustBase.description} Dilanjutkan ownership, borrowing, enum & pattern matching, error handling, trait & generic, closure & iterator, smart pointer, concurrency, testing, macro, serta REST API dengan Tokio, Axum, dan SQLx. Ditutup async mendalam, unsafe & FFI, Axum siap produksi, proyek CLI clap, benchmark, dan WebAssembly.`,
+  tracks: insertTracks(
+    insertTracks(insertTracks(rustBase.tracks, rustCoreTracks, 'Rust Dasar', 'after'), rustAdvancedTracks, 'Rust Inti', 'after'),
+    rustProjectsTracks, 'Rust untuk Backend', 'after',
+  ),
+  sources: [...(rustBase.sources ?? []), rustCoreSource, rustAdvancedSource, rustProjectsSource],
+  modules: [...rustBase.modules, ...rustCoreModules, ...rustAdvancedModules, ...rustProjectsModules],
 });
 
 /** Flutter: Dart 3, Pigeon, dan aksesibilitas masuk ke track yang sudah ada. */
@@ -276,9 +323,17 @@ const flutter = numbered({
   modules: [...flutterBase.modules, ...dartModernModules],
 });
 
+/** Jalur belajar: fondasi pemrograman & ilmu komputer tepat setelah Mulai di Sini. */
+const roadmap = numbered({
+  ...roadmapCurriculum,
+  tracks: insertTracks(roadmapCurriculum.tracks, csFoundationTracks, 'Mulai di Sini', 'after'),
+  sources: [...(roadmapCurriculum.sources ?? []), csFoundationSource],
+  modules: [...roadmapCurriculum.modules, ...csFoundationModules],
+});
+
 /** Daftar kurikulum sesuai urutan tampil. */
 export const curricula: Curriculum[] = [
-  numbered(roadmapCurriculum),
+  roadmap,
   numbered(devToolsCurriculum),
   numbered(webSecurityCurriculum),
   java,
@@ -286,9 +341,12 @@ export const curricula: Curriculum[] = [
   javascript,
   python,
   rust,
+  numbered(cppCurriculum),
   numbered(kotlinCurriculum),
   numbered(csharpCurriculum),
+  numbered(phpCurriculum),
   flutter,
+  numbered(swiftCurriculum),
   numbered(gen(sqlGen)),
   numbered(gen(distributedGen)),
   numbered(gen(lldGen)),

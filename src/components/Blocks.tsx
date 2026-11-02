@@ -277,6 +277,7 @@ const LANG_LABEL: Record<CodeLang, string> = {
   csharp: 'C#',
   php: 'PHP',
   kotlin: 'Kotlin',
+  swift: 'Swift',
   text: 'Teks',
 };
 

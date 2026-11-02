@@ -32,6 +32,7 @@ export type CodeLang =
   | 'csharp'
   | 'php'
   | 'kotlin'
+  | 'swift'
   | 'text';
 
 export type Hue =

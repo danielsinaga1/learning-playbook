@@ -5,14 +5,16 @@ const DASAR = 'Kotlin Dasar';
 const LANJUTAN = 'Kotlin Lanjutan';
 const BACKEND = 'Kotlin untuk Backend';
 const ANDROID = 'Android: Jetpack Compose';
+const KMP = 'Kotlin Multiplatform';
 
-export const kotlinSource = 'Kotlin: materi tulisan tangan dari dokumentasi resmi Kotlin, kotlinx.coroutines, Spring, dan Android Developers (30 Oktober 2026)';
+export const kotlinSource = 'Kotlin: materi tulisan tangan dari dokumentasi resmi Kotlin, kotlinx.coroutines, Spring, dan Android Developers (30 Oktober 2026); ditambah Ktor, Exposed & Flyway, arsitektur & data layer Android, Hilt, dan Kotlin Multiplatform (2 November 2026)';
 
 const kotlinTracks: Track[] = [
   { title: DASAR, summary: 'Setup, sintaks, null safety, fungsi & lambda, class/data/sealed, koleksi, dan scope function.' },
   { title: LANJUTAN, summary: 'Coroutines, Flow, generic & variance, DSL, dan interop dengan Java.' },
-  { title: BACKEND, summary: 'REST API Spring Boot dengan Kotlin, lalu testing dengan JUnit 5, MockK, Kotest, dan runTest.' },
-  { title: ANDROID, summary: 'UI deklaratif dengan Jetpack Compose: state, recomposition, ViewModel + StateFlow.' },
+  { title: BACKEND, summary: 'REST API Spring Boot dan Ktor dengan Kotlin, database dengan Exposed + Flyway, lalu testing dengan JUnit 5, MockK, Kotest, runTest, dan testApplication.' },
+  { title: ANDROID, summary: 'UI deklaratif dengan Jetpack Compose, arsitektur (ViewModel, UiState, Navigation type-safe), data layer offline-first (Retrofit/Ktor, Room), Hilt, dan testing UI.' },
+  { title: KMP, summary: 'Berbagi logika Kotlin antara Android, iOS, desktop, dan server: expect/actual, shared module, dan Compose Multiplatform.' },
 ];
 
 const kotlinModules: Omit<Module, 'code'>[] = [
@@ -1186,6 +1188,486 @@ class PengingatTest {
     ],
   },
   {
+    id: 'kt-ktor-server',
+    title: 'Kotlin: Ktor Server — Routing, Plugin & JWT',
+    summary: 'REST API dengan Ktor 3: routing, plugin ContentNegotiation, RequestValidation, StatusPages, autentikasi JWT, konfigurasi YAML, dan testing dengan testApplication.',
+    track: BACKEND, source: kotlinSource, duration: '3 jam', level: 'Med',
+    blocks: [
+      paragraph('**Ktor** adalah framework web asinkron buatan JetBrains yang ditulis penuh dengan Kotlin dan coroutines. Berbeda dengan Spring Boot yang menyiapkan banyak hal lewat auto-configuration, aplikasi Ktor dimulai kosong: setiap kemampuan (JSON, autentikasi, logging, CORS) dipasang eksplisit sebagai **plugin** dengan `install(...)`. Hasilnya aplikasi kecil, start cepat, alur request mudah dilacak, dan setiap handler adalah lambda `suspend`.'),
+      paragraph('Ktor cocok untuk microservice ringan, BFF (backend-for-frontend) aplikasi mobile, atau saat ingin berbagi model dengan [Kotlin Multiplatform](#kotlin.kt-kmp). Pilih [Spring Boot](#kotlin.kt-spring-boot-api) bila tim butuh ekosistem enterprise lengkap (Spring Data, Security, Batch). Proyek baru bisa dibuat di [start.ktor.io](https://start.ktor.io) atau plugin Ktor di IntelliJ IDEA; contoh di bawah memakai Ktor 3.x (cek versi terbaru di situs Ktor).'),
+      code('build.gradle.kts', `// gradle.properties: ktor_version=3.x.y dan logback_version=1.5.x → isi dengan versi terbaru
+plugins {
+    kotlin("jvm") version "2.3.21"
+    kotlin("plugin.serialization") version "2.3.21"   // @Serializable untuk kotlinx.serialization
+    application
+}
+
+val ktor_version: String by project
+val logback_version: String by project
+
+application {
+    mainClass = "id.contoh.dompet.ApplicationKt"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("io.ktor:ktor-server-core:$ktor_version")
+    implementation("io.ktor:ktor-server-netty:$ktor_version")
+    implementation("io.ktor:ktor-server-config-yaml:$ktor_version")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("io.ktor:ktor-server-request-validation:$ktor_version")
+    implementation("io.ktor:ktor-server-status-pages:$ktor_version")
+    implementation("io.ktor:ktor-server-call-logging:$ktor_version")
+    implementation("io.ktor:ktor-server-auth:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
+    runtimeOnly("ch.qos.logback:logback-classic:$logback_version")
+
+    testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    testImplementation(kotlin("test"))
+}
+
+kotlin {
+    jvmToolchain(21)
+}`, 'kotlin'),
+      code('Application.kt — plugin, error handling, dan JWT', `package id.contoh.dompet
+
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.config.*
+import io.ktor.server.plugins.*
+import io.ktor.server.plugins.calllogging.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.requestvalidation.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.util.Date
+
+fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)   // membaca application.yaml
+
+@Serializable
+data class ErrorResponse(val kode: String, val pesan: String)
+
+data class JwtConfig(val secret: String, val issuer: String, val audience: String, val realm: String) {
+    fun buatToken(username: String): String = JWT.create()
+        .withAudience(audience)
+        .withIssuer(issuer)
+        .withClaim("username", username)
+        .withExpiresAt(Date(System.currentTimeMillis() + 60 * 60 * 1000))    // 1 jam
+        .sign(Algorithm.HMAC256(secret))
+
+    companion object {
+        fun dari(c: ApplicationConfig) = JwtConfig(
+            secret = c.property("jwt.secret").getString(),
+            issuer = c.property("jwt.issuer").getString(),
+            audience = c.property("jwt.audience").getString(),
+            realm = c.propertyOrNull("jwt.realm")?.getString() ?: "dompet",
+        )
+    }
+}
+
+// Modul produksi: dirakit dari konfigurasi
+fun Application.module() = configure(JwtConfig.dari(environment.config), TransaksiRepoMemori())
+
+// Dipisah agar test bisa memasukkan konfigurasi dan repository palsu
+fun Application.configure(jwt: JwtConfig, repo: TransaksiRepo) {
+    install(CallLogging)
+    install(ContentNegotiation) {
+        json(Json { ignoreUnknownKeys = true })
+    }
+    install(RequestValidation) {
+        validate<BuatTransaksi> { req ->
+            when {
+                req.judul.isBlank() -> ValidationResult.Invalid("judul wajib diisi")
+                req.jumlah <= 0 -> ValidationResult.Invalid("jumlah harus positif")
+                else -> ValidationResult.Valid
+            }
+        }
+    }
+    install(StatusPages) {                     // handler dengan tipe paling spesifik yang dipilih
+        exception<RequestValidationException> { call, e ->
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse("VALIDASI", e.reasons.joinToString()))
+        }
+        exception<BadRequestException> { call, _ ->      // JSON rusak / tipe salah
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse("BODY_TIDAK_VALID", "format body salah"))
+        }
+        exception<NoSuchElementException> { call, e ->
+            call.respond(HttpStatusCode.NotFound, ErrorResponse("TIDAK_DITEMUKAN", e.message ?: "tidak ditemukan"))
+        }
+        exception<Throwable> { call, e ->
+            call.application.log.error("error tak terduga", e)
+            call.respond(HttpStatusCode.InternalServerError, ErrorResponse("INTERNAL", "terjadi kesalahan"))
+        }
+    }
+    install(Authentication) {
+        jwt("auth-jwt") {
+            realm = jwt.realm
+            verifier(
+                JWT.require(Algorithm.HMAC256(jwt.secret))
+                    .withAudience(jwt.audience)
+                    .withIssuer(jwt.issuer)
+                    .build()
+            )
+            validate { cred ->
+                if (cred.payload.getClaim("username").asString().isNullOrBlank()) null else JWTPrincipal(cred.payload)
+            }
+            challenge { _, _ ->
+                call.respond(HttpStatusCode.Unauthorized, ErrorResponse("UNAUTHORIZED", "token tidak valid atau kedaluwarsa"))
+            }
+        }
+    }
+    ruteAuth(jwt)
+    ruteTransaksi(repo)
+}`, 'kotlin'),
+      code('Routes.kt — routing dan rute terproteksi', `package id.contoh.dompet
+
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicLong
+
+@Serializable data class LoginRequest(val username: String, val password: String)
+@Serializable data class TokenResponse(val token: String)
+@Serializable data class BuatTransaksi(val judul: String, val jumlah: Long)
+@Serializable data class Transaksi(val id: Long, val pemilik: String, val judul: String, val jumlah: Long)
+
+interface TransaksiRepo {
+    suspend fun milik(pemilik: String): List<Transaksi>
+    suspend fun cari(id: Long, pemilik: String): Transaksi?
+    suspend fun buat(pemilik: String, req: BuatTransaksi): Transaksi
+}
+
+class TransaksiRepoMemori : TransaksiRepo {
+    private val data = ConcurrentHashMap<Long, Transaksi>()
+    private val seq = AtomicLong()
+    override suspend fun milik(pemilik: String) = data.values.filter { it.pemilik == pemilik }.sortedBy { it.id }
+    override suspend fun cari(id: Long, pemilik: String) = data[id]?.takeIf { it.pemilik == pemilik }
+    override suspend fun buat(pemilik: String, req: BuatTransaksi) =
+        Transaksi(seq.incrementAndGet(), pemilik, req.judul.trim(), req.jumlah).also { data[it.id] = it }
+}
+
+fun Application.ruteAuth(jwt: JwtConfig) = routing {
+    get("/health") { call.respondText("OK") }
+    post("/auth/login") {
+        val req = call.receive<LoginRequest>()
+        // DEMO saja: di produksi cocokkan hash password (bcrypt/argon2) dari database
+        if (req.password != "rahasia") {
+            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("LOGIN_GAGAL", "username atau password salah"))
+            return@post
+        }
+        call.respond(TokenResponse(jwt.buatToken(req.username)))
+    }
+}
+
+fun Application.ruteTransaksi(repo: TransaksiRepo) = routing {
+    authenticate("auth-jwt") {
+        route("/api/transaksi") {
+            get {
+                call.respond(repo.milik(call.pemilik()))
+            }
+            get("/{id}") {
+                val id = call.parameters["id"]?.toLongOrNull()
+                    ?: throw BadRequestException("id harus angka")
+                val t = repo.cari(id, call.pemilik()) ?: throw NoSuchElementException("transaksi $id tidak ditemukan")
+                call.respond(t)
+            }
+            post {
+                val req = call.receive<BuatTransaksi>()        // divalidasi plugin RequestValidation
+                call.respond(HttpStatusCode.Created, repo.buat(call.pemilik(), req))
+            }
+        }
+    }
+}
+
+private fun ApplicationCall.pemilik(): String =
+    requireNotNull(principal<JWTPrincipal>()?.payload?.getClaim("username")?.asString())`, 'kotlin'),
+      code('src/main/resources/application.yaml', `ktor:
+  deployment:
+    port: "$PORT:8080"            # env PORT bila ada, selain itu 8080
+  application:
+    modules:
+      - id.contoh.dompet.ApplicationKt.module
+
+jwt:
+  secret: "$JWT_SECRET"           # wajib dari environment, jangan ditulis di repo
+  issuer: "https://dompet.contoh.id"
+  audience: "dompet-api"
+  realm: "dompet"`, 'yaml'),
+      code('TransaksiApiTest.kt — testApplication', `package id.contoh.dompet
+
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.config.*
+import io.ktor.server.testing.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class TransaksiApiTest {
+    private val jwt = JwtConfig(secret = "rahasia-test", issuer = "test", audience = "test", realm = "test")
+
+    // Server in-memory tanpa port jaringan; client JSON siap pakai
+    private fun ujiApi(blok: suspend ApplicationTestBuilder.(HttpClient) -> Unit) = testApplication {
+        environment { config = MapApplicationConfig() }      // jangan muat modul dari application.yaml
+        application { configure(jwt, TransaksiRepoMemori()) }
+        blok(createClient { install(ContentNegotiation) { json() } })
+    }
+
+    @Test
+    fun \`tanpa token ditolak 401\`() = ujiApi { client ->
+        assertEquals(HttpStatusCode.Unauthorized, client.get("/api/transaksi").status)
+    }
+
+    @Test
+    fun \`buat lalu baca transaksi milik sendiri\`() = ujiApi { client ->
+        val token = jwt.buatToken("budi")
+        val res = client.post("/api/transaksi") {
+            bearerAuth(token)
+            contentType(ContentType.Application.Json)
+            setBody(BuatTransaksi("Kopi", 25_000))
+        }
+        assertEquals(HttpStatusCode.Created, res.status)
+        val dibuat = res.body<Transaksi>()
+
+        val daftar = client.get("/api/transaksi") { bearerAuth(token) }.body<List<Transaksi>>()
+        assertEquals(listOf(dibuat), daftar)
+
+        val olehOrangLain = client.get("/api/transaksi/\${dibuat.id}") { bearerAuth(jwt.buatToken("sari")) }
+        assertEquals(HttpStatusCode.NotFound, olehOrangLain.status)   // tidak membocorkan data pengguna lain
+    }
+
+    @Test
+    fun \`jumlah negatif menghasilkan 400\`() = ujiApi { client ->
+        val res = client.post("/api/transaksi") {
+            bearerAuth(jwt.buatToken("budi"))
+            contentType(ContentType.Application.Json)
+            setBody(BuatTransaksi("Kopi", -5))
+        }
+        assertEquals(HttpStatusCode.BadRequest, res.status)
+    }
+}`, 'kotlin'),
+      table(['Kebutuhan', 'Spring Boot', 'Ktor'], [
+        ['Menambah fitur', 'Starter + auto-configuration', '`install(Plugin) { ... }` eksplisit'],
+        ['Routing', '`@RestController` + `@GetMapping`', 'DSL `routing { route { get { } } }`'],
+        ['JSON', 'Jackson otomatis', '`ContentNegotiation` + `json()` (kotlinx.serialization)'],
+        ['Validasi', 'Bean Validation `@Valid`', 'Plugin `RequestValidation` atau validasi manual'],
+        ['Error global', '`@RestControllerAdvice`', 'Plugin `StatusPages`'],
+        ['Autentikasi', 'Spring Security', 'Plugin `Authentication` (`jwt`, `basic`, `session`, `oauth`)'],
+        ['Dependency injection', 'Container Spring', 'Manual (parameter fungsi) atau library (Koin, Ktor DI)'],
+        ['Test HTTP', '`MockMvc` / `@SpringBootTest`', '`testApplication` (in-memory, tanpa port)'],
+      ]),
+      callout('warn', 'JWT di produksi', 'Secret HMAC minimal 256 bit dan diambil dari environment atau secret manager, bukan dari repo. Selalu verifikasi `issuer`, `audience`, dan waktu kedaluwarsa (sudah dilakukan `JWT.require(...).build()`). Untuk banyak service, pertimbangkan RS256 dengan endpoint JWKS (`jwt { verifier(jwkProvider, issuer) }`) agar service lain tidak perlu memegang secret penandatangan.'),
+      callout('tip', 'Urutan plugin dan struktur kode', 'Pasang plugin sebelum routing yang memakainya. Pecah rute per fitur sebagai extension `fun Application.ruteX()` atau `fun Route.ruteX()`, dan rakit dependency di satu tempat (`configure`) sehingga test cukup memanggil fungsi yang sama dengan objek palsu.'),
+      ...quiz([
+        ['KT-28', 'Apa beda cara Ktor dan Spring Boot menambahkan fitur seperti JSON atau autentikasi?', 'Spring Boot mengaktifkan fitur secara otomatis begitu starter ada di classpath (auto-configuration). Ktor tidak melakukan apa pun sampai plugin dipasang eksplisit dengan `install(...)` beserta konfigurasinya, sehingga semua perilaku terlihat di kode, dengan konsekuensi lebih banyak wiring manual.'],
+        ['KT-29', 'Mengapa `exception<BadRequestException>` perlu ditulis terpisah padahal sudah ada `exception<Throwable>`?', 'StatusPages memilih handler dengan tipe paling spesifik. Tanpa handler khusus, body JSON yang rusak (dilempar sebagai `BadRequestException`) akan ditangkap handler `Throwable` dan dijawab 500, padahal itu kesalahan klien yang seharusnya 400.'],
+        ['KT-30', 'Mengapa test memanggil `application { configure(...) }` dan memasang `MapApplicationConfig()` kosong?', 'Agar test tidak memuat modul produksi dari `application.yaml` (yang membutuhkan env `JWT_SECRET` dan bisa memasang plugin dua kali), dan agar test memakai secret serta repository palsu yang dikendalikan sendiri. Server berjalan in-memory sehingga test cepat dan deterministik.'],
+      ]),
+      ...practice('kt-ktor', [
+        'Buat proyek Ktor (start.ktor.io atau Gradle manual), jalankan `./gradlew run`, dan cek `GET /health`.',
+        'Tambahkan `PUT` dan `DELETE /api/transaksi/{id}` yang hanya boleh dilakukan pemilik transaksi.',
+        'Lengkapi test: token kedaluwarsa (buat token dengan `withExpiresAt` di masa lalu) → 401, id bukan angka → 400.',
+        'Pasang plugin `CORS` dan `CallId`, lalu pastikan header `X-Request-Id` muncul di log setiap request.',
+      ]),
+      references(
+        ['Ktor: Create a new project', 'https://ktor.io/docs/server-create-a-new-project.html'],
+        ['Ktor: Content negotiation and serialization', 'https://ktor.io/docs/server-serialization.html'],
+        ['Ktor: Status pages', 'https://ktor.io/docs/server-status-pages.html'],
+        ['Ktor: JSON Web Tokens', 'https://ktor.io/docs/server-jwt.html'],
+        ['Ktor: Request validation', 'https://ktor.io/docs/server-request-validation.html'],
+        ['Ktor: Testing', 'https://ktor.io/docs/server-testing.html'],
+      ),
+    ],
+  },
+  {
+    id: 'kt-ktor-exposed',
+    title: 'Kotlin: Database dengan Exposed & Flyway di Ktor',
+    summary: 'Exposed DSL vs DAO, koneksi HikariCP, migrasi skema dengan Flyway, transaksi dan row lock, serta memanggil JDBC dari handler suspend dengan aman.',
+    track: BACKEND, source: kotlinSource, duration: '3 jam', level: 'Med',
+    blocks: [
+      paragraph('**Exposed** adalah library SQL dari JetBrains dengan dua gaya: **DSL** yang mirip SQL bertipe (`selectAll().where { ... }`) dan **DAO** yang mirip ORM ringan (entity dengan properti). Keduanya berjalan di atas JDBC, sehingga bersifat *blocking*. Skema database tidak dibuat dari kode, melainkan dikelola **Flyway**: file SQL bernomor yang dijalankan berurutan dan dicatat di tabel riwayat, sehingga setiap lingkungan (lokal, staging, produksi) punya skema yang sama.'),
+      paragraph('Modul ini melanjutkan [Ktor Server](#kotlin.kt-ktor-server): `TransaksiRepoMemori` diganti implementasi PostgreSQL tanpa mengubah rute. Catatan versi: sejak **Exposed 1.0** nama package berubah menjadi `org.jetbrains.exposed.v1.core` / `.jdbc` / `.dao` (contoh lama memakai `org.jetbrains.exposed.sql`), dan beberapa signature ikut bergeser. Import sengaja tidak ditulis di contoh; biarkan IDE melengkapinya dan cocokkan dengan dokumentasi versi yang Anda pakai.'),
+      code('Dependency dan migrasi pertama', `// build.gradle.kts (tambahan) — isi versi terbaru di gradle.properties
+dependencies {
+    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")       // hanya bila memakai gaya DAO
+    implementation("com.zaxxer:HikariCP:$hikari_version")                      // connection pool
+    implementation("org.flywaydb:flyway-core:$flyway_version")
+    implementation("org.flywaydb:flyway-database-postgresql:$flyway_version")  // modul database terpisah sejak Flyway 10
+    runtimeOnly("org.postgresql:postgresql:$postgres_version")
+}
+
+// src/main/resources/db/migration/V1__buat_rekening_transaksi.sql
+// CREATE TABLE rekening (
+//     id      BIGSERIAL PRIMARY KEY,
+//     pemilik VARCHAR(50) NOT NULL UNIQUE,
+//     saldo   BIGINT      NOT NULL DEFAULT 0 CHECK (saldo >= 0)
+// );
+// CREATE TABLE transaksi (
+//     id          BIGSERIAL PRIMARY KEY,
+//     rekening_id BIGINT       NOT NULL REFERENCES rekening(id),
+//     judul       VARCHAR(100) NOT NULL,
+//     jumlah      BIGINT       NOT NULL,
+//     dibuat      TIMESTAMPTZ  NOT NULL DEFAULT now()
+// );
+// CREATE INDEX idx_transaksi_rekening ON transaksi (rekening_id, id DESC);`, 'kotlin'),
+      code('Tabel dan repository gaya DSL', `object RekeningTable : LongIdTable("rekening") {
+    val pemilik = varchar("pemilik", 50).uniqueIndex()
+    val saldo = long("saldo")
+}
+
+object TransaksiTable : LongIdTable("transaksi") {
+    val rekening = reference("rekening_id", RekeningTable)     // foreign key → bisa innerJoin
+    val judul = varchar("judul", 100)
+    val jumlah = long("jumlah")
+    // kolom 'dibuat' diisi DEFAULT database; tidak wajib dideklarasikan bila tidak dibaca
+}
+
+// JDBC blocking → jalankan di Dispatchers.IO agar thread event loop Ktor tidak tertahan
+suspend fun <T> dbQuery(db: Database, blok: () -> T): T =
+    withContext(Dispatchers.IO) { transaction(db) { blok() } }
+
+class TransaksiRepoExposed(private val db: Database) : TransaksiRepo {
+
+    override suspend fun milik(pemilik: String): List<Transaksi> = dbQuery(db) {
+        (TransaksiTable innerJoin RekeningTable)
+            .selectAll()
+            .where { RekeningTable.pemilik eq pemilik }
+            .orderBy(TransaksiTable.id to SortOrder.DESC)
+            .limit(100)
+            .map { it.keTransaksi() }
+    }
+
+    override suspend fun cari(id: Long, pemilik: String): Transaksi? = dbQuery(db) {
+        (TransaksiTable innerJoin RekeningTable)
+            .selectAll()
+            .where { (TransaksiTable.id eq id) and (RekeningTable.pemilik eq pemilik) }
+            .singleOrNull()
+            ?.keTransaksi()
+    }
+
+    override suspend fun buat(pemilik: String, req: BuatTransaksi): Transaksi = dbQuery(db) {
+        val rekeningId = RekeningTable.selectAll().where { RekeningTable.pemilik eq pemilik }
+            .singleOrNull()?.get(RekeningTable.id)
+            ?: RekeningTable.insertAndGetId { it[RekeningTable.pemilik] = pemilik; it[saldo] = 0 }
+        val id = TransaksiTable.insertAndGetId {
+            it[rekening] = rekeningId
+            it[judul] = req.judul.trim()
+            it[jumlah] = req.jumlah
+        }
+        Transaksi(id.value, pemilik, req.judul.trim(), req.jumlah)
+    }
+
+    // Satu transaksi database: semua berhasil atau semua di-rollback saat exception
+    suspend fun transfer(dari: String, ke: String, jumlah: Long): Unit = dbQuery(db) {
+        require(jumlah > 0) { "jumlah harus positif" }
+        fun kunci(p: String) = RekeningTable.selectAll().where { RekeningTable.pemilik eq p }
+            .forUpdate()                                            // SELECT ... FOR UPDATE: cegah lost update
+            .singleOrNull() ?: throw NoSuchElementException("rekening $p tidak ada")
+        val asal = kunci(dari)
+        val tujuan = kunci(ke)
+        check(asal[RekeningTable.saldo] >= jumlah) { "saldo tidak cukup" }
+        RekeningTable.update({ RekeningTable.id eq asal[RekeningTable.id] }) { it[saldo] = asal[saldo] - jumlah }
+        RekeningTable.update({ RekeningTable.id eq tujuan[RekeningTable.id] }) { it[saldo] = tujuan[saldo] + jumlah }
+    }
+}
+
+private fun ResultRow.keTransaksi() = Transaksi(
+    id = this[TransaksiTable.id].value,
+    pemilik = this[RekeningTable.pemilik],
+    judul = this[TransaksiTable.judul],
+    jumlah = this[TransaksiTable.jumlah],
+)`, 'kotlin'),
+      code('Gaya DAO untuk perbandingan', `class RekeningEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<RekeningEntity>(RekeningTable)
+    var pemilik by RekeningTable.pemilik
+    var saldo by RekeningTable.saldo
+    val transaksi by TransaksiEntity referrersOn TransaksiTable.rekening   // relasi satu-ke-banyak
+}
+
+class TransaksiEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<TransaksiEntity>(TransaksiTable)
+    var rekening by RekeningEntity referencedOn TransaksiTable.rekening
+    var judul by TransaksiTable.judul
+    var jumlah by TransaksiTable.jumlah
+}
+
+fun contohDao(db: Database) = transaction(db) {
+    val budi = RekeningEntity.find { RekeningTable.pemilik eq "budi" }.single()
+    TransaksiEntity.new {
+        rekening = budi
+        judul = "Kopi"
+        jumlah = 25_000
+    }
+    budi.saldo -= 25_000                              // perubahan properti di-flush saat commit
+    // Waspada N+1: memuat relasi untuk banyak rekening → pakai eager loading
+    RekeningEntity.all().with(RekeningEntity::transaksi).forEach { r -> println("\${r.pemilik}: \${r.transaksi.count()}") }
+}`, 'kotlin'),
+      code('Merakit di Ktor: pool, migrasi, lalu koneksi', `fun Application.module() {
+    val cfg = environment.config
+    val ds = HikariDataSource(HikariConfig().apply {
+        jdbcUrl = cfg.property("db.url").getString()          // mis. jdbc:postgresql://localhost:5432/dompet
+        username = cfg.property("db.user").getString()
+        password = cfg.property("db.password").getString()
+        maximumPoolSize = 10
+    })
+    Flyway.configure().dataSource(ds).load().migrate()       // migrasi selesai sebelum menerima request
+    val db = Database.connect(ds)
+    monitor.subscribe(ApplicationStopped) { ds.close() }     // tutup pool saat server berhenti
+
+    configure(JwtConfig.dari(cfg), TransaksiRepoExposed(db))
+}`, 'kotlin'),
+      table(['Aspek', 'DSL', 'DAO'], [
+        ['Bentuk kode', 'Query bertipe mirip SQL', 'Entity dengan properti, mirip ORM'],
+        ['Kontrol SQL', 'Tinggi: join, agregasi, `forUpdate`, batch', 'Lebih abstrak; query kompleks tetap turun ke DSL'],
+        ['Hasil', '`ResultRow` → dipetakan manual ke data class', 'Objek entity yang hidup di dalam transaksi'],
+        ['Risiko umum', 'Mapping berulang', 'N+1 query, akses entity di luar `transaction`'],
+        ['Cocok untuk', 'API dengan query beragam, laporan', 'CRUD sederhana dengan relasi'],
+      ]),
+      callout('warn', 'Transaksi pendek dan tanpa I/O lain', 'Selama blok `transaction` berjalan, satu koneksi pool dan lock baris tertahan. Jangan memanggil HTTP, mengirim email, atau `delay` di dalamnya; lakukan setelah commit (atau pakai pola outbox). Ingat juga bahwa transaksi Exposed terikat ke thread: jangan berpindah dispatcher di tengah blok. Exposed menyediakan API transaksi suspend dan (sejak 1.0) modul R2DBC; cek nama API yang tepat di dokumentasi versi Anda.'),
+      callout('info', 'SchemaUtils vs Flyway', '`SchemaUtils.create(TransaksiTable)` praktis untuk prototipe atau test, tetapi tidak menyimpan riwayat dan tidak bisa mengubah kolom dengan aman. Untuk aplikasi nyata gunakan migrasi bernomor (`V2__tambah_kategori.sql`) yang tidak pernah diedit setelah dijalankan. Konsep migrasi sama dengan Flyway di ekosistem Spring/Java.'),
+      ...quiz([
+        ['KT-31', 'Kapan memilih DSL dan kapan DAO di Exposed?', 'DSL saat butuh kendali SQL: join, agregasi, filter dinamis, `FOR UPDATE`, atau batch insert, dengan hasil dipetakan ke data class yang aman dibawa keluar transaksi. DAO nyaman untuk CRUD sederhana berbasis entity dan relasi, dengan catatan entity hanya valid di dalam `transaction` dan rawan N+1 bila relasi tidak di-eager load.'],
+        ['KT-32', 'Mengapa `transaction { }` dibungkus `withContext(Dispatchers.IO)` di handler Ktor?', 'JDBC memblokir thread selama menunggu database. Handler Ktor berjalan di thread event loop/dispatcher terbatas; bila diblokir, request lain ikut tertahan. `Dispatchers.IO` menyediakan pool thread yang memang untuk operasi blocking.'],
+        ['KT-33', 'Pada `transfer`, apa fungsi `forUpdate()` dan mengapa pengecekan saldo saja tidak cukup?', 'Tanpa lock, dua transfer bersamaan bisa membaca saldo yang sama lalu sama-sama menulis hasilnya (lost update), sehingga saldo akhir salah. `SELECT ... FOR UPDATE` mengunci baris rekening sampai commit, sehingga transfer kedua menunggu dan membaca saldo terbaru. Constraint `CHECK (saldo >= 0)` menjadi pengaman terakhir di database.'],
+      ]),
+      ...practice('kt-exposed', [
+        'Jalankan PostgreSQL di Docker, buat migrasi `V1`, dan pastikan tabel `flyway_schema_history` terisi saat aplikasi start.',
+        'Ganti `TransaksiRepoMemori` dengan `TransaksiRepoExposed` tanpa mengubah kode rute; semua test API tetap lulus (jalankan dengan database Testcontainers).',
+        'Tambahkan migrasi `V2__tambah_kategori.sql` (kolom `kategori` dengan default) dan endpoint ringkasan total per kategori memakai `groupBy` + `sum` di DSL.',
+        'Uji `transfer` dengan dua coroutine bersamaan dari rekening yang sama dan buktikan saldo akhir benar.',
+      ]),
+      references(
+        ['Exposed documentation', 'https://www.jetbrains.com/help/exposed/home.html'],
+        ['Exposed (GitHub)', 'https://github.com/JetBrains/Exposed'],
+        ['Ktor: Integrate a database with Exposed', 'https://ktor.io/docs/server-integrate-database.html'],
+        ['Flyway documentation', 'https://documentation.red-gate.com/flyway'],
+        ['HikariCP', 'https://github.com/brettwooldridge/HikariCP'],
+      ),
+    ],
+  },
+  {
     id: 'kt-compose-dasar',
     title: 'Android: Dasar Jetpack Compose',
     summary: 'Fungsi @Composable, state & remember, recomposition, state hoisting, ViewModel + StateFlow, dan layar daftar dengan LazyColumn.',
@@ -1352,6 +1834,733 @@ fun TransaksiContent(state: TransaksiUiState, onMuatUlang: () -> Unit, modifier:
       ),
     ],
   },
+  {
+    id: 'kt-android-arsitektur',
+    title: 'Android: Arsitektur — ViewModel, UiState & Navigation Type-Safe',
+    summary: 'Lapisan UI/domain/data, UiState dengan sealed interface, event sebagai state, SavedStateHandle, Navigation Compose dengan route @Serializable, dan efek lifecycle di Compose.',
+    track: ANDROID, source: kotlinSource, duration: '3 jam', level: 'Med',
+    blocks: [
+      paragraph('Panduan arsitektur resmi Android membagi aplikasi menjadi **UI layer** (composable + ViewModel), **data layer** (repository + sumber data), dan opsional **domain layer** (use case). Aturannya: data mengalir turun sebagai state, event mengalir naik sebagai pemanggilan fungsi (*unidirectional data flow*), dan setiap data punya satu sumber kebenaran. Modul ini melanjutkan [Dasar Jetpack Compose](#kotlin.kt-compose-dasar) dengan beberapa layar yang saling bernavigasi.'),
+      paragraph('Sejak Navigation Compose 2.8.0, route tidak lagi ditulis sebagai string `"detail/{id}"` melainkan sebagai tipe Kotlin `@Serializable`. Compiler memeriksa argumen, dan ViewModel bisa membaca argumen yang sama dari `SavedStateHandle`. Google juga merilis **Navigation 3** (`androidx.navigation3`) dengan model back stack yang dikelola sendiri; konsep route bertipe di bawah tetap relevan, tetapi cek dokumentasi bila memulai proyek baru.'),
+      code('Gradle dan definisi route', `// app/build.gradle.kts (tambahan) — versi dari Compose BOM / version catalog proyek Anda
+plugins {
+    kotlin("plugin.serialization") version "2.3.21"      // samakan dengan versi Kotlin proyek
+}
+dependencies {
+    implementation("androidx.navigation:navigation-compose:$navVersion")   // route type-safe butuh 2.8.0+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+}
+
+// Navigation.kt
+import kotlinx.serialization.Serializable
+
+@Serializable data object DaftarRoute
+@Serializable data class DetailRoute(val id: Long)        // argumen wajib, bertipe
+@Serializable data class TambahRoute(val kategoriAwal: String? = null)   // argumen opsional`, 'kotlin'),
+      code('NavHost dengan route bertipe', `import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+
+@Composable
+fun DompetNavHost(navController: NavHostController = rememberNavController()) {
+    NavHost(navController = navController, startDestination = DaftarRoute) {
+        composable<DaftarRoute> {
+            DaftarScreen(
+                onBukaDetail = { id -> navController.navigate(DetailRoute(id)) },
+                onTambah = { navController.navigate(TambahRoute()) },
+            )
+        }
+        composable<DetailRoute> { entry ->
+            val route: DetailRoute = entry.toRoute()          // argumen dibaca bertipe, tanpa parsing string
+            DetailScreen(judulBar = "Transaksi #\${route.id}", onKembali = { navController.popBackStack() })
+        }
+        composable<TambahRoute> {
+            TambahScreen(onSelesai = {
+                // Kembali ke daftar dan buang layar tambah dari back stack
+                navController.navigate(DaftarRoute) { popUpTo<DaftarRoute> { inclusive = true } }
+            })
+        }
+    }
+}`, 'kotlin'),
+      code('UiState sealed, SavedStateHandle, dan event sebagai state', `import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import java.io.IOException
+
+sealed interface DetailUiState {
+    data object Memuat : DetailUiState
+    data class Tampil(val item: TransaksiItem, val menghapus: Boolean = false) : DetailUiState
+    data class Error(val pesan: String) : DetailUiState
+    data object Terhapus : DetailUiState                   // "event" navigasi dimodelkan sebagai state
+}
+
+interface DetailRepository {
+    suspend fun cari(id: Long): TransaksiItem?              // TransaksiItem dari modul Dasar Compose
+    suspend fun hapus(id: Long)
+}
+
+class DetailViewModel(savedStateHandle: SavedStateHandle, private val repo: DetailRepository) : ViewModel() {
+    private val id = savedStateHandle.toRoute<DetailRoute>().id   // bertahan saat process death
+
+    private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Memuat)
+    val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
+
+    init { muat() }
+
+    fun muat() {
+        viewModelScope.launch {
+            _uiState.value = try {
+                repo.cari(id)?.let { DetailUiState.Tampil(it) } ?: DetailUiState.Error("Transaksi tidak ditemukan")
+            } catch (e: IOException) {
+                DetailUiState.Error(e.message ?: "Gagal memuat")
+            }
+        }
+    }
+
+    fun hapus() {
+        val sekarang = _uiState.value as? DetailUiState.Tampil ?: return
+        _uiState.value = sekarang.copy(menghapus = true)
+        viewModelScope.launch {
+            _uiState.value = try {
+                repo.hapus(id)
+                DetailUiState.Terhapus
+            } catch (e: IOException) {
+                DetailUiState.Error(e.message ?: "Gagal menghapus")
+            }
+        }
+    }
+}`, 'kotlin'),
+      code('Layar: collect state, reaksi navigasi, dan efek lifecycle', `import androidx.compose.runtime.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewmodel.compose.viewModel
+
+@Composable
+fun DetailScreen(
+    judulBar: String,
+    onKembali: () -> Unit,
+    // Tanpa DI: factory membaca SavedStateHandle milik back stack entry (Hilt menggantikannya di modul berikutnya)
+    viewModel: DetailViewModel = viewModel { DetailViewModel(createSavedStateHandle(), RepositoriDetailContoh()) },
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state) {                                   // jalan ulang setiap state berubah
+        if (state is DetailUiState.Terhapus) onKembali()
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {        // muat ulang saat kembali dari background
+        viewModel.muat()
+    }
+
+    DetailContent(judulBar = judulBar, state = state, onHapus = viewModel::hapus, onCobaLagi = viewModel::muat)
+}`, 'kotlin'),
+      table(['Tempat menyimpan', 'Rotasi / ganti tema', 'Process death', 'Pakai untuk'], [
+        ['`remember`', 'Hilang', 'Hilang', 'State UI sementara (animasi, popup terbuka)'],
+        ['`rememberSaveable`', 'Bertahan', 'Bertahan', 'Input teks, tab terpilih, posisi scroll'],
+        ['`ViewModel` (field / StateFlow)', 'Bertahan', 'Hilang', 'UiState, data yang sudah dimuat'],
+        ['`SavedStateHandle`', 'Bertahan', 'Bertahan', 'Argumen route, query pencarian, filter kecil'],
+        ['Room / DataStore', 'Bertahan', 'Bertahan', 'Data persisten, preferensi pengguna'],
+      ]),
+      callout('tip', 'Event sekali jalan', 'Panduan Android menyarankan event dari ViewModel (navigasi setelah hapus, snackbar) dimodelkan sebagai **state** yang dikonsumsi UI, bukan `SharedFlow`/`Channel` yang bisa hilang saat UI tidak sedang collect (misalnya saat rotasi). Setelah UI bereaksi, ViewModel bisa mereset state-nya (`pesanDitampilkan()`).'),
+      callout('warn', 'Kirim ID, bukan objek', 'Route sebaiknya berisi ID atau nilai kecil, bukan objek domain lengkap. Objek besar membengkakkan saved state (batas Bundle) dan cepat basi; layar tujuan memuat ulang data dari repository berdasarkan ID, yang juga membuat deep link bekerja.'),
+      ...quiz([
+        ['KT-34', 'Mengapa route `DetailRoute(val id: Long)` lebih baik daripada string `"detail/{id}"`?', 'Route bertipe dicek compiler: argumen yang salah tipe atau terlupa menjadi error kompilasi, bukan crash saat runtime. Tidak ada parsing string manual, dan argumen yang sama dibaca dengan `toRoute()` baik di composable maupun di ViewModel lewat `SavedStateHandle`.'],
+        ['KT-35', 'Mengapa navigasi setelah hapus dimodelkan sebagai `DetailUiState.Terhapus`, bukan event di `SharedFlow`?', 'SharedFlow tanpa replay membuang event bila tidak ada collector aktif, misalnya saat Activity sedang dibuat ulang, sehingga navigasi bisa hilang. State selalu memiliki nilai terkini yang akan dibaca UI begitu kembali aktif, sehingga reaksinya terjamin dan mudah diuji.'],
+        ['KT-36', 'Data apa yang hilang saat process death dan bagaimana menjaganya?', 'Semua isi memori proses: field ViewModel dan `remember`. Yang bertahan adalah `rememberSaveable`, `SavedStateHandle` (termasuk argumen route), serta data persisten di Room/DataStore. Simpan state kecil yang penting untuk memulihkan layar di saved state, lalu muat ulang data besar dari repository.'],
+      ]),
+      ...practice('kt-android-arch', [
+        'Bangun tiga layar (Daftar, Detail, Tambah) dengan route `@Serializable` dan `NavHost`; tidak ada route berupa string.',
+        'Implementasikan `DetailViewModel` dengan `SavedStateHandle.toRoute()` dan uji dengan `SavedStateHandle(mapOf("id" to 7L))` di unit test.',
+        'Simulasikan process death (Developer options → Don\'t keep activities) dan pastikan layar Detail pulih dengan ID yang benar.',
+        'Tampilkan snackbar "Transaksi dihapus" di layar Daftar memakai state, bukan SharedFlow.',
+      ]),
+      references(
+        ['Android Developers: Guide to app architecture', 'https://developer.android.com/topic/architecture'],
+        ['Android Developers: UI layer', 'https://developer.android.com/topic/architecture/ui-layer'],
+        ['Android Developers: UI events', 'https://developer.android.com/topic/architecture/ui-layer/events'],
+        ['Android Developers: Type safety in Kotlin DSL and Navigation Compose', 'https://developer.android.com/guide/navigation/design/type-safety'],
+        ['Android Developers: Saved state module for ViewModel', 'https://developer.android.com/topic/libraries/architecture/viewmodel/viewmodel-savedstate'],
+      ),
+    ],
+  },
+  {
+    id: 'kt-android-data-layer',
+    title: 'Android: Data Layer Offline-First — Retrofit/Ktor, Room & Repository',
+    summary: 'DTO dengan kotlinx.serialization, Retrofit atau Ktor client, Room dengan Flow, repository sebagai satu sumber kebenaran, antrean tulis offline, dan sinkronisasi dengan WorkManager.',
+    track: ANDROID, source: kotlinSource, duration: '4 jam', level: 'Hard',
+    blocks: [
+      paragraph('Aplikasi mobile hidup di jaringan yang tidak bisa diandalkan: lift, kereta bawah tanah, sinyal lemah. Pola **offline-first** membuat database lokal (Room) menjadi **satu sumber kebenaran**: UI selalu membaca dari Room lewat `Flow`, sedangkan jaringan hanya dipakai untuk menyinkronkan isi database. Hasilnya layar langsung tampil dengan data terakhir, dan perubahan pengguna tidak hilang saat offline.'),
+      paragraph('Data layer terdiri dari tiga jenis model: **DTO** (bentuk JSON dari API), **entity** (bentuk tabel Room), dan **model domain** (yang dipakai UI). Pemisahan ini mencegah perubahan API atau skema database merembet ke seluruh UI. Repository adalah satu-satunya kelas yang tahu ketiganya.'),
+      code('API: DTO, Retrofit, dan alternatif Ktor client', `// app/build.gradle.kts (tambahan) — ambil versi terbaru dari dokumentasi masing-masing
+// implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
+// implementation("com.squareup.retrofit2:converter-kotlinx-serialization:$retrofitVersion")
+// implementation("com.squareup.okhttp3:logging-interceptor:$okhttpVersion")
+// implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import retrofit2.create
+import retrofit2.http.*
+
+@Serializable
+data class TransaksiDto(
+    val id: Long,
+    val judul: String,
+    val jumlah: Long,
+    @SerialName("updated_at") val diperbaruiPada: Long,      // nama JSON berbeda dari nama properti
+)
+
+@Serializable
+data class BuatTransaksiDto(@SerialName("client_id") val idKlien: String, val judul: String, val jumlah: Long)
+
+interface DompetApi {
+    @GET("transaksi")
+    suspend fun semua(@Query("sejak") sejak: Long? = null): List<TransaksiDto>   // null → parameter tidak dikirim
+
+    @POST("transaksi")
+    suspend fun buat(@Body body: BuatTransaksiDto): TransaksiDto
+}
+
+val jsonApi = Json { ignoreUnknownKeys = true }              // field baru di API tidak membuat app crash
+
+fun buatApi(baseUrl: String): DompetApi = Retrofit.Builder()
+    .baseUrl(baseUrl)                                        // wajib diakhiri "/"
+    .client(OkHttpClient.Builder()
+        .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC })
+        .build())
+    .addConverterFactory(jsonApi.asConverterFactory("application/json".toMediaType()))
+    .build()
+    .create()
+
+// Alternatif Ktor client (juga bisa dipakai ulang di Kotlin Multiplatform):
+// val client = HttpClient(OkHttp) {
+//     expectSuccess = true                                  // 4xx/5xx → exception
+//     install(ContentNegotiation) { json(jsonApi) }
+//     install(HttpTimeout) { requestTimeoutMillis = 15_000 }
+//     defaultRequest { url("https://api.contoh.id/") }
+// }
+// suspend fun semua(): List<TransaksiDto> = client.get("transaksi").body()`, 'kotlin'),
+      code('Room: entity, DAO dengan Flow, dan antrean tertunda', `// plugins { id("com.google.devtools.ksp") }   dependencies: room-runtime, room-ktx, ksp(room-compiler)
+import androidx.room.*
+import kotlinx.coroutines.flow.Flow
+
+@Entity(tableName = "transaksi")
+data class TransaksiEntity(
+    @PrimaryKey val id: Long,
+    val judul: String,
+    val jumlah: Long,
+    val diperbaruiPada: Long,
+)
+
+@Entity(tableName = "transaksi_tertunda")
+data class TransaksiTertunda(
+    @PrimaryKey val idKlien: String,                         // UUID dibuat di perangkat → idempoten di server
+    val judul: String,
+    val jumlah: Long,
+)
+
+@Dao
+interface TransaksiDao {
+    @Query("SELECT * FROM transaksi ORDER BY diperbaruiPada DESC")
+    fun amatiSemua(): Flow<List<TransaksiEntity>>           // emit ulang setiap tabel berubah
+
+    @Query("SELECT * FROM transaksi_tertunda")
+    fun amatiTertunda(): Flow<List<TransaksiTertunda>>
+
+    @Query("SELECT MAX(diperbaruiPada) FROM transaksi")
+    suspend fun terakhirDiperbarui(): Long?
+
+    @Upsert
+    suspend fun upsert(items: List<TransaksiEntity>)
+
+    @Insert
+    suspend fun antre(item: TransaksiTertunda)
+
+    @Query("SELECT * FROM transaksi_tertunda")
+    suspend fun tertunda(): List<TransaksiTertunda>
+
+    @Delete
+    suspend fun hapusTertunda(item: TransaksiTertunda)
+}
+
+@Database(entities = [TransaksiEntity::class, TransaksiTertunda::class], version = 1)
+abstract class DompetDatabase : RoomDatabase() {            // ekspor skema (room.schemaLocation) untuk test migrasi
+    abstract fun transaksiDao(): TransaksiDao
+}`, 'kotlin'),
+      code('Repository offline-first', `import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import retrofit2.HttpException
+import java.io.IOException
+import java.util.UUID
+
+data class Transaksi(val kunci: String, val judul: String, val jumlah: Long, val tertunda: Boolean)
+
+class TransaksiRepositoryOffline(private val api: DompetApi, private val dao: TransaksiDao) {
+
+    // UI hanya membaca database: data server + perubahan lokal yang belum terkirim
+    val transaksi: Flow<List<Transaksi>> = combine(dao.amatiSemua(), dao.amatiTertunda()) { server, lokal ->
+        lokal.map { Transaksi("lokal-\${it.idKlien}", it.judul, it.jumlah, tertunda = true) } +
+            server.map { Transaksi("srv-\${it.id}", it.judul, it.jumlah, tertunda = false) }
+    }
+
+    suspend fun tambah(judul: String, jumlah: Long) {
+        dao.antre(TransaksiTertunda(UUID.randomUUID().toString(), judul, jumlah))   // tulis lokal dulu
+        sinkron()                                                                // gagal = dicoba lagi nanti
+    }
+
+    /** Retrofit suspend dan DAO suspend sudah main-safe; tidak perlu withContext di sini. */
+    suspend fun sinkron(): Boolean = try {
+        for (t in dao.tertunda()) {                          // 1. dorong perubahan lokal
+            val hasil = api.buat(BuatTransaksiDto(t.idKlien, t.judul, t.jumlah))
+            dao.upsert(listOf(hasil.keEntity()))
+            dao.hapusTertunda(t)
+        }
+        val sejak = dao.terakhirDiperbarui()                 // 2. tarik perubahan server secara inkremental
+        dao.upsert(api.semua(sejak).map { it.keEntity() })
+        true
+    } catch (e: IOException) {                               // offline / timeout
+        false
+    } catch (e: HttpException) {                             // 4xx/5xx
+        false
+    }
+}
+
+private fun TransaksiDto.keEntity() = TransaksiEntity(id, judul, jumlah, diperbaruiPada)
+
+// Sinkron berkala hanya saat ada jaringan (WorkManager bertahan walau app ditutup):
+// val req = PeriodicWorkRequestBuilder<SinkronWorker>(15, TimeUnit.MINUTES)
+//     .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+//     .build()
+// WorkManager.getInstance(context).enqueueUniquePeriodicWork("sinkron", ExistingPeriodicWorkPolicy.KEEP, req)
+// SinkronWorker : CoroutineWorker → doWork() { if (repo.sinkron()) Result.success() else Result.retry() }`, 'kotlin'),
+      table(['Komponen', 'Pilihan umum', 'Catatan'], [
+        ['HTTP client', 'Retrofit + OkHttp', 'Standar de facto Android; interface beranotasi'],
+        ['', 'Ktor client', 'API Kotlin murni, bisa dipakai di Kotlin Multiplatform'],
+        ['JSON', 'kotlinx.serialization', 'Tanpa refleksi, aman untuk R8; `ignoreUnknownKeys` untuk API yang berkembang'],
+        ['Database lokal', 'Room', 'SQLite dengan query dicek saat kompilasi, `Flow` reaktif, migrasi teruji'],
+        ['Preferensi kecil', 'DataStore', 'Pengganti SharedPreferences, asinkron dan aman dari ANR'],
+        ['Sinkronisasi latar', 'WorkManager', 'Constraint jaringan/baterai, retry dengan backoff, bertahan setelah restart'],
+      ]),
+      callout('warn', 'Jebakan `runCatching` di coroutine', '`runCatching { }` dan `catch (e: Exception)` ikut menangkap `CancellationException`, sehingga coroutine yang seharusnya dibatalkan (layar ditutup) tetap berjalan. Tangkap exception spesifik seperti contoh di atas (`IOException`, `HttpException`) atau lempar ulang `CancellationException`.'),
+      callout('info', 'Konflik dan idempotensi', '`idKlien` UUID dikirim ke server agar permintaan yang terulang (misalnya respons hilang lalu dicoba lagi) tidak membuat transaksi ganda. Untuk data yang bisa diedit di beberapa perangkat, tentukan strategi konflik sejak awal: *last write wins* berdasarkan `diperbaruiPada`, atau tolak di server dengan nomor versi.'),
+      ...quiz([
+        ['KT-37', 'Mengapa UI membaca dari Room, bukan langsung dari hasil API?', 'Dengan Room sebagai satu sumber kebenaran, layar langsung tampil dari data terakhir walau offline, perubahan dari sinkronisasi otomatis mengalir lewat `Flow`, dan tidak ada dua versi data (cache vs respons API) yang bisa saling bertentangan. Jaringan hanya bertugas memperbarui database.'],
+        ['KT-38', 'Apa risiko tanpa `ignoreUnknownKeys = true` pada kotlinx.serialization?', 'Secara default kotlinx.serialization melempar exception saat JSON berisi field yang tidak ada di DTO. Begitu backend menambah field baru, versi aplikasi lama yang sudah terpasang di ponsel pengguna akan gagal mem-parse respons. Dengan opsi ini field tak dikenal diabaikan.'],
+        ['KT-39', 'Mengapa antrean tertunda memakai UUID buatan perangkat, bukan menunggu ID dari server?', 'Item harus punya identitas sejak dibuat offline agar bisa ditampilkan, dihapus dari antrean, dan dikirim ulang. Bila respons `POST` hilang lalu dikirim ulang, server bisa mengenali UUID yang sama dan tidak membuat duplikat (idempoten).'],
+      ]),
+      ...practice('kt-android-data', [
+        'Buat `DompetApi` (Retrofit) terhadap API Ktor dari modul [Ktor Server](#kotlin.kt-ktor-server) atau mock server, dengan DTO `@Serializable`.',
+        'Implementasikan Room + `TransaksiRepositoryOffline`; matikan jaringan emulator, tambah transaksi, lalu nyalakan dan pastikan item tertunda terkirim sekali saja.',
+        'Tulis test DAO dengan `Room.inMemoryDatabaseBuilder` dan test repository dengan API palsu yang melempar `IOException`.',
+        'Jadwalkan `SinkronWorker` dengan WorkManager dan constraint jaringan; amati statusnya di App Inspection → Background Task Inspector.',
+      ]),
+      references(
+        ['Android Developers: Data layer', 'https://developer.android.com/topic/architecture/data-layer'],
+        ['Android Developers: Build an offline-first app', 'https://developer.android.com/topic/architecture/data-layer/offline-first'],
+        ['Android Developers: Room', 'https://developer.android.com/training/data-storage/room'],
+        ['Retrofit', 'https://square.github.io/retrofit/'],
+        ['Ktor client', 'https://ktor.io/docs/client-create-new-application.html'],
+        ['kotlinx.serialization guide', 'https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serialization-guide.md'],
+        ['Android Developers: WorkManager', 'https://developer.android.com/topic/libraries/architecture/workmanager'],
+      ),
+    ],
+  },
+  {
+    id: 'kt-android-hilt-testing',
+    title: 'Android: Dependency Injection dengan Hilt & Testing Compose UI',
+    summary: 'Setup Hilt dengan KSP, @HiltAndroidApp, @Module/@Provides/@Binds, @HiltViewModel + hiltViewModel(), lalu test Compose UI dan mengganti modul dengan @TestInstallIn.',
+    track: ANDROID, source: kotlinSource, duration: '3 jam', level: 'Med',
+    blocks: [
+      paragraph('Pada modul sebelumnya ViewModel dibuat manual dengan factory (`viewModel { DetailViewModel(...) }`). Saat dependency bertambah (API, database, dispatcher, repository), wiring manual menjadi berantakan. **Hilt** adalah library dependency injection resmi Android di atas Dagger: dependency dideklarasikan dengan anotasi, graph-nya diperiksa saat kompilasi, dan umurnya terikat ke komponen Android (aplikasi, Activity, ViewModel).'),
+      paragraph('Manfaat terbesar DI justru terasa di test: implementasi asli (Retrofit, Room) bisa ditukar dengan versi palsu tanpa mengubah kode produksi. Modul ini menutup dengan **test Compose UI**: memeriksa tampilan lewat *semantics tree* (teks, peran, tag) dan mensimulasikan klik, seperti pengguna sungguhan.'),
+      code('Setup Gradle (tambahkan ke konfigurasi yang sudah ada)', `// build.gradle.kts (root): daftarkan plugin
+plugins {
+    id("com.google.devtools.ksp") version "$kspVersion" apply false
+    id("com.google.dagger.hilt.android") version "$hiltVersion" apply false   // versi terbaru: dagger.dev/hilt
+}
+
+// app/build.gradle.kts
+plugins {
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
+}
+
+android {
+    defaultConfig {
+        testInstrumentationRunner = "id.contoh.dompet.HiltTestRunner"
+    }
+}
+
+dependencies {
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    ksp("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    // hiltViewModel() untuk Compose. Rilis androidx.hilt terbaru memindahkannya ke artefak
+    // androidx.hilt:hilt-lifecycle-viewmodel-compose; ikuti dokumentasi versi yang Anda pakai.
+    implementation("androidx.hilt:hilt-navigation-compose:$androidxHiltVersion")
+
+    androidTestImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
+    kspAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    androidTestImplementation(platform("androidx.compose:compose-bom:$composeBomVersion"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+}`, 'kotlin'),
+      code('Application, modul, dan ViewModel', `import android.app.Application
+import android.content.Context
+import androidx.room.Room
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@HiltAndroidApp                                          // daftarkan di AndroidManifest: android:name=".DompetApp"
+class DompetApp : Application()
+
+// MainActivity: @AndroidEntryPoint class MainActivity : ComponentActivity() { ... }
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DataModule {                                      // @Provides: untuk objek yang dibuat lewat builder/library
+    @Provides @Singleton
+    fun database(@ApplicationContext context: Context): DompetDatabase =
+        Room.databaseBuilder(context, DompetDatabase::class.java, "dompet.db").build()
+
+    @Provides
+    fun transaksiDao(db: DompetDatabase): TransaksiDao = db.transaksiDao()
+
+    @Provides @Singleton
+    fun api(): DompetApi = buatApi("https://api.contoh.id/")
+}
+
+class TransaksiRepositoryImpl @Inject constructor(       // @Inject constructor: Hilt tahu cara membuatnya
+    private val api: DompetApi,
+    private val dao: TransaksiDao,
+) : TransaksiRepository {                                 // interface dari modul Dasar Compose
+    override suspend fun semua(): List<TransaksiItem> =
+        api.semua().map { TransaksiItem(it.id, it.judul, it.jumlah) }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {                        // @Binds: memetakan interface → implementasi
+    @Binds @Singleton
+    abstract fun transaksiRepository(impl: TransaksiRepositoryImpl): TransaksiRepository
+}
+
+@HiltViewModel
+class TransaksiViewModelHilt @Inject constructor(private val repo: TransaksiRepository) : ViewModel() {
+    // isi sama dengan TransaksiViewModel di modul Dasar Compose (uiState + muat())
+}
+
+// Di composable: argumen route & SavedStateHandle tetap tersedia untuk ViewModel
+// @Composable fun TransaksiScreen(viewModel: TransaksiViewModelHilt = hiltViewModel()) { ... }`, 'kotlin'),
+      code('Test Compose UI untuk composable stateless (androidTest)', `import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createComposeRule
+import org.junit.Assert.assertEquals
+import org.junit.Rule
+import org.junit.Test
+
+class TransaksiContentTest {
+    @get:Rule
+    val composeRule = createComposeRule()
+
+    @Test
+    fun errorMenampilkanPesanDanTombolCobaLagi() {
+        var dimuatUlang = 0
+        composeRule.setContent {
+            TransaksiContent(state = TransaksiUiState(memuat = false, error = "Tidak ada koneksi"), onMuatUlang = { dimuatUlang++ })
+        }
+
+        composeRule.onNodeWithText("Tidak ada koneksi").assertIsDisplayed()
+        composeRule.onNodeWithText("Coba lagi").assertHasClickAction().performClick()
+        assertEquals(1, dimuatUlang)
+    }
+
+    @Test
+    fun daftarMenampilkanSetiapTransaksi() {
+        val items = listOf(TransaksiItem(1, "Kopi", 25_000), TransaksiItem(2, "Bensin", 50_000))
+        composeRule.setContent { TransaksiContent(state = TransaksiUiState(memuat = false, items = items), onMuatUlang = {}) }
+
+        composeRule.onNodeWithText("Kopi").assertIsDisplayed()
+        composeRule.onNodeWithText("Rp50000").assertIsDisplayed()
+        // Untuk elemen tanpa teks unik, beri Modifier.testTag("daftar-transaksi") lalu onNodeWithTag(...)
+    }
+}`, 'kotlin'),
+      code('Test end-to-end dengan Hilt: ganti repository asli', `import android.app.Application
+import android.content.Context
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.test.runner.AndroidJUnitRunner
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
+import dagger.hilt.components.SingletonComponent
+import dagger.hilt.testing.TestInstallIn
+import javax.inject.Inject
+import javax.inject.Singleton
+import org.junit.Rule
+import org.junit.Test
+
+class HiltTestRunner : AndroidJUnitRunner() {            // pakai Application khusus test dari Hilt
+    override fun newApplication(cl: ClassLoader?, name: String?, context: Context?): Application =
+        super.newApplication(cl, HiltTestApplication::class.java.name, context)
+}
+
+class FakeTransaksiRepository @Inject constructor() : TransaksiRepository {
+    override suspend fun semua() = listOf(TransaksiItem(1, "Kopi", 25_000))
+}
+
+@Module
+@TestInstallIn(components = [SingletonComponent::class], replaces = [RepositoryModule::class])
+abstract class FakeRepositoryModule {                    // berlaku untuk SEMUA test di androidTest
+    @Binds @Singleton
+    abstract fun transaksiRepository(fake: FakeTransaksiRepository): TransaksiRepository
+}
+
+@HiltAndroidTest
+class TransaksiScreenTest {
+    @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)                       // graph dibuat lebih dulu
+    @get:Rule(order = 1) val composeRule = createAndroidComposeRule<MainActivity>()
+
+    @Test
+    fun layarMemuatDataDariRepository() {
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithText("Kopi").fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+}`, 'kotlin'),
+      table(['Anotasi', 'Fungsi'], [
+        ['`@HiltAndroidApp`', 'Membuat komponen tingkat aplikasi; wajib di class `Application`'],
+        ['`@AndroidEntryPoint`', 'Mengizinkan injeksi ke Activity/Fragment (dan `hiltViewModel()` di dalamnya)'],
+        ['`@Inject constructor`', 'Cara termudah: Hilt membuat class dari constructor-nya'],
+        ['`@Module` + `@InstallIn`', 'Kumpulan cara membuat dependency, terpasang di komponen tertentu'],
+        ['`@Provides`', 'Fungsi pembuat untuk class library/builder (Retrofit, Room)'],
+        ['`@Binds`', 'Memetakan interface ke implementasi; lebih efisien dari `@Provides`'],
+        ['`@Singleton` / `@ViewModelScoped`', 'Scope: satu instance per aplikasi / per ViewModel'],
+        ['`@HiltViewModel`', 'ViewModel yang dependency-nya disuntik Hilt'],
+        ['`@TestInstallIn`', 'Mengganti modul produksi di seluruh test instrumentasi'],
+      ]),
+      callout('tip', 'Uji di tingkat yang tepat', 'Sebagian besar logika diuji dengan unit test ViewModel + repository palsu (cepat, di JVM). Test Compose UI paling murah untuk composable stateless seperti `TransaksiContent`; test end-to-end dengan Hilt dan Activity cukup untuk beberapa alur utama. Test Compose juga bisa dijalankan di JVM dengan Robolectric. Unit test ViewModel tanpa Hilt: cukup panggil constructor-nya dengan objek palsu (lihat [Testing Kotlin](#kotlin.kt-testing)).'),
+      ...quiz([
+        ['KT-40', 'Apa beda `@Binds` dan `@Provides`?', '`@Binds` adalah fungsi abstrak yang hanya memberi tahu Hilt "bila diminta interface X, berikan implementasi Y" (Y harus punya `@Inject constructor`); tidak ada kode pembuat sehingga lebih efisien. `@Provides` adalah fungsi konkret yang membangun objek sendiri, dipakai untuk class library atau objek yang dibuat lewat builder seperti Retrofit dan Room.'],
+        ['KT-41', 'Mengapa test UI lebih disukai menguji `TransaksiContent` daripada `TransaksiScreen`?', '`TransaksiContent` stateless: hasilnya hanya bergantung pada parameter, sehingga setiap state (memuat, error, daftar) bisa diuji langsung tanpa ViewModel, jaringan, atau DI, dan test-nya cepat serta stabil. `TransaksiScreen` cukup diuji di beberapa test end-to-end.'],
+        ['KT-42', 'Mengapa `HiltAndroidRule` diberi `order = 0`?', 'Rule Hilt harus membuat graph dependency sebelum Activity diluncurkan oleh compose rule; bila urutannya terbalik, Activity mencoba menyuntik dependency dari komponen yang belum siap dan test gagal.'],
+      ]),
+      ...practice('kt-hilt', [
+        'Migrasikan aplikasi dari modul sebelumnya ke Hilt: `@HiltAndroidApp`, `@AndroidEntryPoint`, `DataModule`, `RepositoryModule`, dan `hiltViewModel()`.',
+        'Tambahkan qualifier `@IoDispatcher` untuk `CoroutineDispatcher` dan suntikkan ke repository.',
+        'Tulis test Compose untuk tiga state `TransaksiContent` dan satu test form tambah (`performTextInput`, tombol nonaktif saat input kosong).',
+        'Buat test end-to-end dengan `@TestInstallIn` yang memakai repository palsu dan jalankan `./gradlew connectedAndroidTest`.',
+      ]),
+      references(
+        ['Android Developers: Dependency injection with Hilt', 'https://developer.android.com/training/dependency-injection/hilt-android'],
+        ['Android Developers: Hilt testing guide', 'https://developer.android.com/training/dependency-injection/hilt-testing'],
+        ['Android Developers: Hilt and Jetpack integrations', 'https://developer.android.com/training/dependency-injection/hilt-jetpack'],
+        ['Android Developers: Test your Compose layout', 'https://developer.android.com/develop/ui/compose/testing'],
+        ['Dagger Hilt', 'https://dagger.dev/hilt/'],
+      ),
+    ],
+  },
+  {
+    id: 'kt-kmp',
+    title: 'Kotlin Multiplatform: expect/actual, Shared Module & Compose Multiplatform',
+    summary: 'Struktur proyek KMP, source set commonMain/androidMain/iosMain, expect/actual, shared module dengan Ktor client, memanggil Kotlin dari Swift, gambaran Compose Multiplatform, dan kapan memakainya.',
+    track: KMP, source: kotlinSource, duration: '4 jam', level: 'Hard',
+    blocks: [
+      paragraph('**Kotlin Multiplatform (KMP)** memungkinkan satu kode Kotlin dikompilasi ke beberapa target: JVM/Android, iOS (Kotlin/Native), desktop, web (JS/Wasm), dan server. Berbeda dengan Flutter yang juga menggambar UI sendiri, KMP awalnya fokus pada **berbagi logika** (model, validasi, networking, repository) sementara UI tetap native: Jetpack Compose di Android, SwiftUI di iOS. Tim bisa mulai kecil, misalnya hanya modul validasi, lalu memperluasnya.'),
+      paragraph('Untuk berbagi UI juga, JetBrains menyediakan **Compose Multiplatform**: API Compose yang sama di Android, iOS, desktop, dan web. Dukungan iOS-nya dinyatakan Stable sejak Compose Multiplatform 1.8 (2025). Proyek baru paling mudah dibuat dengan wizard di [kmp.jetbrains.com](https://kmp.jetbrains.com) atau Android Studio/IntelliJ IDEA dengan plugin Kotlin Multiplatform; struktur Gradle terus berkembang, jadi jadikan template terbaru sebagai acuan.'),
+      code('Struktur proyek dan shared/build.gradle.kts', `// dompet/
+// ├── androidApp/          ← aplikasi Android (Compose), bergantung pada :shared
+// ├── iosApp/              ← proyek Xcode (SwiftUI), mengimpor framework "Shared"
+// └── shared/src/
+//     ├── commonMain/kotlin   ← kode bersama: model, repository, use case
+//     ├── commonTest/kotlin   ← test yang dijalankan di semua target
+//     ├── androidMain/kotlin  ← actual untuk Android (boleh memakai API Android/Java)
+//     └── iosMain/kotlin      ← actual untuk iOS (boleh memakai framework Apple: platform.UIKit, platform.Foundation)
+
+plugins {
+    kotlin("multiplatform")
+    kotlin("plugin.serialization")
+    id("com.android.library")    // template baru bisa memakai plugin com.android.kotlin.multiplatform.library
+}
+
+val ktor_version: String by project
+
+kotlin {
+    androidTarget()
+    listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
+        target.binaries.framework {
+            baseName = "Shared"                              // nama modul yang di-import di Swift
+            isStatic = true
+        }
+    }
+    jvm()                                                     // opsional: dipakai server Ktor atau desktop
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+            implementation("io.ktor:ktor-client-core:$ktor_version")
+            implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+        }
+        androidMain.dependencies {
+            implementation("io.ktor:ktor-client-okhttp:$ktor_version")   // engine HTTP Android
+        }
+        iosMain.dependencies {
+            implementation("io.ktor:ktor-client-darwin:$ktor_version")   // engine NSURLSession
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+    }
+}
+
+android {
+    namespace = "id.contoh.dompet.shared"
+    compileSdk = 36
+    defaultConfig { minSdk = 24 }
+}`, 'kotlin'),
+      code('expect/actual', `// commonMain/kotlin/Platform.kt — deklarasi tanpa implementasi
+expect fun namaPlatform(): String
+expect fun idUnik(): String
+
+class Sapaan {
+    fun teks(): String = "Halo dari \${namaPlatform()}"
+}
+
+// androidMain/kotlin/Platform.android.kt
+actual fun namaPlatform(): String = "Android \${android.os.Build.VERSION.SDK_INT}"
+actual fun idUnik(): String = java.util.UUID.randomUUID().toString()
+
+// iosMain/kotlin/Platform.ios.kt
+import platform.Foundation.NSUUID
+import platform.UIKit.UIDevice
+
+actual fun namaPlatform(): String = UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
+actual fun idUnik(): String = NSUUID().UUIDString()
+
+// Catatan: untuk UUID, stdlib Kotlin kini punya kotlin.uuid.Uuid (cek status stabilitas API-nya).
+// Untuk dependency yang lebih besar (penyimpanan aman, sensor), lebih fleksibel memakai
+// interface di commonMain + implementasi per platform yang disuntikkan (DI), bukan expect class.`, 'kotlin'),
+      code('Shared repository dengan Ktor client', `// commonMain/kotlin/KursRepository.kt
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class Kurs(val mataUang: String, val nilai: Double)
+
+// Tanpa argumen engine: Ktor memilih engine dari dependency platform (OkHttp di Android, Darwin di iOS)
+fun buatClient(): HttpClient = HttpClient {
+    install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+}
+
+class KursRepository(private val client: HttpClient) {
+    @Throws(Exception::class)                // tanpa ini, exception selain pembatalan membuat app iOS crash
+    suspend fun ambil(): List<Kurs> = client.get("https://api.contoh.id/kurs").body()
+}
+
+// commonTest/kotlin/SapaanTest.kt — dijalankan di JVM, Android, dan simulator iOS
+// class SapaanTest {
+//     @Test fun teksMenyebutPlatform() = assertTrue(Sapaan().teks().startsWith("Halo dari"))
+// }`, 'kotlin'),
+      code('Memakai shared module dari SwiftUI', `import SwiftUI
+import Shared
+
+struct KursView: View {
+    @State private var daftar: [Kurs] = []
+    @State private var pesanError: String?
+    private let repo = KursRepository(client: KursRepositoryKt.buatClient())   // fungsi top-level → <NamaFile>Kt
+
+    var body: some View {
+        List(daftar, id: \\.mataUang) { kurs in
+            Text("\\(kurs.mataUang): \\(kurs.nilai)")
+        }
+        .overlay { if let pesanError { Text(pesanError) } }
+        .task {
+            do {
+                daftar = try await repo.ambil()          // fungsi suspend tampil sebagai async throws di Swift
+            } catch {
+                pesanError = error.localizedDescription
+            }
+        }
+    }
+}`, 'swift'),
+      code('Compose Multiplatform: satu UI untuk Android, iOS, dan desktop', `// composeApp/src/commonMain/kotlin/App.kt
+@Composable
+fun App(repo: KursRepository) {
+    var daftar by remember { mutableStateOf<List<Kurs>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        daftar = try { repo.ambil() } catch (e: Exception) { emptyList() }   // contoh ringkas; pakai ViewModel di aplikasi nyata
+    }
+    MaterialTheme {
+        LazyColumn {
+            items(daftar) { Text("\${it.mataUang}: \${it.nilai}") }
+        }
+    }
+}
+
+// androidMain — MainActivity:  setContent { App(KursRepository(buatClient())) }
+
+// iosMain — dipanggil dari Swift lewat UIViewControllerRepresentable
+fun MainViewController() = ComposeUIViewController { App(KursRepository(buatClient())) }
+
+// jvmMain — aplikasi desktop
+fun main() = application {
+    Window(onCloseRequest = ::exitApplication, title = "Kurs") { App(KursRepository(buatClient())) }
+}`, 'kotlin'),
+      table(['Pendekatan', 'Yang dibagi', 'UI', 'Cocok bila'], [
+        ['Native penuh (Kotlin + Swift)', 'Tidak ada', 'Compose + SwiftUI', 'Tim per platform besar, butuh fitur OS paling baru'],
+        ['KMP (shared logic)', 'Model, networking, validasi, repository', 'Tetap native', 'Ingin UI native tetapi logika bisnis satu sumber; adopsi bertahap di app yang sudah ada'],
+        ['Compose Multiplatform', 'Logika + UI', 'Compose di semua platform', 'Tim sudah mahir Compose/Kotlin dan ingin satu basis kode UI'],
+        ['Flutter', 'Logika + UI (Dart)', 'Engine render sendiri', 'Tim baru tanpa basis Kotlin/Swift, ekosistem paket matang, satu bahasa'],
+      ]),
+      callout('tip', 'Kapan memakai KMP', 'Pilih KMP bila sudah ada aplikasi Android Kotlin dan ingin menghadirkan iOS tanpa menulis ulang logika bisnis, bila aturan bisnis (perhitungan, validasi, sinkronisasi) harus identik di semua platform, atau bila backend juga Kotlin sehingga model bisa dibagi. Mulai dari satu modul kecil yang murni logika, ukur dampaknya pada build iOS dan alur kerja tim iOS, baru perluas. Perbandingan dengan pendekatan Dart ada di kurikulum [Flutter](#flutter).'),
+      callout('warn', 'Hal yang perlu diantisipasi', 'Build iOS membutuhkan macOS + Xcode dan kompilasi Kotlin/Native lebih lambat dari JVM. Interop ke Swift melewati Objective-C: generic, sealed class, default argument, dan `Flow` terasa kurang alami di Swift (library komunitas seperti SKIE atau KMP-NativeCoroutines membantu; Swift export langsung masih berkembang). Library yang dipakai di `commonMain` harus mendukung multiplatform, jadi cek dukungan target sebelum memilih dependency.'),
+      ...quiz([
+        ['KT-43', 'Kapan memakai `expect/actual` dan kapan interface + implementasi per platform?', '`expect/actual` cocok untuk fungsi atau nilai kecil yang tidak perlu diganti saat test (nama platform, pembuat ID). Untuk dependency besar yang ingin di-mock atau dikonfigurasi (penyimpanan aman, lokasi, database), interface di `commonMain` dengan implementasi per platform yang disuntikkan lebih fleksibel dan mudah diuji. `expect class` sendiri masih berstatus Beta.'],
+        ['KT-44', 'Apa yang terjadi bila fungsi `suspend` tanpa `@Throws` melempar `IOException` saat dipanggil dari Swift?', 'Hanya `CancellationException` yang otomatis diterjemahkan menjadi error Swift; exception lain yang tidak dideklarasikan dengan `@Throws` dianggap tak terduga dan menghentikan aplikasi (crash). Dengan `@Throws(Exception::class)` (atau tipe yang lebih spesifik), exception tampil sebagai error yang bisa ditangkap dengan `do/try/catch`.'],
+        ['KT-45', 'Sebuah tim punya aplikasi Android Kotlin yang matang dan tim iOS kecil yang mahir SwiftUI. Pendekatan mana yang paling masuk akal?', 'KMP dengan shared logic: modul bersama untuk model, networking, dan aturan bisnis dipakai Android dan iOS, sementara tim iOS tetap menulis UI dengan SwiftUI. Risikonya kecil karena bisa diadopsi bertahap; Compose Multiplatform bisa dipertimbangkan kemudian untuk layar yang tidak membutuhkan nuansa native.'],
+      ]),
+      ...practice('kt-multiplatform', [
+        'Buat proyek dari wizard KMP (Android + iOS + shared), jalankan di emulator Android dan simulator iOS.',
+        'Pindahkan logika validasi transaksi (jumlah positif, judul tidak kosong) ke `commonMain` dan tulis test di `commonTest`; jalankan `./gradlew allTests`.',
+        'Implementasikan `KursRepository` dengan Ktor client, panggil dari Compose di Android dan dari SwiftUI di iOS, termasuk penanganan error tanpa crash.',
+        'Tambahkan target desktop (`jvm()`) dengan Compose Multiplatform dan tampilkan layar `App` yang sama.',
+      ]),
+      references(
+        ['Kotlin Multiplatform overview', 'https://www.jetbrains.com/kotlin-multiplatform/'],
+        ['Kotlin: Multiplatform documentation', 'https://kotlinlang.org/docs/multiplatform.html'],
+        ['Kotlin: Expected and actual declarations', 'https://kotlinlang.org/docs/multiplatform-expect-actual.html'],
+        ['Kotlin: Interoperability with Swift/Objective-C', 'https://kotlinlang.org/docs/native-objc-interop.html'],
+        ['Compose Multiplatform', 'https://www.jetbrains.com/compose-multiplatform/'],
+        ['Ktor: Multiplatform client', 'https://ktor.io/docs/client-create-multiplatform-application.html'],
+      ),
+    ],
+  },
 ];
 
 export const kotlinCurriculum: Omit<Curriculum, 'modules'> & { modules: Omit<Module, 'code'>[] } = {
@@ -1360,7 +2569,7 @@ export const kotlinCurriculum: Omit<Curriculum, 'modules'> & { modules: Omit<Mod
   short: 'Kotlin',
   monogram: 'Kt',
   hue: 'pink',
-  description: 'Kotlin modern untuk developer Java: sintaks, null safety, data & sealed class, koleksi, coroutines dan Flow, generic & DSL, interop Java, REST API Spring Boot, testing dengan MockK dan runTest, serta dasar Jetpack Compose untuk Android.',
+  description: 'Kotlin modern untuk developer Java: sintaks, null safety, data & sealed class, koleksi, coroutines dan Flow, generic & DSL, interop Java, REST API Spring Boot dan Ktor, database dengan Exposed + Flyway, testing dengan MockK dan runTest, Jetpack Compose untuk Android (arsitektur, Navigation type-safe, data layer offline-first dengan Retrofit/Room, Hilt, testing UI), serta Kotlin Multiplatform dan Compose Multiplatform.',
   tracks: kotlinTracks,
   sources: [kotlinSource],
   intro: [

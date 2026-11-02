@@ -39,6 +39,8 @@ const CS_KW =
   'abstract|as|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|do|double|else|enum|event|explicit|extern|false|finally|fixed|float|for|foreach|goto|if|implicit|in|int|interface|internal|is|lock|long|namespace|new|null|object|operator|out|override|params|private|protected|public|readonly|ref|return|sbyte|sealed|short|sizeof|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|var|virtual|void|volatile|while';
 const KT_KW =
   'abstract|actual|annotation|as|break|by|catch|class|companion|const|constructor|continue|crossinline|data|do|else|enum|expect|external|false|final|finally|for|fun|get|if|import|in|infix|init|inline|inner|interface|internal|is|lateinit|noinline|null|object|open|operator|out|override|package|private|protected|public|reified|return|sealed|set|super|suspend|tailrec|this|throw|true|try|typealias|val|value|var|vararg|when|where|while';
+const SWIFT_KW =
+  'actor|any|as|associatedtype|async|await|borrowing|break|case|catch|class|consuming|continue|convenience|default|defer|deinit|didSet|do|else|enum|extension|fallthrough|false|fileprivate|final|for|func|get|guard|if|import|in|indirect|init|inout|internal|is|lazy|let|mutating|nil|nonisolated|open|operator|override|package|private|protocol|public|repeat|rethrows|return|self|Self|sending|set|some|static|struct|subscript|super|switch|throw|throws|true|try|typealias|unowned|var|weak|where|while|willSet';
 const PHP_KW =
   'abstract|and|array|as|break|case|catch|class|clone|const|continue|declare|default|do|echo|else|elseif|empty|endfor|endforeach|endif|endwhile|extends|final|for|foreach|function|global|if|implements|include|instanceof|interface|isset|list|new|or|print|private|protected|public|require|return|static|switch|throw|try|unset|use|var|while|true|false|null';
 const PREPROC: Rule = ['ann', /#\s*(?:include|define|ifndef|ifdef|endif|pragma|undef|if|else)\b[^\n]*/y];
@@ -49,6 +51,7 @@ const RULES: Record<CodeLang, Rule[]> = {
   csharp: [SLASH_CMT, DQ_STR, SQ_STR, ['kw', kw(CS_KW)], NUM, TYPE, FN],
   php: [SLASH_CMT, HASH_CMT, DQ_STR, SQ_STR, ['ann', /<\?php|\?>/y], ['num', /\$[A-Za-z_]\w*/y], ['kw', kw(PHP_KW)], NUM, FN],
   kotlin: [SLASH_CMT, ['str', /"""[\s\S]*?"""/y], DQ_STR, SQ_STR, ANN, ['kw', kw(KT_KW)], NUM, TYPE, FN],
+  swift: [SLASH_CMT, ['str', /"""[\s\S]*?"""/y], DQ_STR, ANN, ['ann', /#[A-Za-z_]\w*/y], ['kw', kw(SWIFT_KW)], NUM, TYPE, FN],
   java: [SLASH_CMT, DQ_STR, SQ_STR, ANN, ['kw', kw(JAVA_KW)], NUM, TYPE, FN],
   go: [SLASH_CMT, DQ_STR, BT_STR, SQ_STR, ['kw', kw(GO_KW)], NUM, TYPE, FN],
   ts: [SLASH_CMT, BT_STR, DQ_STR, SQ_STR, ANN, ['kw', kw(TS_KW)], NUM, TYPE, FN],

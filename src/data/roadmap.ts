@@ -11,7 +11,7 @@ const tracks: Track[] = [
   { title: GOAL, summary: 'Rute alternatif bila tujuanmu cloud-native, full stack, mobile, AI, systems, atau enterprise .NET.' },
 ];
 
-export const roadmapSource = 'Rekomendasi jalur belajar: disusun dari isi playbook (30 Oktober 2026)';
+export const roadmapSource = 'Rekomendasi jalur belajar: disusun dari isi playbook (30 Oktober 2026, diperbarui 2 November 2026)';
 
 /** Langkah berurutan; tiap langkah berisi tautan ke modul pertama track terkait. */
 const route = (items: [title: string, text: string][]): Block => ({
@@ -40,7 +40,7 @@ const modules: Omit<Module, 'code'>[] = [
         ['**Pendamping 2**', '[Python](#python)', 'Jalan masuk ke AI Engineer (LangChain, LangGraph, FastAPI) dan otomasi.'],
         ['**Fondasi harian**', '[Git & Shell](#tools)', 'Dipakai setiap hari di bahasa apa pun; pelajari sejak minggu pertama.'],
         ['**Fondasi lintas bahasa**', '[Web & Keamanan](#web)', 'HTTP, desain REST API, dan OWASP berlaku sama di semua bahasa backend.'],
-        ['**Opsional, nanti**', '[Go](#go), [Rust](#rust), [Kotlin](#kotlin), [C# & .NET](#csharp)', 'Sesuai tujuan karier; lihat [Jalur per Tujuan](#jalur.jalur-per-tujuan).'],
+        ['**Opsional, nanti**', '[Go](#go), [Rust](#rust), [Kotlin](#kotlin), [C# & .NET](#csharp), [PHP & Laravel](#php), [C & C++](#cpp), [Swift & iOS](#swift)', 'Sesuai tujuan karier; lihat [Jalur per Tujuan](#jalur.jalur-per-tujuan).'],
       ]),
       callout('info', 'Lebih suka startup atau infrastruktur cloud?', 'Tukar posisi Java dengan **Go**. Go lebih cepat dikuasai, binarinya kecil, dan materinya di playbook juga dalam (dua proyek lengkap). Rute lengkapnya ada di [Jalur per Tujuan](#jalur.jalur-per-tujuan).'),
       heading('Perbandingan bahasa di playbook'),
@@ -48,11 +48,14 @@ const modules: Omit<Module, 'code'>[] = [
         ['Java', 'Backend enterprise, perbankan, sistem besar', 'Sedang', '[Persiapan Tools & Mindset](#java.persiapan-tools-mindset)'],
         ['Go', 'Microservices, cloud-native, CLI, infrastruktur', 'Landai', '[Pengenalan Go](#go.pengenalan-go-golang)'],
         ['JavaScript / TypeScript', 'Frontend, full stack, backend Node.js', 'Landai → sedang', '[JavaScript: Variabel & Tipe](#js.js-variabel-tipe)'],
-        ['Python', 'AI/LLM, data, otomasi, backend FastAPI', 'Landai', '[Python: Fondasi Bahasa](#python.py-fondasi-bahasa)'],
+        ['Python', 'AI/LLM, data, otomasi, backend FastAPI', 'Landai', '[Python Dasar: Setup & Variabel](#python.pyf-setup-variabel-string)'],
         ['Kotlin', 'Android, backend Spring modern', 'Sedang (mudah bila sudah Java)', '[Kotlin: Setup & Dasar](#kotlin.kt-setup-dasar)'],
         ['C# / .NET', 'Enterprise, pemerintahan, aplikasi Windows, game (Unity)', 'Sedang', '[C#: Setup & Dasar](#csharp.cs-setup-dasar)'],
         ['Dart / Flutter', 'Aplikasi mobile lintas platform', 'Landai', '[Peta Belajar Flutter](#flutter.peta-belajar-flutter)'],
         ['Rust', 'Performa tinggi, systems, tooling', 'Curam', '[Pendahuluan Rust](#rust.pendahuluan)'],
+        ['PHP / Laravel', 'Web & API bisnis, agensi, UMKM, CMS', 'Landai', '[PHP: Setup & Sintaks Dasar](#php.php-setup-sintaks)'],
+        ['C / C++', 'Systems, embedded, game, competitive programming', 'Curam', '[C: Setup & Tahap Build](#cpp.c-setup-dasar)'],
+        ['Swift', 'Aplikasi iOS/macOS native', 'Sedang', '[Swift: Setup & Sintaks Dasar](#swift.sw-setup-dasar)'],
       ]),
       heading('Cara memakai jalur ini'),
       { type: 'list', ordered: true, items: [
@@ -81,7 +84,8 @@ const modules: Omit<Module, 'code'>[] = [
         ['Python', '[Kontrak API Financial Tracker](#python.kontrak-api-financial-tracker) → FastAPI'],
         ['Node.js', '[Kontrak API Express](#js.kontrak-api-yang-akan-dibangun)'],
         ['React Native', '[Aplikasi mobile Pencatat Keuangan](#js.apa-yang-akan-kita-bangun)'],
-        ['Java, Kotlin, C#, Rust', 'Pakai kontrak API yang sama: Spring Boot, Kotlin + Spring, ASP.NET Core Minimal API, atau Axum.'],
+        ['C# & PHP', '[Proyek ASP.NET Core](#csharp.cs-proyek-financial-tracker) · [Proyek Laravel](#php.lv-proyek-financial-tracker)'],
+        ['Java, Kotlin, Rust', 'Pakai kontrak API yang sama: Spring Boot, Kotlin + Spring/Ktor, atau Axum.'],
       ]),
       heading('Contoh jadwal mingguan (± 10 jam)'),
       table(['Hari', 'Kegiatan', 'Durasi'], [
@@ -114,12 +118,13 @@ const modules: Omit<Module, 'code'>[] = [
       paragraph('Tujuan fase ini: membangun REST API Spring Boot dengan database, validasi, test, dan bisa menjelaskan pilihan desainnya. Struktur data dikerjakan **paralel**, sedikit tapi rutin setiap hari.'),
       route([
         ['Minggu 1: Git & terminal', '[Git: Konsep Dasar](#tools.git-konsep-dasar) → [Branch, Merge & Rebase](#tools.git-branch-merge-rebase) → [Terminal & Navigasi](#tools.sh-terminal-navigasi).'],
-        ['Bulan 1: Java Fundamentals', '[Persiapan Tools & Mindset](#java.persiapan-tools-mindset) → [Java Fundamentals](#java.java-fundamentals) → [Intermediate sampai Advanced](#java.java-intermediate-sampai-advanced).'],
+        ['Bulan 1: Java Fundamentals', '[Persiapan Tools & Mindset](#java.persiapan-tools-mindset) → [Java Fundamentals](#java.java-fundamentals) → [OOP Mendalam](#java.jc-oop-mendalam) → [String & Exception](#java.jc-string-exception) → [Collections & Generics](#java.jc-collections-generics) → [Maven/Gradle & JUnit](#java.jc-build-test).'],
+        ['Bulan 2: Java Inti lanjutan', '[I/O, NIO.2 & JDBC](#java.jc-io-nio-jdbc) → [Intermediate sampai Advanced](#java.java-intermediate-sampai-advanced) → [Concurrency Klasik](#java.jc-concurrency-klasik); [JVM & GC](#java.jc-jvm-gc) dibaca saat mulai tuning.'],
         ['Bulan 1–2: Functional & Java Modern', '[Functional Interfaces](#java.functional-interfaces-konsep-use-case) → [Stream API](#java.stream-api-dengan-lambda-19-35) → [Records, Sealed & Pattern Matching](#java.java-records-sealed-pattern) → [Virtual Threads](#java.java-virtual-threads).'],
-        ['Paralel: Struktur Data & Algoritma', '[Catatan Ringkas Struktur Data](#java.catatan-ringkas-struktur-data) → [Rekursi](#java.rekursi) → [Soal Array](#java.soal-array); target 3–5 soal per minggu.'],
+        ['Paralel: Struktur Data & Algoritma', '[Big-O & Kompleksitas](#java.dsa-big-o-kompleksitas) → [Catatan Ringkas Struktur Data](#java.catatan-ringkas-struktur-data) → [Rekursi](#java.rekursi) → [Soal Array](#java.soal-array) → [Heap](#java.dsa-heap-priority-queue) → [Algoritma Graf](#java.dsa-graph-algorithms); target 3–5 soal per minggu.'],
         ['Bulan 2: SQL', '[Pengenalan Database](#sql.pengenalan-database) → [Peta Belajar SQL](#sql.peta-belajar-sql).'],
         ['Bulan 2: Fondasi web', '[Cara Kerja Internet](#web.web-cara-kerja-internet) → [HTTP Mendalam](#web.web-http-mendalam) → [Desain REST API](#web.web-desain-rest-api).'],
-        ['Bulan 3: Spring Boot', '[Spring Dasar](#java.spring-dasar) → [Spring Web MVC](#java.spring-web-mvc) → [Spring Data JPA](#java.spring-data-jpa) → [Testcontainers & Resilience4j](#java.spring-testcontainers-resilience).'],
+        ['Bulan 3: Spring Boot', '[Spring Dasar](#java.spring-dasar) → [Spring Web MVC](#java.spring-web-mvc) → [Spring Data JPA](#java.spring-data-jpa) → [JPA Mendalam](#java.jc-jpa-mendalam) → [Testcontainers & Resilience4j](#java.spring-testcontainers-resilience).'],
         ['Bulan 4: Proyek & testing', '[Proyek Spring RESTful API](#java.proyek-spring-restful-api-contact-management) + [Fondasi Testing](#testing.pendahuluan) → [TDD](#testing.tdd-untuk-vibe-coding-red-green-refactor).'],
       ]),
       ...checklist('jalur-fase-1', [
@@ -163,8 +168,8 @@ const modules: Omit<Module, 'code'>[] = [
     blocks: [
       paragraph('Tujuan fase ini: membangun aplikasi LLM yang bisa diukur kualitasnya, bukan sekadar demo. Python dipelajari dulu sebagai bahasa, baru framework.'),
       route([
-        ['Bulan 8: Python Inti', '[Fondasi Bahasa](#python.py-fondasi-bahasa) → [OOP & dataclass](#python.py-oop-dataclass) → [Generator & Decorator](#python.py-generator-decorator) → [Typing & Tooling](#python.py-typing-tooling) → [asyncio](#python.py-asyncio).'],
-        ['Bulan 8: Python Praktik', '[pytest Mendalam](#python.py-pytest-mendalam) → [Packaging & pyproject](#python.py-packaging-pyproject) → [Proyek CLI & Otomasi](#python.py-proyek-cli-otomasi).'],
+        ['Bulan 8: Python Dasar → Inti', 'Bila baru mengenal Python: [Python Dasar](#python.pyf-setup-variabel-string) (5 modul) dulu. Lalu [Fondasi Bahasa](#python.py-fondasi-bahasa) → [OOP & dataclass](#python.py-oop-dataclass) → [Generator & Decorator](#python.py-generator-decorator) → [Typing & Tooling](#python.py-typing-tooling) → [asyncio](#python.py-asyncio).'],
+        ['Bulan 8: Python Praktik', '[pytest Mendalam](#python.py-pytest-mendalam) → [Packaging & pyproject](#python.py-packaging-pyproject) → [Proyek CLI & Otomasi](#python.py-proyek-cli-otomasi) → [pandas Mendalam](#python.pyf-pandas-mendalam).'],
         ['Bulan 9: FastAPI & RAG', '[Mengenal FastAPI](#python.mengenal-fastapi) → [Peta Kurikulum Data/AI](#llm.peta-kurikulum-data-ai) → [Apa itu RAG](#llm.apa-itu-rag-manfaatnya).'],
         ['Bulan 10: AI Engineer', '[Peta Stack](#llm.aie-roadmap-stack) → [Claude API & Tool Calling](#llm.aie-llm-api-tool-calling) → [LangGraph Dasar](#llm.aie-langgraph-dasar) → [Langfuse Tracing](#llm.aie-langfuse-tracing) → [Proyek Akhir](#llm.aie-proyek-akhir).'],
       ]),
@@ -203,7 +208,7 @@ const modules: Omit<Module, 'code'>[] = [
   {
     id: 'jalur-per-tujuan',
     title: 'Jalur per Tujuan Karier',
-    summary: 'Tujuh rute alternatif: cloud-native Go, full stack TypeScript, mobile, AI Engineer, systems Rust, JVM modern Kotlin, dan enterprise .NET.',
+    summary: 'Sepuluh rute alternatif: cloud-native Go, full stack TypeScript, mobile, AI Engineer, systems Rust, JVM modern Kotlin, enterprise .NET, web PHP/Laravel, C/C++, dan iOS native.',
     track: GOAL, source: roadmapSource, duration: '15 menit', level: 'Easy',
     blocks: [
       paragraph('Pilih satu rute sesuai tujuan. Git & Shell tetap jadi fondasi di semua rute; struktur data & algoritma tetap dibutuhkan untuk interview di bahasa apa pun.'),
@@ -220,8 +225,8 @@ const modules: Omit<Module, 'code'>[] = [
         { label: 'Full stack (TypeScript)', blocks: [
           paragraph('Satu bahasa untuk frontend dan backend.'),
           route([
-            ['Fondasi', '[HTML & CSS Dasar](#js.html-struktur-semantik) → [JavaScript Dasar](#js.js-variabel-tipe) → [TypeScript Dasar](#js.ts-setup-tipe-dasar) → [TypeScript Lanjutan](#js.kenapa-typescript-dan-kenapa-sekarang).'],
-            ['Frontend', '[React](#js.peta-jalan-react-typescript) → [Next.js](#js.nextjs-fondasi-setup).'],
+            ['Fondasi', '[HTML & CSS Dasar](#js.html-struktur-semantik) → [JavaScript Dasar](#js.js-variabel-tipe) → [JavaScript Lanjutan](#js.jsa-error-debugging) → [Proyek Vanilla JS](#js.jsa-proyek-vanilla) → [TypeScript Dasar](#js.ts-setup-tipe-dasar) → [TypeScript Lanjutan](#js.kenapa-typescript-dan-kenapa-sekarang) → [TypeScript Tingkat Mahir](#js.jsa-ts-conditional-infer).'],
+            ['Frontend', '[React](#js.peta-jalan-react-typescript) → [TanStack Query](#js.jse-tanstack-query-lanjutan) → [Next.js](#js.nextjs-fondasi-setup); alternatif: [Vue 3](#js.jse-vue-dasar) → [Nuxt](#js.jse-nuxt).'],
             ['Backend', '[Event Loop](#js.node-event-loop) → [Express](#js.kontrak-api-yang-akan-dibangun) → [NestJS](#js.mengenal-nest-js) → [Drizzle ORM](#js.node-drizzle-orm).'],
             ['Interview', '[Interview TypeScript & Node.js](#interview.iv-typescript-node) → [React Advanced](#interview.react-advanced).'],
           ]),
@@ -230,13 +235,14 @@ const modules: Omit<Module, 'code'>[] = [
           paragraph('Flutter untuk satu kode di Android & iOS; Kotlin bila fokus Android native.'),
           route([
             ['Lintas platform', '[Peta Belajar Flutter](#flutter.peta-belajar-flutter) → [Dart 3](#flutter.dart3-records-patterns-sealed) → [Membangun UI Nyata](#flutter.membangun-ui-nyata) → [Optimasi Performa](#flutter.optimasi-performa).'],
-            ['Android native', '[Kotlin: Setup & Dasar](#kotlin.kt-setup-dasar) → [Null Safety](#kotlin.kt-null-safety) → [Coroutines](#kotlin.kt-coroutines) → [Flow](#kotlin.kt-flow) → [Jetpack Compose](#kotlin.kt-compose-dasar).'],
+            ['Android native', '[Kotlin: Setup & Dasar](#kotlin.kt-setup-dasar) → [Null Safety](#kotlin.kt-null-safety) → [Coroutines](#kotlin.kt-coroutines) → [Flow](#kotlin.kt-flow) → [Jetpack Compose](#kotlin.kt-compose-dasar) → [Arsitektur Android](#kotlin.kt-android-arsitektur) → [Data Layer](#kotlin.kt-android-data-layer).'],
+            ['iOS native', 'Lihat tab **iOS native (Swift)**: [Swift & iOS](#swift).'],
           ]),
         ] },
         { label: 'AI Engineer (Python)', blocks: [
           paragraph('Membangun aplikasi LLM, RAG, dan agent.'),
           route([
-            ['Python', '[Fondasi Bahasa](#python.py-fondasi-bahasa) → [asyncio](#python.py-asyncio) → [pytest Mendalam](#python.py-pytest-mendalam).'],
+            ['Python', '[Python Dasar](#python.pyf-setup-variabel-string) → [Fondasi Bahasa](#python.py-fondasi-bahasa) → [asyncio](#python.py-asyncio) → [pytest Mendalam](#python.py-pytest-mendalam) → [NumPy](#python.pyf-numpy) → [pandas](#python.pyf-pandas-mendalam).'],
             ['LLM', '[Prompt Engineering](#llm.prompt-engineering-sistematis) → [RAG](#llm.apa-itu-rag-manfaatnya) → [AI Engineer: Peta Stack](#llm.aie-roadmap-stack).'],
             ['Produksi', '[Evaluasi dengan Langfuse](#llm.aie-evaluasi-langfuse) → [Full Stack & Deploy](#llm.aie-fullstack-deploy) → [Proyek Akhir](#llm.aie-proyek-akhir).'],
             ['Interview', '[Interview Python & AI Engineer](#interview.iv-python-ai).'],
@@ -247,14 +253,14 @@ const modules: Omit<Module, 'code'>[] = [
           route([
             ['Dasar & inti', '[Pendahuluan Rust](#rust.pendahuluan) → [Ownership & Borrowing](#rust.rust-ownership-borrowing) → [Error Handling](#rust.rust-error-handling) → [Trait & Generic](#rust.rust-trait-generic).'],
             ['Lanjutan', '[Closure & Iterator](#rust.rust-closure-iterator) → [Smart Pointer](#rust.rust-smart-pointer) → [Concurrency](#rust.rust-concurrency) → [Testing & Cargo](#rust.rust-testing-cargo).'],
-            ['Backend & sistem', '[REST API Axum](#rust.rust-axum-tokio) → [Low-Level & Systems Programming](#lld.fase-1-fondasi-bahasa-sistem-rust-c-modern).'],
+            ['Backend & sistem', '[REST API Axum](#rust.rust-axum-tokio) → [Async Mendalam](#rust.rsp-async-mendalam) → [Axum Siap Produksi](#rust.rsp-axum-produksi) → [Proyek CLI clap](#rust.rsp-cli-clap) → [Low-Level & Systems Programming](#lld.fase-1-fondasi-bahasa-sistem-rust-c-modern).'],
           ]),
         ] },
         { label: 'JVM modern (Kotlin)', blocks: [
           paragraph('Bila sudah menguasai Java dan ingin kode yang lebih ringkas di Spring Boot.'),
           route([
             ['Bahasa', '[Setup & Dasar](#kotlin.kt-setup-dasar) → [Fungsi & Lambda](#kotlin.kt-fungsi-lambda) → [Class, Data & Sealed](#kotlin.kt-class-data-sealed) → [Koleksi & Scope Function](#kotlin.kt-koleksi-scope).'],
-            ['Backend', '[Coroutines](#kotlin.kt-coroutines) → [Spring Boot dengan Kotlin](#kotlin.kt-spring-boot-api) → [Testing](#kotlin.kt-testing).'],
+            ['Backend', '[Coroutines](#kotlin.kt-coroutines) → [Spring Boot dengan Kotlin](#kotlin.kt-spring-boot-api) → [Testing](#kotlin.kt-testing) → [Ktor Server](#kotlin.kt-ktor-server).'],
             ['Interview', '[Interview Kotlin & C#/.NET](#interview.iv-kotlin-dotnet) → [Interview Spring](#interview.spring).'],
           ]),
         ] },
@@ -263,8 +269,32 @@ const modules: Omit<Module, 'code'>[] = [
           route([
             ['Bahasa', '[Setup & Dasar](#csharp.cs-setup-dasar) → [Class & Record](#csharp.cs-oop-class-record) → [Koleksi & LINQ](#csharp.cs-koleksi-linq) → [async/await](#csharp.cs-async-await).'],
             ['Web API', '[Minimal API](#csharp.cs-aspnet-minimal-api) → [EF Core](#csharp.cs-ef-core) → [Auth & Middleware](#csharp.cs-auth-middleware).'],
-            ['Produksi', '[Testing dengan xUnit](#csharp.cs-testing-xunit) → [Deploy dengan Docker](#csharp.cs-deploy-docker).'],
+            ['Produksi', '[Clean Architecture](#csharp.cs-clean-architecture) → [Testing dengan xUnit](#csharp.cs-testing-xunit) → [Deploy dengan Docker](#csharp.cs-deploy-docker) → [Proyek Akhir](#csharp.cs-proyek-financial-tracker).'],
             ['Interview', '[Interview Kotlin & C#/.NET](#interview.iv-kotlin-dotnet).'],
+          ]),
+        ] },
+        { label: 'Web (PHP & Laravel)', blocks: [
+          paragraph('Untuk agensi, UMKM, dan banyak lowongan web di Indonesia. Cepat dari nol sampai aplikasi jalan.'),
+          route([
+            ['Bahasa', '[Setup & Sintaks](#php.php-setup-sintaks) → [OOP](#php.php-oop) → [Composer & PSR](#php.php-error-composer) → [PHP Modern 8.x](#php.php-modern) → [PDO](#php.php-pdo-database).'],
+            ['Laravel', '[Routing & Blade](#php.lv-dasar-routing) → [Eloquent](#php.lv-eloquent) → [Validasi & Resource](#php.lv-validasi-resource) → [Sanctum, Gate & Policy](#php.lv-auth-sanctum).'],
+            ['Produksi', '[Queue & Event](#php.lv-queue-event) → [Testing Pest](#php.lv-testing) → [Performa & Deploy](#php.lv-performa-deploy) → [Proyek Financial Tracker](#php.lv-proyek-financial-tracker).'],
+          ]),
+        ] },
+        { label: 'Systems & CP (C/C++)', blocks: [
+          paragraph('Untuk embedded, game engine, komponen performa kritis, dan competitive programming.'),
+          route([
+            ['C', '[Setup & Tahap Build](#cpp.c-setup-dasar) → [Pointer](#cpp.c-pointer) → [Memori Dinamis](#cpp.c-memori-dinamis) → [Multi-file & Makefile](#cpp.c-file-multi-file).'],
+            ['C++ modern', '[Dari C ke C++](#cpp.cpp-dari-c-ke-cpp) → [STL](#cpp.cpp-stl) → [Smart Pointer & Move](#cpp.cpp-smart-pointer-move) → [Template & Concepts](#cpp.cpp-template-concepts) → [Tooling](#cpp.cpp-tooling).'],
+            ['Lanjutan', '[Template CP](#cpp.cpp-cp-template) → [Pola Soal Klasik](#cpp.cpp-cp-pola-klasik) → [Low-Level & Systems Programming](#lld.fase-1-fondasi-bahasa-sistem-rust-c-modern).'],
+          ]),
+        ] },
+        { label: 'iOS native (Swift)', blocks: [
+          paragraph('Untuk aplikasi iPhone/iPad/Mac native. Butuh Mac + Xcode untuk bagian SwiftUI.'),
+          route([
+            ['Bahasa', '[Setup & Sintaks](#swift.sw-setup-dasar) → [Struct, Class & Enum](#swift.sw-struct-class-enum) → [Protocol & Generic](#swift.sw-protocol-generic) → [Error & ARC](#swift.sw-error-arc).'],
+            ['Concurrency', '[async/await](#swift.sw-async-await) → [Actor & Sendable](#swift.sw-actor-sendable).'],
+            ['SwiftUI', '[View & Layout](#swift.sw-swiftui-dasar) → [State & Navigasi](#swift.sw-swiftui-state) → [Networking & SwiftData](#swift.sw-networking-swiftdata) → [Testing & Rilis](#swift.sw-testing-mvvm-rilis).'],
           ]),
         ] },
       ] },
