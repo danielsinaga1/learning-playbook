@@ -34,6 +34,11 @@ import { webSecurityCurriculum } from './web-security';
 import { interviewLanguageModules, interviewLanguageSource, interviewLanguageTracks } from './interview-languages';
 import { systemDesignModules, systemDesignSource, systemDesignTracks } from './system-design-interview';
 import { englishFoundationArchives, englishFoundationModules, englishFoundationSources, englishFoundationTracks } from './english-foundations';
+import { englishRoadmapModules, englishRoadmapSource, englishRoadmapTracks } from './english-roadmap';
+import { englishStarterModules, englishStarterSource, englishStarterTracks } from './english-starter';
+import { englishGrammarMidModules, englishGrammarMidSource, englishGrammarMidTracks } from './english-grammar-mid';
+import { englishProTracks, englishProWritingModules, englishProWritingSource } from './english-pro-writing';
+import { englishProSpeakingModules, englishProSpeakingSource } from './english-pro-speaking';
 import javaGen from './gen/java.json';
 import goGen from './gen/go.json';
 import jsGen from './gen/js.json';
@@ -172,21 +177,37 @@ const javascript = numbered({
   ],
 });
 
-/** Fondasi grammar mendahului tenses/ujian; Materi 2 dan 3 berbagi satu modul. */
+/**
+ * Fondasi grammar mendahului tenses/ujian; Materi 2 dan 3 berbagi satu modul.
+ * Peta CEFR membuka kurikulum; pengucapan menyusul grammar dasar, Grammar Menengah setelah 16 Tenses,
+ * lalu English Profesional menyusul Grammar Menengah.
+ */
 const englishBase = gen(englishGen);
 const englishTracks = englishBase.tracks ?? [];
 const tensesIndex = englishTracks.findIndex((track) => track.title === '16 Tenses');
 const foundationIndex = tensesIndex < 0 ? 0 : tensesIndex;
 const english = numbered({
   ...englishBase,
-  description: 'Kosakata & phrasal verbs untuk kerja dan developer, grammar dasar, struktur kalimat, superlative & ordinal numbers, 16 tenses, TOEFL, dan IELTS.',
-  tracks: [...englishTracks.slice(0, foundationIndex), ...englishFoundationTracks, ...englishTracks.slice(foundationIndex)],
-  sources: [...(englishBase.sources ?? []), ...englishFoundationSources],
+  description: 'Peta level CEFR, kosakata & phrasal verbs untuk kerja dan developer, grammar dasar sampai menengah, pengucapan & listening, 16 tenses, English profesional (email, technical writing, code review, meeting, presentasi, interview), TOEFL, dan IELTS.',
+  tracks: [
+    ...englishRoadmapTracks,
+    ...insertTracks(
+      insertTracks(
+        insertTracks(
+          [...englishTracks.slice(0, foundationIndex), ...englishFoundationTracks, ...englishTracks.slice(foundationIndex)],
+          englishStarterTracks, 'Adjectives & Numbers', 'after'),
+        englishGrammarMidTracks, '16 Tenses', 'after'),
+      englishProTracks, 'Grammar Menengah', 'after'),
+  ],
+  sources: [...(englishBase.sources ?? []), ...englishFoundationSources, englishRoadmapSource, englishStarterSource, englishGrammarMidSource, englishProWritingSource, englishProSpeakingSource],
   intro: [
-    { type: 'callout', tone: 'tip', title: 'Mulai dari fondasi grammar', text: 'Untuk pemula: [Parts of Speech](#english.english-parts-noun-pronoun-verb) → [Adjectives & Adverbs](#english.english-adjectives-adverbs) → [Prepositions & Determiners](#english.english-function-words) → [Struktur Kalimat](#english.english-sentence-structure) → [Superlative & Ordinal](#english.english-superlative-ordinal), lalu 16 Tenses dan Grammar TOEFL. Materi 2 dan 3 digabung agar tidak berulang; semua halaman asli tersedia di Arsip Sumber.' },
+    { type: 'callout', tone: 'tip', title: 'Mulai dari fondasi grammar', text: 'Belum tahu level Anda? Buka [Peta Belajar CEFR](#english.english-peta-belajar-cefr) dulu. Untuk pemula: [Parts of Speech](#english.english-parts-noun-pronoun-verb) → [Adjectives & Adverbs](#english.english-adjectives-adverbs) → [Prepositions & Determiners](#english.english-function-words) → [Struktur Kalimat](#english.english-sentence-structure) → [Superlative & Ordinal](#english.english-superlative-ordinal), lalu 16 Tenses dan Grammar TOEFL. Materi 2 dan 3 digabung agar tidak berulang; semua halaman asli tersedia di Arsip Sumber.' },
     ...(englishBase.intro ?? []),
   ],
-  modules: [...englishBase.modules, ...englishFoundationModules, ...englishFoundationArchives],
+  modules: [
+    ...englishRoadmapModules, ...englishBase.modules, ...englishFoundationModules, ...englishStarterModules,
+    ...englishGrammarMidModules, ...englishProWritingModules, ...englishProSpeakingModules, ...englishFoundationArchives,
+  ],
 });
 
 /**

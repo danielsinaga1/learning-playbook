@@ -26,7 +26,7 @@ dan tiap dokumen sumber menjadi **track** (submodul) di dalam kurikulumnya.
 | **Software Testing & QA** | Fondasi (+ FSD vs TSD) · Praktik · Automation · API Testing & TDD · Lanjutan & Snippet | Software_Testing_Lengkap, API Testing.pdf, End to End API Testing.pdf, TDD.pdf, FSD dan TSD.pdf |
 | **LLM** | Peta Belajar (termasuk program Hacktiv8) · Fase 0 · Fase 1 · RAG: Panduan Lengkap · AI Engineer: Fondasi · LangChain & LangGraph · Observability & Produksi · Fase 2–4 · Proyek Akhir Terpadu · Referensi: Cheatsheet ML, DL & AI | 03-DataAI-Roadmap-Komprehensif, 03-DataAI-Fase1…4, Belajar_Hacktiv8, Retrieval Augmented Generation.pdf, All Cheatsheet ML DL AI (Stanford & MIT).pdf |
 | **Interview Prep** | Cara Menjawab · Java, Spring Boot & AWS · Go · Python & AI Engineer · TypeScript & Node.js · Kotlin & C#/.NET · React & Spring Boot Advanced · Apache Kafka (Java) · System Design Interview | Interview Prep (HTML), 50_Soal_Advanced_React_SpringBoot, Apache Kafka.pdf, dokumentasi resmi tiap bahasa |
-| **English Learning** | Vocabulary (4 track) · Vocabulary Lanjutan · Grammar Dasar · Struktur Kalimat · Adjectives & Numbers · 16 Tenses · Grammar & Strategi TOEFL · IELTS (5 track) · IELTS Vocabulary Booster | English_Vocabulary_and_Phrasal_Verbs_v3, English_Komprehensif v2 (dua file identik), Panduan_Master_IELTS.pdf, Ringkasan_IELTS_Vocabulary_Booster.pdf, Materi 1-4 (Parts of Speech, Phrase/Clause/Sentence, Sentence Structure, Superlative & Ordinal) |
+| **English Learning** | Mulai di Sini (peta CEFR) · Vocabulary (4 track) · Vocabulary Lanjutan · Grammar Dasar · Struktur Kalimat · Adjectives & Numbers · Pengucapan & Listening · 16 Tenses · Grammar Menengah · English Profesional · Grammar & Strategi TOEFL · IELTS (5 track) · IELTS Vocabulary Booster | English_Vocabulary_and_Phrasal_Verbs_v3, English_Komprehensif v2 (dua file identik), Panduan_Master_IELTS.pdf, Ringkasan_IELTS_Vocabulary_Booster.pdf, Materi 1-4 (Parts of Speech, Phrase/Clause/Sentence, Sentence Structure, Superlative & Ordinal) |
 
 Kurikulum hasil konversi dokumen juga punya track **Arsip Sumber** (lihat di bawah).
 
@@ -74,6 +74,19 @@ Lima pelajaran memiliki checklist dan soal pemahaman. Koreksi contoh/istilah sum
 ID materi lama tetap sama. Materi tambahan disimpan dalam `src/data/english-foundations.ts`, terpisah dari `gen/`.
 Untuk memperbarui gambar halaman dan teks sumber, jalankan
 `python tools/import-english-foundations.py C:/Users/nama/Downloads` (memerlukan pdfplumber, pypdfium2, dan Pillow).
+
+### Pelajaran keterampilan English (4 November 2026)
+
+Enam belas pelajaran tulisan tangan melengkapi daftar kosakata dengan keterampilan dari pemula sampai mahir:
+
+| Submodul | Pelajaran | File |
+|---|---|---|
+| Mulai di Sini | Peta Belajar CEFR A1–C2, urutan modul per level, padanan IELTS/TOEFL (termasuk skala TOEFL iBT 1–6) | `english-roadmap.ts` |
+| Grammar Dasar | Questions: Yes/No, WH-, subject questions, question tags, indirect questions | `english-starter.ts` |
+| Pengucapan & Listening | Pronunciation Dasar (IPA); Word Stress, ending -s/-ed & istilah IT; Connected Speech & Listening | `english-starter.ts` |
+| Grammar Menengah | Modal Verbs; Modal Perfect; Used to, Wish & Causative; Linking Words & Cohesion | `english-grammar-mid.ts` |
+| English Profesional | Email & Chat; Technical Writing (commit, PR, bug report, README, design doc); Code Review & Feedback | `english-pro-writing.ts` |
+| English Profesional | Meeting & Stand-up; Presentasi & Demo; Diplomatic English; Interview Developer (STAR) | `english-pro-speaking.ts` |
 
 ## Jalur belajar Next.js
 

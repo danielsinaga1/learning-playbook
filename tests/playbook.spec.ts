@@ -15,6 +15,24 @@ test('fondasi English: struktur gabungan, latihan, dan arsip halaman sumber', as
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
+test('pelajaran keterampilan English tampil tanpa error', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const lessons: [string, string][] = [
+    ['#english.english-peta-belajar-cefr', 'Peta Belajar English: Level CEFR A1–C2 & Urutan Modul'],
+    ['#english.english-pronunciation-dasar', 'Pronunciation Dasar: IPA & Bunyi yang Sulit bagi Penutur Indonesia'],
+    ['#english.english-modal-verbs', 'Modal Verbs: Ability, Permission, Obligation, Advice & Possibility'],
+    ['#english.english-technical-writing', 'Technical Writing: Commit, Pull Request, Bug Report, README & Design Doc'],
+    ['#english.english-interview-developer', 'Interview Kerja Developer dalam English: Perkenalan, STAR & Menjelaskan Proyek'],
+  ];
+  for (const [hash, title] of lessons) {
+    await page.goto('/' + hash);
+    await expect(page.locator('.reader-sheet h1')).toHaveText(title);
+    await expect(page.locator('.reading-content table').first()).toBeVisible();
+  }
+  expect(errors).toEqual([]);
+});
+
 test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
