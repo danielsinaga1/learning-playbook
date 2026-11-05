@@ -33,6 +33,51 @@ test('pelajaran keterampilan English tampil tanpa error', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test('track Pola Agent AI tampil berurutan tanpa error', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const lessons: [string, string][] = [
+    ['#llm.agent-peta-pola', 'Pola Agent: Peta, Agent Loop & Kapan Memakai Agent'],
+    ['#llm.agent-tool-calling', 'Tool Calling: Desain Tool, Loop Produksi & Keamanan'],
+    ['#llm.agent-planning', 'Planning: Pecah Tujuan, Eksekusi Bertahap & Revisi Rencana'],
+    ['#llm.agent-memory', 'Memory: Context Window, Memori Sesi & Memori Jangka Panjang'],
+    ['#llm.agent-multi-agent', 'Multi-Agent: Orchestrator, Spesialis & Penggabungan Hasil'],
+    ['#llm.agent-human-approval', 'Human Approval: Gerbang Persetujuan untuk Aksi Berisiko'],
+    ['#llm.agent-evaluasi', 'Evaluasi Agent: Outcome, Langkah, Biaya & Keandalan'],
+  ];
+  for (const [hash, title] of lessons) {
+    await page.goto('/' + hash);
+    await expect(page.locator('.reader-sheet h1')).toHaveText(title);
+    await expect(page.locator('.reading-content pre').first()).toBeVisible();
+    await expect(page.locator('.reading-content table').first()).toBeVisible();
+  }
+  await page.goto('/#llm');
+  await expect(page.getByText('Pola Agent AI', { exact: true }).first()).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('track System Design dalam 12 Baris tampil tanpa error', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const lessons: [string, string][] = [
+    ['#distributed.sdp-peta-12-baris', 'System Design dalam 12 Baris: Peta Gejala → Solusi'],
+    ['#distributed.sdp-baca-cepat', 'Baca Cepat: Index, Cache & Read Replica'],
+    ['#distributed.sdp-beban-tulis', 'Beban Tulis: Queue untuk Lonjakan & Sharding'],
+    ['#distributed.sdp-traffic', 'Traffic Besar: Load Balancer, Rate Limiting, Object Storage & CDN'],
+    ['#distributed.sdp-gagal-anggun', 'Gagal dengan Anggun: Retry + Backoff, Circuit Breaker & Idempotency Key'],
+    ['#distributed.sdp-observability', 'Melihat yang Rusak: Logs, Metrics & Tracing'],
+  ];
+  for (const [hash, title] of lessons) {
+    await page.goto('/' + hash);
+    await expect(page.locator('.reader-sheet h1')).toHaveText(title);
+    await expect(page.locator('.reading-content pre').first()).toBeVisible();
+    await expect(page.locator('.reading-content table').first()).toBeVisible();
+  }
+  await page.goto('/#distributed');
+  await expect(page.getByText('System Design dalam 12 Baris', { exact: true }).first()).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));

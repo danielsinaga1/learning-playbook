@@ -5,6 +5,8 @@ import { algorithms } from './algorithms';
 import { ai } from './ai';
 import { nextjsModules, nextjsSource, nextjsTracks } from './nextjs';
 import { aiEngineerModules, aiEngineerSource, aiEngineerTracks } from './ai-engineer';
+import { agentPatternModules, agentPatternSource, agentPatternTracks } from './ai-agent-patterns';
+import { systemDesignPatternModules, systemDesignPatternSource, systemDesignPatternTracks } from './system-design-patterns';
 import { javaModernModules, javaModernSource, javaModernTracks } from './java-modern';
 import { dsaExtraModules, dsaExtraSource } from './dsa-extra';
 import { javaCoreModules, javaCoreSource, javaCoreTracks } from './java-core';
@@ -213,6 +215,7 @@ const english = numbered({
 /**
  * LLM: outline program Applied AI Engineer (Hacktiv8) masuk ke track Peta Belajar.
  * Jalur praktik AI Engineer (LangChain v1, LangGraph, Langfuse) disisipkan setelah RAG, sebelum Fase 2.
+ * Pola Agent AI (tanpa framework) berada di antara AI Engineer: Fondasi dan LangChain & LangGraph.
  */
 const llmBase = gen(llmGen);
 const llmTracks = llmBase.tracks ?? [];
@@ -220,15 +223,18 @@ const ragIndex = llmTracks.findIndex((track) => track.title === 'RAG: Panduan Le
 const aiEngineerIndex = ragIndex < 0 ? llmTracks.length : ragIndex + 1;
 const llm = numbered({
   ...llmBase,
-  description: `${llmBase.description} Plus jalur praktik AI Engineer: Claude API, LangChain v1, LangGraph, Langfuse, eval, dan full stack.`,
-  tracks: [...llmTracks.slice(0, aiEngineerIndex), ...aiEngineerTracks, ...llmTracks.slice(aiEngineerIndex)],
-  sources: [...(llmBase.sources ?? []), aiEngineerSource],
+  description: `${llmBase.description} Plus jalur praktik AI Engineer: Claude API, pola agent tanpa framework (tool calling, planning, memory, multi-agent, human approval, evaluasi), LangChain v1, LangGraph, Langfuse, eval, dan full stack.`,
+  tracks: insertTracks(
+    [...llmTracks.slice(0, aiEngineerIndex), ...aiEngineerTracks, ...llmTracks.slice(aiEngineerIndex)],
+    agentPatternTracks, aiEngineerTracks[0].title, 'after'),
+  sources: [...(llmBase.sources ?? []), aiEngineerSource, agentPatternSource],
   intro: [
-    { type: 'callout', tone: 'tip', title: 'Jalur praktik AI Engineer', text: 'Ingin langsung membangun agent? Ikuti 11 modul mulai dari [Peta Stack & Jalur Belajar](#llm.aie-roadmap-stack): Python modern, Claude API & tool calling, LangChain v1, LangGraph (memory, human-in-the-loop, multi-agent), Langfuse (tracing, prompt, eval), lalu full stack FastAPI + Next.js dan proyek akhir.' },
+    { type: 'callout', tone: 'tip', title: 'Jalur praktik AI Engineer', text: 'Ingin langsung membangun agent? Ikuti modul mulai dari [Peta Stack & Jalur Belajar](#llm.aie-roadmap-stack): Python modern dan Claude API, lalu track Pola Agent AI ([Peta Pola Agent](#llm.agent-peta-pola): tool calling, planning, memory, multi-agent, human approval, evaluasi) tanpa framework, kemudian LangChain v1, LangGraph, Langfuse, full stack FastAPI + Next.js, dan proyek akhir.' },
     ...(llmBase.intro ?? []),
   ],
   modules: [
     ...aiEngineerModules,
+    ...agentPatternModules,
     ...withTrack(ai.modules, 'Peta Belajar').map((m) => ({
       ...m,
       id: m.id === 'program' ? m.id : `hacktiv8-${m.id}`,
@@ -352,6 +358,20 @@ const roadmap = numbered({
   modules: [...roadmapCurriculum.modules, ...csFoundationModules],
 });
 
+/** Distributed System: track praktis "System Design dalam 12 Baris" tepat setelah Roadmap 12 Bulan. */
+const distributedBase = gen(distributedGen);
+const distributed = numbered({
+  ...distributedBase,
+  description: `${distributedBase.description} Dibuka dengan System Design dalam 12 Baris: index, cache, read replica, queue, sharding, load balancer, rate limiting, CDN, retry, circuit breaker, idempotency key, dan observability, lengkap dengan kode teruji.`,
+  tracks: insertTracks(distributedBase.tracks, systemDesignPatternTracks, 'Roadmap 12 Bulan', 'after'),
+  sources: [...(distributedBase.sources ?? []), systemDesignPatternSource],
+  intro: [
+    { type: 'callout', tone: 'tip', title: 'Mulai dari 12 baris', text: 'Butuh peta cepat? Buka [System Design dalam 12 Baris](#distributed.sdp-peta-12-baris): dua belas gejala skala dan keandalan, solusi standarnya, dan harga setiap solusi, lalu pendalaman per jalur (baca, tulis, traffic, kegagalan, observability).' },
+    ...(distributedBase.intro ?? []),
+  ],
+  modules: [...distributedBase.modules, ...systemDesignPatternModules],
+});
+
 /** Daftar kurikulum sesuai urutan tampil. */
 export const curricula: Curriculum[] = [
   roadmap,
@@ -369,7 +389,7 @@ export const curricula: Curriculum[] = [
   flutter,
   numbered(swiftCurriculum),
   numbered(gen(sqlGen)),
-  numbered(gen(distributedGen)),
+  distributed,
   numbered(gen(lldGen)),
   devops,
   numbered(gen(testingGen)),

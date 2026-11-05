@@ -20,11 +20,11 @@ dan tiap dokumen sumber menjadi **track** (submodul) di dalam kurikulumnya.
 | **Mobile: Flutter & Cross-Platform** | Fondasi (+ Dart 3, async Dart) · Membangun Aplikasi (+ Pigeon, go_router, Firebase) · Menuju Produksi (+ aksesibilitas, lokalisasi, flavors & CI/CD) · Roadmap Senior Mobile (12 Bulan) | Flutter-Panduan-Lengkap, 02-Mobile-Fase1…4 |
 | **Swift & iOS** | Swift Dasar · Swift Concurrency · SwiftUI | swift.org, Apple Developer Documentation |
 | **Database & SQL** | Konsep Database · SQL: Pemula sampai Mahir · SQL Notes (Referensi Cepat) · NoSQL & Database Modern | SQL-Pemula-sampai-Mahir, Panduan_Belajar_Database_SQL_NoSQL, SQL Notes.pdf |
-| **Distributed System** | Roadmap 12 Bulan · Arsitektur & Performa Sistem (+ 14 Microservices Design Patterns) · Distributed System dengan Spring Boot | 04-SysDesign-Fase1…4, Panduan-Arsitektur-dan-Performa-Sistem, E-Book Arsitektur & Performa Sistem Enterprise.pdf (bagian baru), Microservices Design Pattern.pdf, Panduan_Distributed_System_Spring_Boot |
+| **Distributed System** | Roadmap 12 Bulan · System Design dalam 12 Baris · Arsitektur & Performa Sistem (+ 14 Microservices Design Patterns) · Distributed System dengan Spring Boot | 04-SysDesign-Fase1…4, Panduan-Arsitektur-dan-Performa-Sistem, E-Book Arsitektur & Performa Sistem Enterprise.pdf (bagian baru), Microservices Design Pattern.pdf, Panduan_Distributed_System_Spring_Boot |
 | **Low Level Design** | Peta Roadmap · Low-Level & Systems Programming · Database Internals & Search · Concurrency & Distributed Lanjutan · Green & Sustainable Computing | 00-Roadmap-Teknis-Lanjutan-Overview, 05-LowLevel-Fase1…4, 06-DBInternals-Fase1…4, 00-Roadmap-ConcDist-Green-Overview, 07-ConcDist-Fase1…4, 08-GreenComputing-Fase1…4 |
 | **Cloud & DevOps** | AWS untuk Java Developer · Docker · Kubernetes · Platform Engineering & SRE | AWS Roadmap (HTML), Docker-Kubernetes + Modul DevOps V2.pdf (bagian baru), Panduan_Backend_Platform_Engineering |
 | **Software Testing & QA** | Fondasi (+ FSD vs TSD) · Praktik · Automation · API Testing & TDD · Lanjutan & Snippet | Software_Testing_Lengkap, API Testing.pdf, End to End API Testing.pdf, TDD.pdf, FSD dan TSD.pdf |
-| **LLM** | Peta Belajar (termasuk program Hacktiv8) · Fase 0 · Fase 1 · RAG: Panduan Lengkap · AI Engineer: Fondasi · LangChain & LangGraph · Observability & Produksi · Fase 2–4 · Proyek Akhir Terpadu · Referensi: Cheatsheet ML, DL & AI | 03-DataAI-Roadmap-Komprehensif, 03-DataAI-Fase1…4, Belajar_Hacktiv8, Retrieval Augmented Generation.pdf, All Cheatsheet ML DL AI (Stanford & MIT).pdf |
+| **LLM** | Peta Belajar (termasuk program Hacktiv8) · Fase 0 · Fase 1 · RAG: Panduan Lengkap · AI Engineer: Fondasi · Pola Agent AI · LangChain & LangGraph · Observability & Produksi · Fase 2–4 · Proyek Akhir Terpadu · Referensi: Cheatsheet ML, DL & AI | 03-DataAI-Roadmap-Komprehensif, 03-DataAI-Fase1…4, Belajar_Hacktiv8, Retrieval Augmented Generation.pdf, All Cheatsheet ML DL AI (Stanford & MIT).pdf |
 | **Interview Prep** | Cara Menjawab · Java, Spring Boot & AWS · Go · Python & AI Engineer · TypeScript & Node.js · Kotlin & C#/.NET · React & Spring Boot Advanced · Apache Kafka (Java) · System Design Interview | Interview Prep (HTML), 50_Soal_Advanced_React_SpringBoot, Apache Kafka.pdf, dokumentasi resmi tiap bahasa |
 | **English Learning** | Mulai di Sini (peta CEFR) · Vocabulary (4 track) · Vocabulary Lanjutan · Grammar Dasar · Struktur Kalimat · Adjectives & Numbers · Pengucapan & Listening · 16 Tenses · Grammar Menengah · English Profesional · Grammar & Strategi TOEFL · IELTS (5 track) · IELTS Vocabulary Booster | English_Vocabulary_and_Phrasal_Verbs_v3, English_Komprehensif v2 (dua file identik), Panduan_Master_IELTS.pdf, Ringkasan_IELTS_Vocabulary_Booster.pdf, Materi 1-4 (Parts of Speech, Phrase/Clause/Sentence, Sentence Structure, Superlative & Ordinal) |
 
@@ -113,6 +113,46 @@ Di kurikulum **LLM**, setelah *RAG: Panduan Lengkap*, tersedia **11 modul** prak
 
 Acuan: LangChain/LangGraph v1, Langfuse Python SDK v3, Anthropic Python SDK; dokumentasi diperiksa pada **29 Oktober 2026**.
 Materi ada di [`src/data/ai-engineer.ts`](src/data/ai-engineer.ts).
+
+### Pola Agent AI (5 November 2026)
+
+Track **Pola Agent AI** (7 modul) berada di antara *AI Engineer: Fondasi* dan *LangChain & LangGraph*: pola agent tanpa framework sebelum memakai LangGraph.
+
+| Modul | Isi |
+|---|---|
+| Peta Pola Agent | Workflow vs agent, agent loop, lima pola workflow, kapan butuh agent |
+| Tool Calling | Desain tool, loop produksi (parallel call, `is_error`, `strict`, batas langkah), `tool_choice`, Tool Runner, server tool, keamanan |
+| Planning | ReAct vs plan-and-execute, rencana terstruktur, verifikasi per langkah, revisi terbatas |
+| Memory | Working context vs durable memory, riwayat append-only, compaction, SQLite FTS5, memory tool, privasi |
+| Multi-Agent | Orchestrator-workers, kontrak tugas, spesialis paralel dengan web search/code execution, isolasi kegagalan, review |
+| Human Approval | Kebijakan risiko per tool dan argumen, preview, setuju/edit/tolak, approval asinkron, idempotensi, audit |
+| Evaluasi Agent | Outcome + langkah + biaya, LLM-as-judge, pass@k vs pass^k, gerbang CI |
+
+Kode Python ditulis untuk Anthropic Python SDK 2.5.0 (model `claude-opus-5-5`). Seluruh kode diuji dengan klien palsu yang memvalidasi struktur request (pasangan `tool_use`/`tool_result`, skema strict), jadi tidak ada panggilan API berbayar.
+Materi ada di [`src/data/ai-agent-patterns.ts`](src/data/ai-agent-patterns.ts).
+
+## System Design dalam 12 Baris
+
+Di kurikulum **Distributed System**, setelah *Roadmap 12 Bulan*, track **System Design dalam 12 Baris** (6 modul) memetakan dua belas gejala ke solusi standarnya beserta harganya. Track ini dikembangkan dari ringkasan "System Design in 12 lines" (Saumya Awasthi).
+
+| Modul | Baris yang dibahas |
+|---|---|
+| Peta Gejala → Solusi | Ke-12 baris, bukti yang dicari, urutan penerapan, cara memakai di interview |
+| Baca Cepat | Query lambat → index · Baca lambat → cache · DB berat di baca → read replica |
+| Beban Tulis | Lonjakan tulis → queue · DB berat di tulis → sharding (partisi, shard key, consistent hashing) |
+| Traffic Besar | Load balancer · rate limiting (token bucket) · object storage + CDN |
+| Gagal dengan Anggun | Retry + backoff + jitter · circuit breaker (Resilience4j) · idempotency key |
+| Observability | Logs terstruktur, metrik RED/USE + histogram, tracing OpenTelemetry, alert berbasis SLO |
+
+Bagaimana kodenya diuji:
+
+- **Java** (cache-aside anti-stampede, read-your-writes, write buffer, consistent hashing, token bucket, retry, circuit breaker, idempotensi): dikompilasi dan diuji dengan JDK 17.
+- **SQL**: dijalankan di PostgreSQL 17.
+- **Konfigurasi nginx**: divalidasi dengan `nginx -t`.
+- **Presigned upload S3**: diuji secara offline dengan boto3.
+
+Snippet Spring Boot + Resilience4j tidak dikompilasi di sini. Nama properti dan urutan aspeknya sudah dicek ke dokumentasi resmi.
+Materi ada di [`src/data/system-design-patterns.ts`](src/data/system-design-patterns.ts).
 
 ## Pelajaran tambahan per bahasa
 
