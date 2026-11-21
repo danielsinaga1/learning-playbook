@@ -24,7 +24,7 @@ dan tiap dokumen sumber menjadi **track** (submodul) di dalam kurikulumnya.
 | **Low Level Design** | Peta Roadmap · Low-Level & Systems Programming · Database Internals & Search · Concurrency & Distributed Lanjutan · Green & Sustainable Computing | 00-Roadmap-Teknis-Lanjutan-Overview, 05-LowLevel-Fase1…4, 06-DBInternals-Fase1…4, 00-Roadmap-ConcDist-Green-Overview, 07-ConcDist-Fase1…4, 08-GreenComputing-Fase1…4 |
 | **Cloud & DevOps** | AWS untuk Java Developer · Docker · Kubernetes · Platform Engineering & SRE | AWS Roadmap (HTML), Docker-Kubernetes + Modul DevOps V2.pdf (bagian baru), Panduan_Backend_Platform_Engineering |
 | **Software Testing & QA** | Fondasi (+ FSD vs TSD) · Praktik · Automation · API Testing & TDD · Lanjutan & Snippet | Software_Testing_Lengkap, API Testing.pdf, End to End API Testing.pdf, TDD.pdf, FSD dan TSD.pdf |
-| **LLM** | Peta Belajar (termasuk program Hacktiv8) · Fase 0 · Fase 1 · RAG: Panduan Lengkap · AI Engineer: Fondasi · Pola Agent AI · LangChain & LangGraph · Observability & Produksi · Fase 2–4 · Proyek Akhir Terpadu · Referensi: Cheatsheet ML, DL & AI | 03-DataAI-Roadmap-Komprehensif, 03-DataAI-Fase1…4, Belajar_Hacktiv8, Retrieval Augmented Generation.pdf, All Cheatsheet ML DL AI (Stanford & MIT).pdf |
+| **LLM** | Peta Belajar (termasuk program Hacktiv8) · AI Engineer: Roadmap 8 Tahap · Fase 0 · Fase 1 · RAG: Panduan Lengkap · AI Engineer: Fondasi · Pola Agent AI · LangChain & LangGraph · Observability & Produksi · Fase 2–4 · Proyek Akhir Terpadu · Referensi: Cheatsheet ML, DL & AI | 03-DataAI-Roadmap-Komprehensif, 03-DataAI-Fase1…4, Belajar_Hacktiv8, Retrieval Augmented Generation.pdf, All Cheatsheet ML DL AI (Stanford & MIT).pdf |
 | **Interview Prep** | Cara Menjawab · Java, Spring Boot & AWS · Go · Python & AI Engineer · TypeScript & Node.js · Kotlin & C#/.NET · React & Spring Boot Advanced · Apache Kafka (Java) · System Design Interview | Interview Prep (HTML), 50_Soal_Advanced_React_SpringBoot, Apache Kafka.pdf, dokumentasi resmi tiap bahasa |
 | **English Learning** | Mulai di Sini (peta CEFR) · Vocabulary (4 track) · Vocabulary Lanjutan · Grammar Dasar · Struktur Kalimat · Adjectives & Numbers · Pengucapan & Listening · 16 Tenses · Grammar Menengah · English Profesional · Grammar & Strategi TOEFL · IELTS (5 track) · IELTS Vocabulary Booster | English_Vocabulary_and_Phrasal_Verbs_v3, English_Komprehensif v2 (dua file identik), Panduan_Master_IELTS.pdf, Ringkasan_IELTS_Vocabulary_Booster.pdf, Materi 1-4 (Parts of Speech, Phrase/Clause/Sentence, Sentence Structure, Superlative & Ordinal) |
 
@@ -167,6 +167,30 @@ Semua kode lab dijalankan di Docker Desktop. Kode di modul identik dengan file d
 Saat lab dijalankan, ditemukan dua snippet modul lama yang salah, dan keduanya sudah diperbaiki:
 - `upstream order_service` di nginx: Tomcat menolak Host yang mengandung underscore dengan 400.
 - `fallbackMethod` di `@CircuitBreaker`: retry tidak pernah berjalan.
+
+### AI Engineer: Roadmap 8 Tahap (16 November 2026)
+
+Track baru di kurikulum LLM, tepat setelah *Peta Belajar*. Isinya 11 modul yang mengikuti delapan tahap:
+fondasi, LLM basics, API & prompting, context engineering, embeddings & RAG, MCP & agents, evals & observability, serta security & production.
+Setiap tahap punya proyek bertema perbankan (data fiktif) di [`labs/ai-engineer`](labs/ai-engineer):
+
+| Tahap | Proyek |
+|---|---|
+| 1 | Kurs referensi ECB → SQLite (Decimal, upsert idempoten, retry) |
+| 2 | Token, simulasi temperature/top-p, banding 3 model dengan penilaian buta |
+| 3 | Triase keluhan lewat Claude, OpenAI, dan Gemini; ekstraksi email ke JSON (zero/few-shot, CoT) |
+| 4 | Memori nasabah, ringkasan, seleksi riwayat sesuai anggaran token, prompt caching |
+| 5 | Bot SOP: Chroma + BM25 + RRF, sitasi `search_result`, hit@k terukur |
+| 6 | MCP server layanan bank, agen dengan persetujuan manusia, MCP connector |
+| 7 | Eval tiga lapis, Cohen's kappa, gerbang regresi, dashboard HTML, log biaya |
+| 8 | OWASP LLM Top 10, pertahanan berlapis, red team 20 serangan (ASR sebelum/sesudah) |
+
+Kualitas kode lab:
+- Ada 63 test pytest dan semuanya lulus tanpa API key. Test memakai SDK asli, dan jaringan diganti `httpx2.MockTransport`.
+- 27 blok kode di modul identik dengan file lab.
+- Angka yang ditampilkan berasal dari run nyata: kurs Frankfurter dan hit@k retrieval. Tidak ada angka kualitas model yang dikarang.
+
+Materi ada di [`src/data/ai-engineer-roadmap.ts`](src/data/ai-engineer-roadmap.ts).
 
 ## Pelajaran tambahan per bahasa
 

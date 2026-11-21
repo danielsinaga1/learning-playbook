@@ -6,6 +6,7 @@ import { ai } from './ai';
 import { nextjsModules, nextjsSource, nextjsTracks } from './nextjs';
 import { aiEngineerModules, aiEngineerSource, aiEngineerTracks } from './ai-engineer';
 import { agentPatternModules, agentPatternSource, agentPatternTracks } from './ai-agent-patterns';
+import { aiRoadmapModules, aiRoadmapSource, aiRoadmapTracks } from './ai-engineer-roadmap';
 import { systemDesignPatternModules, systemDesignPatternSource, systemDesignPatternTracks } from './system-design-patterns';
 import { systemDesignLabModules, systemDesignLabSource } from './system-design-lab';
 import { systemDesignDrillModules } from './system-design-drills';
@@ -225,16 +226,19 @@ const ragIndex = llmTracks.findIndex((track) => track.title === 'RAG: Panduan Le
 const aiEngineerIndex = ragIndex < 0 ? llmTracks.length : ragIndex + 1;
 const llm = numbered({
   ...llmBase,
-  description: `${llmBase.description} Plus jalur praktik AI Engineer: Claude API, pola agent tanpa framework (tool calling, planning, memory, multi-agent, human approval, evaluasi), LangChain v1, LangGraph, Langfuse, eval, dan full stack.`,
+  description: `${llmBase.description} Plus roadmap AI Engineer 8 tahap bertema perbankan (kurs, triase keluhan, RAG SOP dengan sitasi, MCP, eval, red team) dan jalur praktik: Claude API, pola agent tanpa framework (tool calling, planning, memory, multi-agent, human approval, evaluasi), LangChain v1, LangGraph, Langfuse, eval, dan full stack.`,
   tracks: insertTracks(
-    [...llmTracks.slice(0, aiEngineerIndex), ...aiEngineerTracks, ...llmTracks.slice(aiEngineerIndex)],
-    agentPatternTracks, aiEngineerTracks[0].title, 'after'),
-  sources: [...(llmBase.sources ?? []), aiEngineerSource, agentPatternSource],
+    insertTracks(
+      [...llmTracks.slice(0, aiEngineerIndex), ...aiEngineerTracks, ...llmTracks.slice(aiEngineerIndex)],
+      agentPatternTracks, aiEngineerTracks[0].title, 'after'),
+    aiRoadmapTracks, 'Peta Belajar', 'after'),
+  sources: [...(llmBase.sources ?? []), aiEngineerSource, agentPatternSource, aiRoadmapSource],
   intro: [
-    { type: 'callout', tone: 'tip', title: 'Jalur praktik AI Engineer', text: 'Ingin langsung membangun agent? Ikuti modul mulai dari [Peta Stack & Jalur Belajar](#llm.aie-roadmap-stack): Python modern dan Claude API, lalu track Pola Agent AI ([Peta Pola Agent](#llm.agent-peta-pola): tool calling, planning, memory, multi-agent, human approval, evaluasi) tanpa framework, kemudian LangChain v1, LangGraph, Langfuse, full stack FastAPI + Next.js, dan proyek akhir.' },
+    { type: 'callout', tone: 'tip', title: 'Jalur praktik AI Engineer', text: 'Baru mulai? Ikuti [Roadmap 8 Tahap](#llm.ai8-peta-8-tahap): dari fondasi Python sampai red team, dengan proyek perbankan yang teruji. Ingin langsung membangun agent? Ikuti modul mulai dari [Peta Stack & Jalur Belajar](#llm.aie-roadmap-stack): Python modern dan Claude API, lalu track Pola Agent AI ([Peta Pola Agent](#llm.agent-peta-pola): tool calling, planning, memory, multi-agent, human approval, evaluasi) tanpa framework, kemudian LangChain v1, LangGraph, Langfuse, full stack FastAPI + Next.js, dan proyek akhir.' },
     ...(llmBase.intro ?? []),
   ],
   modules: [
+    ...aiRoadmapModules,
     ...aiEngineerModules,
     ...agentPatternModules,
     ...withTrack(ai.modules, 'Peta Belajar').map((m) => ({

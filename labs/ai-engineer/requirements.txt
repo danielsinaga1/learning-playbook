@@ -1,0 +1,14 @@
+# Versi yang dipakai saat lab ini diuji (15-16 November 2026, Python 3.12).
+# MCP SDK v2 butuh Python 3.11+.
+anthropic==2.8.0
+openai==3.51.0
+google-genai==3.3.0
+mcp==2.3.0
+ollama==0.6.3
+chromadb==1.5.9
+pydantic==2.14.3
+httpx==0.28.1
+numpy==2.5.4
+tiktoken==0.14.0
+pytest==9.2.0
+anyio==4.16.0

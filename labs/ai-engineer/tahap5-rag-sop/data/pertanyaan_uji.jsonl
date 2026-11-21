@@ -1,0 +1,15 @@
+{"pertanyaan": "Berapa biaya ganti kartu debit yang hilang?", "sumber": "pemblokiran-kartu#penggantian-kartu"}
+{"pertanyaan": "Nasabah lupa nama ibu kandung saat verifikasi, kartunya tetap diblokir?", "sumber": "pemblokiran-kartu#verifikasi-sebelum-memblokir"}
+{"pertanyaan": "Apakah kartu yang tertelan mesin ATM harus diblokir?", "sumber": "pemblokiran-kartu#kapan-kartu-wajib-diblokir"}
+{"pertanyaan": "Sampai kapan nasabah boleh komplain transaksi kartu kredit yang aneh?", "sumber": "sanggahan-kartu-kredit#batas-waktu-sanggahan"}
+{"pertanyaan": "Dokumen apa saja untuk mengajukan sanggahan tagihan?", "sumber": "sanggahan-kartu-kredit#dokumen-yang-diperlukan"}
+{"pertanyaan": "Apakah nasabah tetap kena bunga atas transaksi yang sedang disanggah?", "sumber": "sanggahan-kartu-kredit#selama-proses-investigasi"}
+{"pertanyaan": "Transfer BI-FAST statusnya pending dari tadi, kapan harus ditelusuri?", "sumber": "transfer-gagal#pengecekan-awal"}
+{"pertanyaan": "Transfer gagal tapi saldo sudah terpotong, kapan uangnya kembali?", "sumber": "transfer-gagal#status-gagal-tetapi-saldo-terdebit"}
+{"pertanyaan": "Transfer sukses tapi penerima bilang dananya belum masuk", "sumber": "transfer-gagal#status-berhasil-tetapi-penerima-belum-menerima"}
+{"pertanyaan": "Nasabah terlanjur memberikan kode OTP ke penelepon, apa yang dilakukan pertama kali?", "sumber": "penipuan-rekayasa-sosial#tindakan-dalam-15-menit-pertama"}
+{"pertanyaan": "Bisakah uang yang sudah dikirim penipu ke bank lain ditahan?", "sumber": "penipuan-rekayasa-sosial#upaya-penahanan-dana"}
+{"pertanyaan": "Apakah call center boleh menjanjikan uang korban penipuan kembali?", "sumber": "penipuan-rekayasa-sosial#laporan-polisi-dan-tindak-lanjut"}
+{"pertanyaan": "Salah PIN tiga kali di aplikasi, bagaimana membukanya?", "sumber": "buka-blokir-mobile-banking#blokir-karena-salah-pin-atau-password"}
+{"pertanyaan": "User ID internet banking tidak aktif karena lama tidak dipakai", "sumber": "buka-blokir-mobile-banking#user-id-dinonaktifkan"}
+{"pertanyaan": "Nasabah minta akunnya yang diblokir unit fraud dibuka sekarang juga", "sumber": "buka-blokir-mobile-banking#blokir-karena-dugaan-penipuan"}

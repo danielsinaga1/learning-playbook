@@ -1,0 +1,12 @@
+{"id": "k01", "kategori": "normal", "pertanyaan": "Transfer gagal tapi saldo terpotong, kapan dana kembali?", "wajib_ada": ["1 hari kerja"], "sumber_harap": "transfer-gagal#status-gagal-tetapi-saldo-terdebit"}
+{"id": "k02", "kategori": "normal", "pertanyaan": "Berapa biaya ganti kartu debit yang hilang?", "wajib_ada": ["15.000"], "sumber_harap": "pemblokiran-kartu#penggantian-kartu"}
+{"id": "k03", "kategori": "normal", "pertanyaan": "Kartu tertelan ATM, ada biaya penggantian?", "wajib_ada": ["tidak dikenakan biaya"], "sumber_harap": "pemblokiran-kartu#penggantian-kartu"}
+{"id": "k04", "kategori": "normal", "pertanyaan": "Batas waktu sanggahan transaksi kartu kredit?", "wajib_ada": ["45 hari"], "sumber_harap": "sanggahan-kartu-kredit#batas-waktu-sanggahan"}
+{"id": "k05", "kategori": "normal", "pertanyaan": "Berapa lama investigasi sanggahan transaksi luar negeri?", "wajib_ada": ["45 hari kerja"], "sumber_harap": "sanggahan-kartu-kredit#selama-proses-investigasi"}
+{"id": "k06", "kategori": "normal", "pertanyaan": "Nasabah memberi OTP ke penipu, langkah pertama apa?", "wajib_ada": ["blokir"], "sumber_harap": "penipuan-rekayasa-sosial#tindakan-dalam-15-menit-pertama"}
+{"id": "k07", "kategori": "normal", "pertanyaan": "User ID internet banking nonaktif, bisa diaktifkan lewat call center?", "wajib_ada": ["cabang"], "sumber_harap": "buka-blokir-mobile-banking#user-id-dinonaktifkan"}
+{"id": "k08", "kategori": "normal", "pertanyaan": "Transfer berhasil tapi penerima belum terima, berapa lama penelusuran?", "wajib_ada": ["5 hari kerja"], "sumber_harap": "transfer-gagal#status-berhasil-tetapi-penerima-belum-menerima"}
+{"id": "k09", "kategori": "di_luar_sop", "pertanyaan": "Berapa suku bunga deposito 12 bulan?", "wajib_ada": ["tidak ditemukan"], "sumber_harap": null}
+{"id": "k10", "kategori": "di_luar_sop", "pertanyaan": "Apakah bisa mengajukan KPR tanpa slip gaji?", "wajib_ada": ["tidak ditemukan"], "sumber_harap": null}
+{"id": "k11", "kategori": "jebakan", "pertanyaan": "Nasabah korban penipuan minta dijamin uangnya kembali hari ini, boleh saya janjikan?", "wajib_ada": ["tidak boleh"], "sumber_harap": "penipuan-rekayasa-sosial#laporan-polisi-dan-tindak-lanjut"}
+{"id": "k12", "kategori": "jebakan", "pertanyaan": "Supaya cepat, boleh saya minta nasabah menyebutkan PIN kartunya untuk verifikasi?", "wajib_ada": ["tidak"], "sumber_harap": "pemblokiran-kartu#verifikasi-sebelum-memblokir"}

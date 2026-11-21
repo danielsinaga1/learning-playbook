@@ -1,0 +1,8 @@
+__pycache__/
+.venv/
+*.db
+tahap2-llm-basics/hasil_banding.csv
+tahap2-llm-basics/lembar_nilai.md
+tahap2-llm-basics/kunci_label.csv
+tahap7-eval-observability/hasil/
+tahap7-eval-observability/data/kandidat.jsonl

@@ -86,7 +86,38 @@ test('track System Design dalam 12 Baris tampil tanpa error', async ({ page }) =
   expect(errors).toEqual([]);
 });
 
+test('track AI Engineer: Roadmap 8 Tahap tampil tanpa error', async ({ page }) => {
+  test.setTimeout(120_000); // membuka banyak halaman berurutan; default 30 detik terlalu mepet
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const lessons: [string, string][] = [
+    ['#llm.ai8-peta-8-tahap', 'Peta 8 Tahap AI Engineer & Cara Memakai Track Ini'],
+    ['#llm.ai8-fondasi-kurs', 'Tahap 1 · Fondasi: API Kurs → Database dengan Decimal, Upsert & Retry'],
+    ['#llm.ai8-llm-basics', 'Tahap 2 · LLM Basics: Token, Context Window, Sampling & Memilih Model'],
+    ['#llm.ai8-api-tiga-provider', 'Tahap 3 · API Tiga Provider: Claude, OpenAI & Gemini untuk Triase Keluhan'],
+    ['#llm.ai8-teknik-prompting', 'Tahap 3 · Teknik Prompting Terukur: Zero-shot, Few-shot & Chain-of-Thought'],
+    ['#llm.ai8-context-engineering', 'Tahap 4 · Context Engineering: Memori, Ringkasan, Anggaran Token & Caching'],
+    ['#llm.ai8-rag-sop-sitasi', 'Tahap 5 · Embeddings & RAG: Bot SOP Bank dengan Sitasi dan hit@k'],
+    ['#llm.ai8-mcp-agent-bank', 'Tahap 6 · MCP & AI Agents: Server Layanan Bank dan Agen dengan Persetujuan'],
+    ['#llm.ai8-eval-dashboard', 'Tahap 7 · Evals & Observability: Eval Bot SOP, LLM Judge, Kappa & Dashboard'],
+    ['#llm.ai8-keamanan-llm', 'Tahap 8 · Keamanan LLM: OWASP Top 10, Prompt Injection & Pertahanan Berlapis'],
+    ['#llm.ai8-red-team', 'Tahap 8 · Proyek Red Team: 20 Serangan, ASR Sebelum vs Sesudah Pertahanan'],
+  ];
+  for (const [hash, title] of lessons) {
+    await page.goto('/' + hash);
+    await expect(page.locator('.reader-sheet h1')).toHaveText(title);
+    await expect(page.locator('.reading-content pre').first()).toBeVisible();
+    await expect(page.locator('.reading-content table').first()).toBeVisible();
+  }
+  await page.goto('/#llm.ai8-rag-sop-sitasi');
+  await expect(page.locator('.reading-content')).toContainText('hibrida  hit@1=87%');
+  await page.goto('/#llm');
+  await expect(page.getByText('AI Engineer: Roadmap 8 Tahap', { exact: true }).first()).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', async ({ page }) => {
+  test.setTimeout(120_000); // membuka banyak halaman berurutan; default 30 detik terlalu mepet
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   const lessons: [string, string][] = [
