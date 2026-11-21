@@ -192,6 +192,36 @@ Kualitas kode lab:
 
 Materi ada di [`src/data/ai-engineer-roadmap.ts`](src/data/ai-engineer-roadmap.ts).
 
+### Review materi Java (19 November 2026)
+
+Masukan yang ditinjau: infografik ConcurrentHashMap, carousel Strategy Pattern, cheat sheet anotasi Spring, dan carousel "5 Java APIs".
+Lima modul baru disisipkan tepat setelah modul terkait:
+
+| Modul | Track | Isi |
+|---|---|---|
+| ConcurrentHashMap Mendalam | Java Inti | Cara kerja Java 8+, operasi atomik, iterator, demo race condition dengan angka nyata, 14 soal interview |
+| 5 API Backend yang Sering Disalahpakai | Java Modern | CompletableFuture, ExecutorService, Stream, Files, HttpClient: jebakan di contoh populer dan versi Java 21 |
+| Strategy Pattern di Produksi | Design Patterns | Review contoh diskon ber-`double`, BigDecimal, registry, enum strategy (bunga flat vs menurun), injeksi Spring |
+| Cheat Sheet Anotasi Spring Boot 4.1 | Spring Boot: Inti | Anotasi modern per kategori dan koreksi cheat sheet lama (dihapus, pindah paket, deprecated, salah tulis) |
+| Lab Anotasi Spring Boot 4.1 | Spring Boot: Inti | Aplikasi rekening: security per method, API versioning, event after-commit, HTTP interface + retry + cache, virtual thread |
+
+Kode ada di [`labs/java-backend`](labs/java-backend):
+- `jdk-api` punya 45 test di JDK 21.
+- `spring-anotasi` punya 50 test di Spring Boot 4.1.2.
+- 49 blok kode di modul identik dengan file lab.
+- Status "dihapus", "pindah paket", dan "deprecated" diperiksa langsung terhadap classpath oleh `AnotasiBoot4Test`.
+
+Perbaikan materi lama:
+- 62 literal string Java berkutip tunggal di 20 blok kode soal interview Spring diganti kutip ganda. Sebelumnya kode itu tidak bisa dikompilasi.
+- `@MockBean` di "Spring Dasar" dan soal SB-20 diganti `@MockitoBean`.
+- Contoh `supplyAsync` tanpa executor di "Java Intermediate" diperbaiki.
+- `ShippingStrategy` di "Behavioral Patterns" memakai `BigDecimal` untuk ongkos dan berat. Contohnya dikompilasi dan dijalankan, dan output di komentar adalah hasil run.
+- Contoh virtual thread tidak lagi mengirim 10.000 request ke `httpbin.org`. Sekarang memakai server lokal, `connectTimeout`, dan timeout per request, dan diuji di jshell.
+
+Materi ada di [`src/data/java-backend-review.ts`](src/data/java-backend-review.ts).
+
+Klaim bahwa `@Cacheable(sync = true)` mencegah stampede juga diperjelas, karena RedisCache bawaan tidak mengunci per key.
+
 ## Pelajaran tambahan per bahasa
 
 Topik yang belum tercakup dokumen sumber ditulis tangan dan digabung lewat `src/data/index.ts` (helper `insertTracks`):

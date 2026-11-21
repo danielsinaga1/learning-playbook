@@ -81,20 +81,27 @@ String sql = """
       paragraph('Virtual thread (final di Java 21) adalah thread ringan yang dikelola JVM. Saat kode menunggu I/O, virtual thread dilepas dari carrier thread OS sehingga satu aplikasi bisa menjalankan ratusan ribu tugas blocking. Kamu tetap menulis kode imperatif biasa tanpa `CompletableFuture` berantai atau WebFlux.'),
       code('Satu virtual thread per tugas', `import java.net.URI;
 import java.net.http.*;
+import java.time.Duration;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
-HttpClient http = HttpClient.newHttpClient();
+// Satu client untuk semua request. connectTimeout membatasi buka koneksi; .timeout() membatasi tunggu respons.
+HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
+
+// Uji ke server MILIK SENDIRI (endpoint yang menunggu 1 detik), jangan ke layanan publik:
+// ribuan request serentak ke layanan orang lain sama dengan uji beban tanpa izin.
+URI target = URI.create("http://localhost:8080/delay/1");
 
 try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
     var futures = IntStream.range(0, 10_000)
         .mapToObj(i -> executor.submit(() -> {
-            var req = HttpRequest.newBuilder(URI.create("https://httpbin.org/delay/1")).build();
+            var req = HttpRequest.newBuilder(target).timeout(Duration.ofSeconds(5)).build();
             return http.send(req, HttpResponse.BodyHandlers.ofString()).statusCode();
         }))
         .toList();
     for (Future<Integer> f : futures) f.get();
 }   // close() menunggu semua tugas selesai`, 'java'),
+      callout('info', 'Hasil uji contoh ini (20 November 2026)', 'Dijalankan di jshell (JDK 21) terhadap `HttpServer` bawaan JDK di laptop Windows yang menunggu 1 detik per request. 1.000 request selesai dalam sekitar 4,5–5 detik tanpa gagal; batasnya ada di server uji dan pembukaan ribuan koneksi, bukan di virtual thread. Pada satu run, sebagian request melewati 5 detik dan `f.get()` melempar `ExecutionException` berisi `HttpTimeoutException`: timeout bekerja, tidak ada request yang menunggu selamanya. Temuan lain: ke server `http://` yang tidak mendukung HTTP/2, client default mencoba upgrade lebih dulu. Dengan `.version(HttpClient.Version.HTTP_1_1)`, 200 request selesai dalam 1,6 detik, dibanding 5,3 detik tanpa itu.'),
       code('Spring Boot: aktifkan dengan satu properti', `# application.yaml
 spring:
   threads:

@@ -116,6 +116,30 @@ test('track AI Engineer: Roadmap 8 Tahap tampil tanpa error', async ({ page }) =
   expect(errors).toEqual([]);
 });
 
+test('review materi Java (ConcurrentHashMap, 5 API, Strategy, anotasi Spring Boot 4) tampil tanpa error', async ({ page }) => {
+  test.setTimeout(120_000);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const lessons: [string, string][] = [
+    ['#java.jc-concurrenthashmap', 'Java Inti: ConcurrentHashMap Mendalam — Cara Kerja, Operasi Atomik & 14 Soal Interview'],
+    ['#java.java-lima-api-backend', 'Java Modern: 5 API Backend yang Sering Disalahpakai — CompletableFuture, ExecutorService, Stream, Files & HttpClient'],
+    ['#java.strategy-pattern-produksi', 'Strategy Pattern di Produksi: Review Contoh Populer, BigDecimal, Registry & Spring'],
+    ['#java.spring-anotasi-boot4', 'Cheat Sheet Anotasi Spring Boot 4.1 (Terverifikasi) & Koreksi Cheat Sheet Lama'],
+    ['#java.spring-anotasi-lab', 'Lab Anotasi Spring Boot 4.1: Aplikasi Rekening yang Diuji dari Controller sampai Retry'],
+  ];
+  for (const [hash, title] of lessons) {
+    await page.goto('/' + hash);
+    await expect(page.locator('.reader-sheet h1')).toHaveText(title);
+    await expect(page.locator('.reading-content pre').first()).toBeVisible();
+    await expect(page.locator('.reading-content table').first()).toBeVisible();
+  }
+  await page.goto('/#java.spring-anotasi-boot4');
+  await expect(page.locator('.reading-content')).toContainText('@MockitoBean');
+  await page.goto('/#java.spring-dasar');
+  await expect(page.locator('.reading-content')).toContainText('dihapus di Boot 4');
+  expect(errors).toEqual([]);
+});
+
 test('jalur AI Engineer dan pelajaran tambahan per bahasa tampil tanpa error', async ({ page }) => {
   test.setTimeout(120_000); // membuka banyak halaman berurutan; default 30 detik terlalu mepet
   const errors: string[] = [];

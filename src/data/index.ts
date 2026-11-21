@@ -13,6 +13,7 @@ import { systemDesignDrillModules } from './system-design-drills';
 import { javaModernModules, javaModernSource, javaModernTracks } from './java-modern';
 import { dsaExtraModules, dsaExtraSource } from './dsa-extra';
 import { javaCoreModules, javaCoreSource, javaCoreTracks } from './java-core';
+import { javaReviewModules, javaReviewSource } from './java-backend-review';
 import { goModernModules, goModernSource } from './go-modern';
 import { goExtraModules, goExtraSource } from './go-extra';
 import { nodeCoreModules, nodeCoreSource, nodeCoreTracks } from './node-core';
@@ -112,6 +113,17 @@ function insertTracks(tracks: Track[] | undefined, add: Track[], anchor: string,
 /** Big-O membuka track Struktur Data; modul DSA lain (Heap, Trie, Union-Find, graf, binary search, bit) menyusul di track masing-masing. */
 const BIG_O = 'dsa-big-o-kompleksitas';
 
+/** Sisipkan modul tepat setelah modul jangkarnya (urutan di dalam track mengikuti urutan array). */
+function insertModulesAfter<T extends { id: string }>(list: T[], add: { after: string; module: T }[]): T[] {
+  const out = [...list];
+  for (const { after, module } of add) {
+    const i = out.findIndex((m) => m.id === after);
+    if (i < 0) throw new Error('Modul jangkar tidak ditemukan: ' + after);
+    out.splice(i + 1, 0, module);
+  }
+  return out;
+}
+
 /**
  * Java Inti (OOP sampai JVM & GC) menyusul Java Fundamentals; Java Modern disisipkan setelah Functional & Lambda.
  * Modul Spring tambahan (JPA mendalam, cache, messaging, native image, Testcontainers) masuk track Spring yang sudah ada.
@@ -122,15 +134,15 @@ const java = numbered({
     insertTracks(gen(javaGen).tracks, javaModernTracks, 'Java Functional & Lambda', 'after'),
     javaCoreTracks, 'Java Fundamentals', 'after',
   ),
-  sources: [...(gen(javaGen).sources ?? []), javaCoreSource, javaModernSource, dsaExtraSource],
-  modules: [
+  sources: [...(gen(javaGen).sources ?? []), javaCoreSource, javaModernSource, dsaExtraSource, javaReviewSource],
+  modules: insertModulesAfter([
     ...withTrack(algorithms.modules, 'Strategi Algoritma'),
     ...dsaExtraModules.filter((m) => m.id === BIG_O),
     ...gen(javaGen).modules,
     ...javaModernModules,
     ...javaCoreModules,
     ...dsaExtraModules.filter((m) => m.id !== BIG_O),
-  ],
+  ], javaReviewModules),
   intro: [...(algorithms.intro ?? []), ...(gen(javaGen).intro ?? [])],
 });
 
