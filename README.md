@@ -20,7 +20,7 @@ dan tiap dokumen sumber menjadi **track** (submodul) di dalam kurikulumnya.
 | **Mobile: Flutter & Cross-Platform** | Fondasi (+ Dart 3, async Dart) · Membangun Aplikasi (+ Pigeon, go_router, Firebase) · Menuju Produksi (+ aksesibilitas, lokalisasi, flavors & CI/CD) · Roadmap Senior Mobile (12 Bulan) | Flutter-Panduan-Lengkap, 02-Mobile-Fase1…4 |
 | **Swift & iOS** | Swift Dasar · Swift Concurrency · SwiftUI | swift.org, Apple Developer Documentation |
 | **Database & SQL** | Konsep Database · SQL: Pemula sampai Mahir · SQL Notes (Referensi Cepat) · NoSQL & Database Modern | SQL-Pemula-sampai-Mahir, Panduan_Belajar_Database_SQL_NoSQL, SQL Notes.pdf |
-| **Distributed System** | Roadmap 12 Bulan · System Design dalam 12 Baris · Arsitektur & Performa Sistem (+ 14 Microservices Design Patterns) · Distributed System dengan Spring Boot | 04-SysDesign-Fase1…4, Panduan-Arsitektur-dan-Performa-Sistem, E-Book Arsitektur & Performa Sistem Enterprise.pdf (bagian baru), Microservices Design Pattern.pdf, Panduan_Distributed_System_Spring_Boot |
+| **Distributed System** | Roadmap 12 Bulan · System Design dalam 12 Baris (+ Lab Flash Sale & latihan insiden) · Arsitektur & Performa Sistem (+ 14 Microservices Design Patterns) · Distributed System dengan Spring Boot | 04-SysDesign-Fase1…4, Panduan-Arsitektur-dan-Performa-Sistem, E-Book Arsitektur & Performa Sistem Enterprise.pdf (bagian baru), Microservices Design Pattern.pdf, Panduan_Distributed_System_Spring_Boot |
 | **Low Level Design** | Peta Roadmap · Low-Level & Systems Programming · Database Internals & Search · Concurrency & Distributed Lanjutan · Green & Sustainable Computing | 00-Roadmap-Teknis-Lanjutan-Overview, 05-LowLevel-Fase1…4, 06-DBInternals-Fase1…4, 00-Roadmap-ConcDist-Green-Overview, 07-ConcDist-Fase1…4, 08-GreenComputing-Fase1…4 |
 | **Cloud & DevOps** | AWS untuk Java Developer · Docker · Kubernetes · Platform Engineering & SRE | AWS Roadmap (HTML), Docker-Kubernetes + Modul DevOps V2.pdf (bagian baru), Panduan_Backend_Platform_Engineering |
 | **Software Testing & QA** | Fondasi (+ FSD vs TSD) · Praktik · Automation · API Testing & TDD · Lanjutan & Snippet | Software_Testing_Lengkap, API Testing.pdf, End to End API Testing.pdf, TDD.pdf, FSD dan TSD.pdf |
@@ -151,8 +151,22 @@ Bagaimana kodenya diuji:
 - **Konfigurasi nginx**: divalidasi dengan `nginx -t`.
 - **Presigned upload S3**: diuji secara offline dengan boto3.
 
-Snippet Spring Boot + Resilience4j tidak dikompilasi di sini. Nama properti dan urutan aspeknya sudah dicek ke dokumentasi resmi.
 Materi ada di [`src/data/system-design-patterns.ts`](src/data/system-design-patterns.ts).
+
+### Lab Flash Sale & latihan diagnosis (13 November 2026)
+
+Tiga modul praktik menutup track ini:
+
+| Modul | Isi | File |
+|---|---|---|
+| Lab Flash Sale: 12 Baris dalam Satu Sistem | Proyek Docker Compose (nginx, 2× Spring Boot 4.1, PostgreSQL primary + replica, Redis, RabbitMQ, Prometheus, Jaeger) yang memasang 10 dari 12 baris, enam percobaan dengan output nyata, dan 11 jebakan yang ditemukan saat membangunnya | `system-design-lab.ts`, folder [`labs/flash-sale`](labs/flash-sale) |
+| Uji Beban, Chaos & Diagnosis | k6 (browse, lonjakan checkout, bot), diagnosis run yang gagal dengan log/metrik/trace, biaya sampling trace, chaos payment gateway | `system-design-lab.ts` |
+| Latihan Diagnosis: 15 Insiden | 12 insiden satu baris + 3 insiden gabungan; gejala dan bukti dulu, jawaban dibuka setelahnya | `system-design-drills.ts` |
+
+Semua kode lab dijalankan di Docker Desktop. Kode di modul identik dengan file di `labs/flash-sale`.
+Saat lab dijalankan, ditemukan dua snippet modul lama yang salah, dan keduanya sudah diperbaiki:
+- `upstream order_service` di nginx: Tomcat menolak Host yang mengandung underscore dengan 400.
+- `fallbackMethod` di `@CircuitBreaker`: retry tidak pernah berjalan.
 
 ## Pelajaran tambahan per bahasa
 

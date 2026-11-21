@@ -1,0 +1,110 @@
+name: flash-sale
+
+services:
+  nginx:                                   # Baris 3 (load balancer) + Baris 9 (rate limiting)
+    image: nginx:1.29-alpine
+    ports: ["8080:80"]
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      app1: { condition: service_healthy }
+      app2: { condition: service_healthy }
+
+  app1: &app
+    build: .
+    init: true                             # tini sebagai PID 1: teruskan SIGTERM, bersihkan proses zombie
+    ports: ["8081:8080"]                   # akses langsung: tombol chaos & actuator
+    environment: &app-env
+      DB_PRIMARY_HOST: postgres-primary
+      DB_REPLICA_HOST: postgres-replica
+      REDIS_HOST: redis
+      RABBITMQ_HOST: rabbitmq
+      PAYMENT_BASE_URL: http://app1:8080   # payment gateway tiruan hidup di app1
+      OTLP_TRACES_ENDPOINT: http://jaeger:4318/v1/traces
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: ${TRACE_SAMPLING:-1.0}   # TRACE_SAMPLING=0.1 untuk uji beban
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+    depends_on:
+      postgres-replica: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+
+  app2:
+    <<: *app
+    ports: []
+    environment: *app-env
+
+  postgres-primary:                        # Baris 6 (index) hidup di sini
+    image: postgres:17
+    environment:
+      POSTGRES_DB: flashsale
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      REPLICATOR_PASSWORD: replicator
+    command: postgres -c wal_level=replica -c max_wal_senders=5 -c max_replication_slots=5
+    volumes:
+      - ./postgres/primary-init.sh:/docker-entrypoint-initdb.d/01-replication.sh:ro
+      - ./postgres/schema.sql:/docker-entrypoint-initdb.d/02-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U app -d flashsale"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  postgres-replica:                        # Baris 4: streaming replication, hanya baca
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: app
+      REPLICATOR_PASSWORD: replicator
+      PRIMARY_HOST: postgres-primary
+    entrypoint: ["/replica-entrypoint.sh"]
+    volumes:
+      - ./postgres/replica-entrypoint.sh:/replica-entrypoint.sh:ro
+    depends_on:
+      postgres-primary: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U app -d flashsale"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  redis:                                   # Baris 1: cache bersama antar-instance
+    image: redis:8-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:                                # Baris 2: queue tahan crash + DLQ
+    image: rabbitmq:4-management-alpine
+    ports: ["15672:15672"]                 # UI: guest / guest
+    healthcheck:
+      # Lewat HTTP, bukan rabbitmq-diagnostics: CLI itu berjalan sebagai root dan, bila server belum
+      # sempat membuat .erlang.cookie, ia membuatnya sebagai root → server gagal start (eacces).
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://guest:guest@localhost:15672/api/health/checks/local-alarms"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  prometheus:                              # Baris 12: metrik
+    image: prom/prometheus:v3.9.1
+    ports: ["9090:9090"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  jaeger:                                  # Baris 12: trace (OTLP masuk di 4318)
+    image: jaegertracing/jaeger:2.23.0
+    ports: ["16686:16686"]
+
+  k6:                                      # uji beban: docker compose run --rm k6
+    image: grafana/k6:2.4.0
+    profiles: ["load"]
+    volumes:
+      - ./load:/scripts:ro
+    environment:
+      BASE_URL: http://nginx
+    command: run /scripts/k6.js

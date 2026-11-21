@@ -66,6 +66,8 @@ test('track System Design dalam 12 Baris tampil tanpa error', async ({ page }) =
     ['#distributed.sdp-traffic', 'Traffic Besar: Load Balancer, Rate Limiting, Object Storage & CDN'],
     ['#distributed.sdp-gagal-anggun', 'Gagal dengan Anggun: Retry + Backoff, Circuit Breaker & Idempotency Key'],
     ['#distributed.sdp-observability', 'Melihat yang Rusak: Logs, Metrics & Tracing'],
+    ['#distributed.sdp-lab-flash-sale', 'Lab Flash Sale: 12 Baris dalam Satu Sistem'],
+    ['#distributed.sdp-lab-uji-beban', 'Lab Flash Sale: Uji Beban, Chaos & Diagnosis dengan Metrik'],
   ];
   for (const [hash, title] of lessons) {
     await page.goto('/' + hash);
@@ -73,6 +75,12 @@ test('track System Design dalam 12 Baris tampil tanpa error', async ({ page }) =
     await expect(page.locator('.reading-content pre').first()).toBeVisible();
     await expect(page.locator('.reading-content table').first()).toBeVisible();
   }
+  await page.goto('/#distributed.sdp-latihan-insiden');
+  await expect(page.locator('.reader-sheet h1')).toHaveText('Latihan Diagnosis: 15 Insiden dari Gejala ke Baris yang Tepat');
+  await page.locator('.qa-q').first().click();
+  await expect(page.locator('.qa-prompt pre').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Lihat jawaban' }).first().click();
+  await expect(page.locator('.qa-a').first()).toContainText('Baris 6');
   await page.goto('/#distributed');
   await expect(page.getByText('System Design dalam 12 Baris', { exact: true }).first()).toBeVisible();
   expect(errors).toEqual([]);

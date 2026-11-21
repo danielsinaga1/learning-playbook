@@ -1,0 +1,96 @@
+spring:
+  application:
+    name: flash-sale
+  cache:
+    type: redis                                 # Baris 1: TTL & serializer di CacheConfig
+    cache-names: products                       # dibuat saat startup → metriknya terdaftar
+    redis:
+      enable-statistics: true                   # metrik cache_gets_total{result="hit|miss"}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    template:
+      observation-enabled: true                 # Baris 12: trace ikut menyeberang lewat pesan
+    listener:
+      simple:
+        observation-enabled: true
+        default-requeue-rejected: false         # setelah retry habis → DLQ (lihat MessagingConfig)
+        retry:
+          enabled: true
+          max-retries: 2                        # Boot 4: max-retries (bukan max-attempts) → total 3 percobaan
+          initial-interval: 500ms
+          multiplier: 2
+
+app:
+  datasource:
+    primary:
+      jdbc-url: jdbc:postgresql://${DB_PRIMARY_HOST:localhost}:5432/flashsale
+      username: app
+      password: app
+      maximum-pool-size: 10
+    replica:
+      jdbc-url: jdbc:postgresql://${DB_REPLICA_HOST:localhost}:5432/flashsale
+      username: app
+      password: app
+      maximum-pool-size: 10
+      read-only: true
+  payment:
+    base-url: ${PAYMENT_BASE_URL:http://localhost:8080}
+
+resilience4j:
+  retry:
+    instances:
+      payment:
+        max-attempts: 3
+        wait-duration: 200ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        enable-randomized-wait: true            # jitter
+        randomized-wait-factor: 0.5
+        retry-exceptions:                       # hanya error sementara; CallNotPermittedException tidak di-retry
+          - org.springframework.web.client.HttpServerErrorException
+          - org.springframework.web.client.ResourceAccessException
+  circuitbreaker:
+    instances:
+      payment:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 2
+        register-health-indicator: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,circuitbreakers,retries
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true                           # /actuator/health/readiness untuk healthcheck compose
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true          # Baris 12: histogram → p99 dihitung di Prometheus
+  tracing:
+    sampling:
+      probability: 1.0                          # lab: simpan semua trace; produksi biasanya 0.05–0.1
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${OTLP_TRACES_ENDPOINT:http://localhost:4318/v1/traces}
+  otlp:
+    metrics:
+      export:
+        enabled: false                          # metrik lewat Prometheus, bukan OTLP
+
+logging:
+  structured:
+    format:
+      console: ecs                              # Baris 12: log JSON, trace.id ikut tercatat

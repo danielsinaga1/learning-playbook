@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: flash-sale                 # metrik HTTP, cache, circuit breaker, JVM
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["app1:8080", "app2:8080"]
+
+  - job_name: rabbitmq                   # panjang antrean per queue (Baris 2)
+    metrics_path: /metrics/per-object
+    static_configs:
+      - targets: ["rabbitmq:15692"]

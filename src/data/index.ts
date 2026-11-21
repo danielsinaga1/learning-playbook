@@ -7,6 +7,8 @@ import { nextjsModules, nextjsSource, nextjsTracks } from './nextjs';
 import { aiEngineerModules, aiEngineerSource, aiEngineerTracks } from './ai-engineer';
 import { agentPatternModules, agentPatternSource, agentPatternTracks } from './ai-agent-patterns';
 import { systemDesignPatternModules, systemDesignPatternSource, systemDesignPatternTracks } from './system-design-patterns';
+import { systemDesignLabModules, systemDesignLabSource } from './system-design-lab';
+import { systemDesignDrillModules } from './system-design-drills';
 import { javaModernModules, javaModernSource, javaModernTracks } from './java-modern';
 import { dsaExtraModules, dsaExtraSource } from './dsa-extra';
 import { javaCoreModules, javaCoreSource, javaCoreTracks } from './java-core';
@@ -362,14 +364,14 @@ const roadmap = numbered({
 const distributedBase = gen(distributedGen);
 const distributed = numbered({
   ...distributedBase,
-  description: `${distributedBase.description} Dibuka dengan System Design dalam 12 Baris: index, cache, read replica, queue, sharding, load balancer, rate limiting, CDN, retry, circuit breaker, idempotency key, dan observability, lengkap dengan kode teruji.`,
+  description: `${distributedBase.description} Dibuka dengan System Design dalam 12 Baris: index, cache, read replica, queue, sharding, load balancer, rate limiting, CDN, retry, circuit breaker, idempotency key, dan observability, lengkap dengan kode teruji, Lab Flash Sale di Docker Compose (uji beban & chaos), dan latihan diagnosis 15 insiden.`,
   tracks: insertTracks(distributedBase.tracks, systemDesignPatternTracks, 'Roadmap 12 Bulan', 'after'),
-  sources: [...(distributedBase.sources ?? []), systemDesignPatternSource],
+  sources: [...(distributedBase.sources ?? []), systemDesignPatternSource, systemDesignLabSource],
   intro: [
     { type: 'callout', tone: 'tip', title: 'Mulai dari 12 baris', text: 'Butuh peta cepat? Buka [System Design dalam 12 Baris](#distributed.sdp-peta-12-baris): dua belas gejala skala dan keandalan, solusi standarnya, dan harga setiap solusi, lalu pendalaman per jalur (baca, tulis, traffic, kegagalan, observability).' },
     ...(distributedBase.intro ?? []),
   ],
-  modules: [...distributedBase.modules, ...systemDesignPatternModules],
+  modules: [...distributedBase.modules, ...systemDesignPatternModules, ...systemDesignLabModules, ...systemDesignDrillModules],
 });
 
 /** Daftar kurikulum sesuai urutan tampil. */

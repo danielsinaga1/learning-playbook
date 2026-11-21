@@ -495,7 +495,7 @@ http {
     limit_req_zone $binary_remote_addr zone=api_per_ip:10m rate=10r/s;
     limit_req_status 429;
 
-    upstream order_service {
+    upstream order-service {                            # tanpa underscore: Host "order_service" ditolak Tomcat (400)
         least_conn;                                     # kirim ke instance dengan koneksi aktif paling sedikit
         server 10.0.1.11:8080 max_fails=3 fail_timeout=10s;   # 3 gagal → istirahat 10 detik (health check pasif)
         server 10.0.1.12:8080 max_fails=3 fail_timeout=10s;
@@ -508,7 +508,8 @@ http {
 
         location /api/ {
             limit_req zone=api_per_ip burst=20 nodelay;
-            proxy_pass http://order_service;
+            proxy_pass http://order-service;
+            proxy_set_header Host $host;                     # teruskan Host asli, bukan nama upstream
             proxy_http_version 1.1;
             proxy_set_header Connection "";
             proxy_set_header X-Request-Id $request_id;       # korelasi log antar-layanan
@@ -566,6 +567,7 @@ Semua komponen ──▶ logs · metrics · traces`, 'text'),
         { title: 'Read replica & queue', text: 'Pisahkan beban baca dari primary; ubah tulis yang tidak harus sinkron menjadi asinkron.' },
         { title: 'Partisi, lalu sharding', text: 'Paling akhir, karena paling mahal dan paling sulit dibatalkan.' },
       ] },
+      callout('tip', 'Praktik setelah teori', 'Setelah enam modul teori, jalankan [Lab Flash Sale](#distributed.sdp-lab-flash-sale) yang memasang sepuluh baris dalam satu sistem, ujilah dengan [beban & chaos](#distributed.sdp-lab-uji-beban), lalu latih diagnosis di [15 insiden](#distributed.sdp-latihan-insiden).'),
       callout('warn', 'Jangan mulai dari sharding', 'Sharding mengubah cara menulis query, transaksi, migrasi, dan backup untuk selamanya. Satu server PostgreSQL yang dirawat baik dengan index tepat, cache, dan read replica sanggup melayani beban yang jauh lebih besar daripada kebanyakan produk.'),
       heading('Memakai 12 baris ini di interview'),
       { type: 'list', items: [
@@ -618,7 +620,7 @@ Semua komponen ──▶ logs · metrics · traces`, 'text'),
       ]),
       code('CacheAside.java', CACHE_ASIDE, 'java'),
       { type: 'list', items: [
-        '**Cache stampede**: saat key populer kedaluwarsa, ribuan request menghantam DB bersamaan. Obatnya satu loader per key (seperti di atas) atau `@Cacheable(sync = true)` di Spring.',
+        '**Cache stampede**: saat key populer kedaluwarsa, ribuan request menghantam DB bersamaan. Obatnya satu loader per key (seperti di atas). Di Spring, `@Cacheable(sync = true)` hanya mengunci per key bila provider-nya mendukung: ConcurrentMap dan Caffeine ya, RedisCache dengan writer bawaan tidak (terukur di [Lab Flash Sale](#distributed.sdp-lab-flash-sale): 50 miss serentak tetap memicu 3–6 query).',
         '**Kedaluwarsa serentak**: beri jitter pada TTL agar key yang diisi bersamaan tidak kedaluwarsa bersamaan.',
         '**Invalidasi**: setelah tulis ke DB sukses, **hapus** key cache, jangan menulis nilai baru (dua penulis bisa saling menimpa dengan nilai basi).',
         '**Key yang tidak ada**: cache juga hasil kosong (`Optional.empty()`) dengan TTL pendek, agar request untuk ID palsu tidak selalu tembus ke DB.',
@@ -631,7 +633,7 @@ Semua komponen ──▶ logs · metrics · traces`, 'text'),
       code('ReplicaRouter.java', REPLICA_ROUTER, 'java'),
       { type: 'list', items: [
         '**Read-your-writes**: setelah user menulis, arahkan bacaannya ke primary selama jendela yang lebih panjang dari lag p99. Dengan banyak instance aplikasi, simpan penanda waktu tulis di sesi/cookie, bukan di memori satu instance.',
-        '**Di Spring**: tandai service baca dengan `@Transactional(readOnly = true)`, lalu arahkan koneksi lewat `AbstractRoutingDataSource` yang membungkus `LazyConnectionDataSourceProxy`.',
+        '**Di Spring**: tandai service baca dengan `@Transactional(readOnly = true)`, lalu bungkus primary dengan `LazyConnectionDataSourceProxy` dan daftarkan replica lewat `setReadOnlyDataSource(...)` (Spring Framework 6.1.2+). Di versi lama, `LazyConnectionDataSourceProxy` membungkus `AbstractRoutingDataSource`. Penerapan lengkapnya ada di [Lab Flash Sale](#distributed.sdp-lab-flash-sale).',
         '**Pantau lag** dan keluarkan replica dari rotasi bila lag melewati ambang.',
       ] },
       paragraph(`Pendalaman konsep: ${sd('caching', 'Caching')} dan ${sd('performance-tuning', 'Performance Tuning')}.`),
@@ -644,7 +646,7 @@ Semua komponen ──▶ logs · metrics · traces`, 'text'),
       ...quiz([
         ['SDP-04', 'Index (status, customer_id) sudah ada, tetapi query WHERE customer_id = ? masih Seq Scan. Mengapa?', 'Index B-tree dibaca dari kolom paling kiri (leftmost prefix). Karena kolom pertamanya `status`, index itu tidak bisa dipakai untuk mencari berdasarkan `customer_id` saja. Buat index yang diawali `customer_id`, atau ubah urutan kolom bila query lain mengizinkan.'],
         ['SDP-05', 'Setelah update produk, mengapa key cache dihapus alih-alih langsung diisi nilai baru?', 'Dua request tulis yang hampir bersamaan bisa menulis ke cache dengan urutan terbalik dari urutan commit di DB, sehingga cache menyimpan nilai lama tanpa batas waktu. Menghapus key memaksa pembacaan berikutnya mengambil nilai terbaru dari DB.'],
-        ['SDP-06', 'Apa itu cache stampede dan dua cara mencegahnya?', 'Saat key populer kedaluwarsa, banyak request miss bersamaan dan semuanya menghantam DB. Cegah dengan single flight (hanya satu loader per key, yang lain menunggu hasilnya, mis. `@Cacheable(sync = true)`) dan jitter pada TTL agar key tidak kedaluwarsa serentak. Untuk key sangat panas, perbarui cache di latar belakang sebelum kedaluwarsa.'],
+        ['SDP-06', 'Apa itu cache stampede dan dua cara mencegahnya?', 'Saat key populer kedaluwarsa, banyak request miss bersamaan dan semuanya menghantam DB. Cegah dengan single flight (hanya satu loader per key, yang lain menunggu hasilnya; `@Cacheable(sync = true)` menjaminnya di Caffeine/ConcurrentMap, tetapi tidak di RedisCache bawaan) dan jitter pada TTL agar key tidak kedaluwarsa serentak. Untuk key sangat panas, perbarui cache di latar belakang sebelum kedaluwarsa.'],
         ['SDP-07', 'User menyimpan alamat baru, lalu halaman profil masih menampilkan alamat lama. Apa penyebab yang mungkin dan perbaikannya?', 'Bacaan diarahkan ke read replica yang tertinggal dari primary (replication lag). Terapkan read-your-writes: setelah user menulis, arahkan bacaannya ke primary selama jendela lebih panjang dari lag p99, atau baca dari primary khusus untuk data milik user itu sendiri.'],
       ]),
       references(
@@ -736,6 +738,7 @@ hash % N          : 80.1% key pindah`, 'text'),
       code('nginx.conf', NGINX, 'text'),
       { type: 'list', items: [
         '**Aplikasi wajib stateless**: sesi di Redis atau token, file di object storage. Instance mana pun harus bisa melayani request mana pun.',
+        '**Header Host ke backend**: tanpa `proxy_set_header Host $host`, nginx mengirim nama upstream sebagai Host. Nama dengan underscore (`order_service`) ditolak Tomcat/Spring Boot dengan 400 Bad Request, jadi pakai tanda hubung dan teruskan Host asli.',
         '**Health check**: bedakan *liveness* (proses hidup) dan *readiness* (siap menerima traffic, mis. DB terhubung). Spring Boot: `/actuator/health/liveness` dan `/actuator/health/readiness`.',
         '**Graceful shutdown**: saat deploy, berhenti menerima request baru dan selesaikan yang sedang berjalan (`server.shutdown=graceful`, default sejak Spring Boot 3.4).',
         '**Retry di load balancer** hanya untuk request idempoten; nginx secara default tidak mengulang POST ke upstream lain.',
@@ -831,6 +834,7 @@ Download: Browser ──▶ CDN edge terdekat ──(miss)──▶ Object stora
         ['Gagal cepat dengan pesan jelas', '503 + pesan "coba beberapa saat lagi", bukan menggantung 30 detik'],
       ]),
       paragraph('Di Spring Boot, pakai Resilience4j alih-alih menulis sendiri. Urutan default aspek Resilience4j adalah Retry membungkus CircuitBreaker, sehingga saat sirkuit terbuka, panggilan ditolak cepat tanpa menghabiskan jatah retry (asal `CallNotPermittedException` tidak termasuk exception yang di-retry).'),
+      callout('warn', 'Pasang fallbackMethod di anotasi terluar', 'Bila `fallbackMethod` diletakkan di `@CircuitBreaker` (aspek dalam), fallback menangkap exception lebih dulu dan mengembalikan nilai normal, sehingga `@Retry` di luarnya mengira panggilan sukses dan **tidak pernah mengulang**. Letakkan fallback di `@Retry`: fallback baru berjalan setelah semua percobaan habis atau saat sirkuit terbuka. Perilaku ini terbukti di [Lab Flash Sale](#distributed.sdp-lab-uji-beban).'),
       code('application.yml (Resilience4j)', `resilience4j:
   circuitbreaker:
     instances:
@@ -850,9 +854,9 @@ Download: Browser ──▶ CDN edge terdekat ──(miss)──▶ Object stora
         wait-duration: 200ms
         enable-exponential-backoff: true
         exponential-backoff-multiplier: 2
-        retry-exceptions:
-          - java.io.IOException
-          - org.springframework.web.client.ResourceAccessException`, 'yaml'),
+        retry-exceptions:                           # whitelist error sementara
+          - org.springframework.web.client.HttpServerErrorException   # 5xx dari dependency
+          - org.springframework.web.client.ResourceAccessException    # timeout, koneksi gagal`, 'yaml'),
       code('PaymentClient.java (Spring Boot + Resilience4j)', `@Service
 public class PaymentClient {
     private final RestClient restClient;
@@ -861,8 +865,8 @@ public class PaymentClient {
         this.restClient = builder.baseUrl("https://payment.internal").build();
     }
 
-    @Retry(name = "payment")
-    @CircuitBreaker(name = "payment", fallbackMethod = "markPending")
+    @Retry(name = "payment", fallbackMethod = "markPending")    // fallback di aspek TERLUAR
+    @CircuitBreaker(name = "payment")
     public PaymentResult charge(ChargeRequest request, String idempotencyKey) {
         return restClient.post().uri("/charges")
                 .header("Idempotency-Key", idempotencyKey)   // retry aman: gateway menolak tagihan ganda

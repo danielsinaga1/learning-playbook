@@ -1,0 +1,6 @@
+# Skrip dan konfigurasi ini di-mount ke container Linux: wajib LF, bukan CRLF.
+*.sh   text eol=lf
+*.conf text eol=lf
+*.sql  text eol=lf
+*.yml  text eol=lf
+*.js   text eol=lf
