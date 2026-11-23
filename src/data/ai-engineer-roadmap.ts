@@ -1724,6 +1724,7 @@ from pathlib import Path
 from typing import Literal
 
 from mcp.server import MCPServer
+from mcp.server.mcpserver.exceptions import ResourceError, ToolError
 from mcp.types import ToolAnnotations
 from pydantic import BaseModel, Field
 
@@ -1767,10 +1768,10 @@ def cek_status_transfer(nomor_referensi: str) -> StatusTransfer:
     """Cek status transfer berdasarkan nomor referensi (huruf besar/angka, mis. FT2611150042)."""
     ref = nomor_referensi.strip().upper()
     if not POLA_REFERENSI.fullmatch(ref):
-        raise ValueError("format nomor referensi tidak valid")         # validasi input dari model
+        raise ToolError("format nomor referensi tidak valid")          # pesan ini sampai ke model
     data = TRANSFER.get(ref)
     if data is None:
-        raise ValueError(f"transfer {ref} tidak ditemukan")
+        raise ToolError(f"transfer {ref} tidak ditemukan")
     audit("cek_status_transfer", ref=ref)
     langkah = {"gagal": "Dana kembali otomatis maks. 1 hari kerja; jika lewat, tiket investigasi prioritas tinggi.",
                "berhasil": "Terbitkan surat keterangan transfer berhasil; tiket antarbank target 5 hari kerja.",
@@ -1800,9 +1801,9 @@ def blokir_kartu(empat_digit_terakhir: str,
 
 def _kartu(empat_digit: str) -> dict:
     if not re.fullmatch(r"\\d{4}", empat_digit):
-        raise ValueError("isi tepat 4 digit terakhir; jangan pernah kirim nomor kartu lengkap")
+        raise ToolError("isi tepat 4 digit terakhir; jangan pernah kirim nomor kartu lengkap")
     if empat_digit not in KARTU:
-        raise ValueError("kartu tidak ditemukan untuk nasabah ini")
+        raise ToolError("kartu tidak ditemukan untuk nasabah ini")
     return KARTU[empat_digit]
 
 
@@ -1810,10 +1811,10 @@ def _kartu(empat_digit: str) -> dict:
 def baca_sop(nama: str) -> str:
     """Isi lengkap satu dokumen SOP, mis. sop://transfer-gagal."""
     if not re.fullmatch(r"[a-z0-9-]+", nama):                       # cegah path traversal (../../etc)
-        raise ValueError("nama SOP tidak valid")
+        raise ResourceError("nama SOP tidak valid")
     path = FOLDER_SOP / f"{nama}.md"
     if not path.is_file():
-        raise ValueError(f"SOP {nama} tidak ada")
+        raise ResourceError(f"SOP {nama} tidak ada")
     return path.read_text(encoding="utf-8")
 
 
@@ -1835,6 +1836,7 @@ if __name__ == "__main__":
       heading('Keamanan tool: model adalah pengguna yang tidak tepercaya'),
       table(['Kontrol', 'Implementasi', 'Mengapa'], [
         ['Validasi input', 'Regex nomor referensi, tepat 4 digit kartu, enum alasan', 'Argumen tool ditulis model dan bisa dipengaruhi prompt injection'],
+        ['Pesan error yang disengaja', 'Tolak dengan `ToolError` (tool) atau `ResourceError` (resource), bukan `ValueError`', 'Di SDK mcp 2.x, exception lain dianggap crash: model hanya menerima `Error executing tool <nama>` dan tidak tahu apa yang harus diperbaiki, sementara detail internal tetap di log server'],
         ['Data tersamarkan', 'Rekening tujuan `BCA ****8812`', 'Hasil tool masuk context model dan bisa ikut keluar di jawaban'],
         ['Anotasi tool', '`read_only_hint`, `destructive_hint`, `idempotent_hint`', 'Klien (Claude Code, agen kita) bisa meminta persetujuan untuk tool destruktif'],
         ['Idempoten', 'Blokir kartu yang sudah diblokir mengembalikan status yang sama', 'Retry dan pemanggilan ganda tidak menimbulkan efek ganda'],
@@ -1887,13 +1889,18 @@ def test_cek_transfer_terstruktur_dan_tersamarkan():
     assert data["rekening_tujuan"] == "BCA ****8812"
 
 
-@pytest.mark.parametrize("argumen", [{"nomor_referensi": "x'; DROP TABLE--"}, {"nomor_referensi": "FT0000000000"}])
-def test_input_buruk_menjadi_error_tool_bukan_crash(argumen):
+@pytest.mark.parametrize(("argumen", "pesan"), [
+    ({"nomor_referensi": "x'; DROP TABLE--"}, "format nomor referensi tidak valid"),
+    ({"nomor_referensi": "FT0000000000"}, "transfer FT0000000000 tidak ditemukan"),
+])
+def test_input_buruk_menjadi_error_tool_bukan_crash(argumen, pesan):
     async def uji():
         async with Client(sb.mcp) as c:
             return await c.call_tool("cek_status_transfer", argumen)
 
-    assert jalankan(uji).is_error is True                              # model melihat pesan error dan bisa memperbaiki
+    hasil = jalankan(uji)
+    assert hasil.is_error is True
+    assert pesan in hasil.content[0].text           # pesan sampai ke model, jadi model bisa memperbaiki argumennya
 
 
 def test_blokir_kartu_idempoten_dan_menolak_nomor_lengkap():
@@ -1908,6 +1915,7 @@ def test_blokir_kartu_idempoten_dan_menolak_nomor_lengkap():
     a, b, lengkap, alasan_aneh = jalankan(uji)
     assert a.structured_content["status"] == b.structured_content["status"] == "diblokir"
     assert lengkap.is_error and alasan_aneh.is_error
+    assert "jangan pernah kirim nomor kartu lengkap" in lengkap.content[0].text
     assert sb.KARTU["9034"]["status"] == "aktif"
 
 
@@ -1921,12 +1929,18 @@ def test_resource_sop_dan_path_traversal():
                 bocor = True
             except Exception:
                 bocor = False
-            return templat, isi, bocor
+            try:
+                await c.read_resource("sop://tidak-ada")
+                pesan = ""
+            except Exception as e:
+                pesan = str(e)
+            return templat, isi, bocor, pesan
 
-    templat, isi, bocor = jalankan(uji)
+    templat, isi, bocor, pesan = jalankan(uji)
     assert templat == ["sop://{nama}"]
     assert "BI-FAST" in isi.contents[0].text
     assert bocor is False
+    assert "SOP tidak-ada tidak ada" in pesan                          # ResourceError: pesannya sampai ke klien
 
 
 def test_prompt_menyisipkan_keluhan():
@@ -1936,7 +1950,7 @@ def test_prompt_menyisipkan_keluhan():
 
     hasil = jalankan(uji)
     assert "kartu saya hilang" in hasil.messages[0].content.text`, 'python'),
-      paragraph('`Client(sb.mcp)` menjalankan protokol MCP sungguhan di memori: daftar tool, skema input dan output, pemanggilan, resource template, dan prompt diuji tanpa proses terpisah. Input buruk menjadi hasil `is_error`, bukan crash; model melihat pesan error dan bisa memperbaiki argumennya.'),
+      paragraph('`Client(sb.mcp)` menjalankan protokol MCP sungguhan di memori: daftar tool, skema input dan output, pemanggilan, resource template, dan prompt diuji tanpa proses terpisah. Input buruk menjadi hasil `is_error`, bukan crash. Test memeriksa isi pesannya, bukan hanya flag `is_error`: kalau server melempar `ValueError`, flag tetap `True` tetapi model hanya menerima `Error executing tool cek_status_transfer`. Dengan `ToolError`, model menerima `format nomor referensi tidak valid` dan bisa memperbaiki argumennya.'),
       heading('Memasang di Claude Code'),
       code('Daftarkan server (stdio atau HTTP)', `# stdio: Claude Code menjalankan proses server sendiri
 claude mcp add bank-nusantara -- python /path/ke/labs/ai-engineer/tahap6-mcp-agent/server_bank.py
@@ -2092,7 +2106,9 @@ def test_error_tool_dikembalikan_ke_model():
     client, log = skenario(pakai_tool("cek_status_transfer", {"nomor_referensi": "salah format!"}),
                            pesan([{"type": "text", "text": "Mohon nomor referensi yang benar."}], "end_turn"))
     anyio.run(ag.jalankan_agen, client, "cek", lambda n, a: True)
-    assert log[1]["messages"][2]["content"][0]["is_error"] is True
+    hasil = log[1]["messages"][2]["content"][0]
+    assert hasil["is_error"] is True
+    assert "format nomor referensi tidak valid" in hasil["content"]     # model tahu apa yang harus diperbaiki
 
 
 def test_batas_langkah_mencegah_loop_tanpa_akhir():
@@ -2134,6 +2150,7 @@ def tanya_lewat_konektor(client: anthropic.Anthropic, pertanyaan: str, url: str,
         ['AI8-19', 'Mengapa identitas nasabah tidak boleh menjadi argumen tool seperti `nomor_rekening`?', 'Argumen tool ditulis model dan bisa dimanipulasi lewat prompt injection, sehingga agen bisa diarahkan membaca data nasabah lain. Identitas harus berasal dari sesi terautentikasi (token OAuth), dan server membatasi akses ke data milik identitas itu saja.'],
         ['AI8-20', 'Server MCP stdio tiba-tiba tidak bisa dipakai setelah developer menambahkan `print("debug")`. Mengapa?', 'Pada transport stdio, stdout adalah saluran pesan JSON-RPC. Teks lain di stdout merusak protokol. Log harus ke stderr atau file.'],
         ['AI8-21', 'Kapan memakai MCP connector di Claude API dan kapan loop agen sendiri?', 'Connector cocok untuk tool baca di server HTTPS yang bisa dijangkau Anthropic, tanpa perlu menulis loop. Loop sendiri diperlukan bila ada tool destruktif yang butuh persetujuan, server hanya di jaringan internal, atau kamu perlu kontrol penuh atas validasi, audit, dan batas langkah.'],
+        ['AI8-31', 'Agen terus mengulang `cek_status_transfer` dengan argumen salah yang sama sampai batas langkah, padahal server menolaknya dengan pesan yang jelas. Log server penuh traceback. Apa yang perlu dicek?', 'Jenis exception di server. Di SDK mcp 2.x, hanya `ToolError` (dan `ResourceError`) yang pesannya diteruskan ke model; `ValueError` dan exception lain dianggap crash, sehingga model hanya menerima `Error executing tool cek_status_transfer` tanpa alasan dan tidak tahu apa yang harus diperbaiki. Traceback di log adalah tanda yang sama: kegagalan yang disengaja dicatat di level INFO tanpa traceback. Ganti dengan `ToolError`, lalu uji isi pesannya, bukan hanya `is_error`.'],
       ]),
       references(
         ['Model Context Protocol: Specification', 'https://modelcontextprotocol.io/specification'],

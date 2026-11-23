@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Literal
 
 from mcp.server import MCPServer
+from mcp.server.mcpserver.exceptions import ResourceError, ToolError
 from mcp.types import ToolAnnotations
 from pydantic import BaseModel, Field
 
@@ -58,10 +59,10 @@ def cek_status_transfer(nomor_referensi: str) -> StatusTransfer:
     """Cek status transfer berdasarkan nomor referensi (huruf besar/angka, mis. FT2611150042)."""
     ref = nomor_referensi.strip().upper()
     if not POLA_REFERENSI.fullmatch(ref):
-        raise ValueError("format nomor referensi tidak valid")         # validasi input dari model
+        raise ToolError("format nomor referensi tidak valid")          # pesan ini sampai ke model
     data = TRANSFER.get(ref)
     if data is None:
-        raise ValueError(f"transfer {ref} tidak ditemukan")
+        raise ToolError(f"transfer {ref} tidak ditemukan")
     audit("cek_status_transfer", ref=ref)
     langkah = {"gagal": "Dana kembali otomatis maks. 1 hari kerja; jika lewat, tiket investigasi prioritas tinggi.",
                "berhasil": "Terbitkan surat keterangan transfer berhasil; tiket antarbank target 5 hari kerja.",
@@ -91,9 +92,9 @@ def blokir_kartu(empat_digit_terakhir: str,
 
 def _kartu(empat_digit: str) -> dict:
     if not re.fullmatch(r"\d{4}", empat_digit):
-        raise ValueError("isi tepat 4 digit terakhir; jangan pernah kirim nomor kartu lengkap")
+        raise ToolError("isi tepat 4 digit terakhir; jangan pernah kirim nomor kartu lengkap")
     if empat_digit not in KARTU:
-        raise ValueError("kartu tidak ditemukan untuk nasabah ini")
+        raise ToolError("kartu tidak ditemukan untuk nasabah ini")
     return KARTU[empat_digit]
 
 
@@ -101,10 +102,10 @@ def _kartu(empat_digit: str) -> dict:
 def baca_sop(nama: str) -> str:
     """Isi lengkap satu dokumen SOP, mis. sop://transfer-gagal."""
     if not re.fullmatch(r"[a-z0-9-]+", nama):                       # cegah path traversal (../../etc)
-        raise ValueError("nama SOP tidak valid")
+        raise ResourceError("nama SOP tidak valid")
     path = FOLDER_SOP / f"{nama}.md"
     if not path.is_file():
-        raise ValueError(f"SOP {nama} tidak ada")
+        raise ResourceError(f"SOP {nama} tidak ada")
     return path.read_text(encoding="utf-8")
 
 

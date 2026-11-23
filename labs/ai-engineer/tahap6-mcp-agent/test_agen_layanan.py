@@ -69,7 +69,9 @@ def test_error_tool_dikembalikan_ke_model():
     client, log = skenario(pakai_tool("cek_status_transfer", {"nomor_referensi": "salah format!"}),
                            pesan([{"type": "text", "text": "Mohon nomor referensi yang benar."}], "end_turn"))
     anyio.run(ag.jalankan_agen, client, "cek", lambda n, a: True)
-    assert log[1]["messages"][2]["content"][0]["is_error"] is True
+    hasil = log[1]["messages"][2]["content"][0]
+    assert hasil["is_error"] is True
+    assert "format nomor referensi tidak valid" in hasil["content"]     # model tahu apa yang harus diperbaiki
 
 
 def test_batas_langkah_mencegah_loop_tanpa_akhir():

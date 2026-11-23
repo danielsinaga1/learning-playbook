@@ -43,13 +43,18 @@ def test_cek_transfer_terstruktur_dan_tersamarkan():
     assert data["rekening_tujuan"] == "BCA ****8812"
 
 
-@pytest.mark.parametrize("argumen", [{"nomor_referensi": "x'; DROP TABLE--"}, {"nomor_referensi": "FT0000000000"}])
-def test_input_buruk_menjadi_error_tool_bukan_crash(argumen):
+@pytest.mark.parametrize(("argumen", "pesan"), [
+    ({"nomor_referensi": "x'; DROP TABLE--"}, "format nomor referensi tidak valid"),
+    ({"nomor_referensi": "FT0000000000"}, "transfer FT0000000000 tidak ditemukan"),
+])
+def test_input_buruk_menjadi_error_tool_bukan_crash(argumen, pesan):
     async def uji():
         async with Client(sb.mcp) as c:
             return await c.call_tool("cek_status_transfer", argumen)
 
-    assert jalankan(uji).is_error is True                              # model melihat pesan error dan bisa memperbaiki
+    hasil = jalankan(uji)
+    assert hasil.is_error is True
+    assert pesan in hasil.content[0].text           # pesan sampai ke model, jadi model bisa memperbaiki argumennya
 
 
 def test_blokir_kartu_idempoten_dan_menolak_nomor_lengkap():
@@ -64,6 +69,7 @@ def test_blokir_kartu_idempoten_dan_menolak_nomor_lengkap():
     a, b, lengkap, alasan_aneh = jalankan(uji)
     assert a.structured_content["status"] == b.structured_content["status"] == "diblokir"
     assert lengkap.is_error and alasan_aneh.is_error
+    assert "jangan pernah kirim nomor kartu lengkap" in lengkap.content[0].text
     assert sb.KARTU["9034"]["status"] == "aktif"
 
 
@@ -77,12 +83,18 @@ def test_resource_sop_dan_path_traversal():
                 bocor = True
             except Exception:
                 bocor = False
-            return templat, isi, bocor
+            try:
+                await c.read_resource("sop://tidak-ada")
+                pesan = ""
+            except Exception as e:
+                pesan = str(e)
+            return templat, isi, bocor, pesan
 
-    templat, isi, bocor = jalankan(uji)
+    templat, isi, bocor, pesan = jalankan(uji)
     assert templat == ["sop://{nama}"]
     assert "BI-FAST" in isi.contents[0].text
     assert bocor is False
+    assert "SOP tidak-ada tidak ada" in pesan                          # ResourceError: pesannya sampai ke klien
 
 
 def test_prompt_menyisipkan_keluhan():
